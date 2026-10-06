@@ -28,5 +28,8 @@ vm.createContext(context);vm.runInContext(fs.readFileSync('web/camera.js','utf8'
   assert.equal(context.frameDelay(100,5),150);
   assert.equal(context.frameDelay(0,10),0);
   assert.equal(context.frameCanvas({videoWidth:1920,videoHeight:1080,frames:[clear]}).width,1280);
+  vm.runInContext('recognitionRegion=[25,25,50,50]',context);
+  const cropped=context.frameCanvas({videoWidth:1920,videoHeight:1080,frames:[clear]});
+  assert.equal(cropped.width,960);assert.equal(cropped.height,540);
   console.log('PASS: burst, cancellation, bounded frame size and target-rate timing without extra processing delay.');
 })().catch(error=>{console.error(error);process.exitCode=1;});

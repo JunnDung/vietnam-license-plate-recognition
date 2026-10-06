@@ -1,13 +1,15 @@
 import csv
+import hashlib
 import io
 import json
 import logging
 import os
 import secrets
+import shutil
 import sqlite3
 import time
 import uuid
-from contextlib import asynccontextmanager, contextmanager
+from contextlib import asynccontextmanager, contextmanager, nullcontext
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Annotated, Literal
@@ -18,6 +20,7 @@ from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
 from recognition import MAX_BYTES, ROOT, PlateEngine, decode_image, format_plate, is_vietnamese_plate, jpeg_bytes, normalize_plate
+from temporal import StreamConsensus
 
 DATA = Path(os.getenv('PLATE_DATA_DIR', str(ROOT / 'runtime'))).resolve()
 API_KEY = os.getenv('PLATE_API_KEY', '')
@@ -38,6 +41,7 @@ def connect():
 
 @asynccontextmanager
 async def lifespan(application):
+    application.state.streams = StreamConsensus()
     DATA.mkdir(parents=True, exist_ok=True)
     (DATA / 'images').mkdir(exist_ok=True)
     with connect() as db:
@@ -48,6 +52,8 @@ async def lifespan(application):
             image_id TEXT NOT NULL, crop_id TEXT NOT NULL)''')
         db.execute('CREATE INDEX IF NOT EXISTS plate_index ON records(plate)')
         db.execute('CREATE INDEX IF NOT EXISTS time_index ON records(created_at)')
+        if 'review_details' not in {row[1] for row in db.execute('PRAGMA table_info(records)')}:
+            db.execute("ALTER TABLE records ADD COLUMN review_details TEXT NOT NULL DEFAULT '{}'")
         db.execute('''CREATE TABLE IF NOT EXISTS parking_sessions (
             id TEXT PRIMARY KEY, plate TEXT NOT NULL, entered_at TEXT NOT NULL, exited_at TEXT,
             entry_record_id TEXT NOT NULL REFERENCES records(id),
@@ -70,7 +76,7 @@ def authorized(request: Request):
         raise HTTPException(401, 'API key không hợp lệ.')
 
 
-app = FastAPI(title='Biển Số Việt · Recognition API', version='1.2.0', lifespan=lifespan)
+app = FastAPI(title='Biển Số Việt · Recognition API', version='1.3.0', lifespan=lifespan)
 
 
 @app.middleware('http')
@@ -94,6 +100,7 @@ def health():
     return {'status': 'ready' if getattr(app.state, 'engine', None) else 'model_unavailable',
             'detector': 'YOLO11n · fine-tuned Vietnamese plates', 'ocr': 'CCT S v2 · pretrained',
             'device': getattr(getattr(app.state, 'engine', None), 'device', None), 'auth_required': bool(API_KEY),
+            'version': app.version, 'storage_free_mb': round(shutil.disk_usage(DATA).free / 1024**2),
             'detector_weights_sha256': getattr(getattr(app.state, 'engine', None), 'detector_weights_sha256', None),
             'model_error': getattr(app.state, 'model_error', None)}
 
@@ -101,17 +108,22 @@ def health():
 @app.get('/api/model', dependencies=[Depends(authorized)])
 def model_report():
     reports = {}
-    for name in ('training', 'robustness', 'ocr_evaluation', 'hardening', 'ocr_weather'):
+    for name in ('training', 'robustness', 'ocr_evaluation', 'hardening', 'ocr_weather', 'real_video'):
         path = ROOT / 'reports' / (name + '.json')
         if path.exists():
             reports[name] = json.loads(path.read_text(encoding='utf-8'))
+            if name == 'real_video':
+                for clip in reports[name]['clips']:
+                    clip.pop('frames',None)
     return reports
 
 
 @app.post('/api/recognize', dependencies=[Depends(authorized)])
 def recognize(file: Annotated[UploadFile, File()], source: Annotated[str, Form(max_length=80)] = 'upload',
               confidence: Annotated[float, Form(ge=.1, le=.95)] = .35,
-              save: Annotated[bool, Form()] = True):
+              save: Annotated[bool, Form()] = True,
+              stream_id: Annotated[uuid.UUID | None, Form()] = None,
+              sample_time: Annotated[float | None, Form(ge=0, le=86400, allow_inf_nan=False)] = None):
     if not getattr(app.state, 'engine', None):
         raise HTTPException(503, 'Mô hình chưa sẵn sàng. Xem hướng dẫn tải model và /api/health.')
     raw = file.file.read(MAX_BYTES + 1)
@@ -119,36 +131,76 @@ def recognize(file: Annotated[UploadFile, File()], source: Annotated[str, Form(m
         image = decode_image(raw)
     except ValueError as error:
         raise HTTPException(400, str(error)) from error
+    if (stream_id is None) != (sample_time is None):
+        raise HTTPException(422, 'Gửi stream_id và sample_time cùng nhau cho camera/video.')
+    streams = app.state.streams
+    with streams.lock if stream_id else nullcontext():
+        session = None
+        if stream_id:
+            try:
+                session = streams.session(str(stream_id))
+            except ValueError as error:
+                raise HTTPException(429, str(error)) from error
+            signature = (hashlib.sha256(raw).hexdigest(), source, confidence)
+            if sample_time <= session['time']:
+                if sample_time == session['time'] and signature == session['signature']:
+                    return session['reply']
+                raise HTTPException(409, 'Mốc khung phải tăng trong một phiên. Quét lại cần stream_id mới.')
+            previous = streams.snapshot(session)
+        try:
+            reply = recognize_image(image, source, confidence, save, session, sample_time)
+            if session is not None:
+                session.update(reply=reply, signature=signature)
+            return reply
+        except Exception:
+            if session is not None:
+                streams.sessions[str(stream_id)] = previous
+            raise
+
+
+def recognize_image(image, source, confidence, save, session=None, sample_time=None):
     start = time.perf_counter()
     detections = app.state.engine.predict(image, confidence=confidence)
+    if session is not None:
+        app.state.streams.update(session, detections, sample_time, image.shape[1], image.shape[0])
+    selected, selected_plates = [], set()
+    for item in detections:
+        if save and (session is None or item['temporal']['new_event'] and item['plate'] not in selected_plates):
+            selected.append(item)
+            selected_plates.add(item['plate'])
     request_id = uuid.uuid4().hex
     now = datetime.now(timezone.utc).isoformat()
     files_written, records = [], []
     try:
-        if save and detections:
+        if selected:
             path = DATA / 'images' / (request_id + '.jpg')
             path.write_bytes(jpeg_bytes(image))
             files_written.append(path)
         with connect() as db:
             for detection in detections:
+                should_save = any(item is detection for item in selected)
                 crop = detection.pop('crop')
                 record_id = uuid.uuid4().hex
                 detection.update({'id': record_id, 'created_at': now, 'source': source,
-                                  'image_url': f'/api/images/{request_id}' if save else None,
-                                  'crop_url': f'/api/images/{record_id}' if save else None})
-                if save:
+                                  'image_url': f'/api/images/{request_id}' if should_save else None,
+                                  'crop_url': f'/api/images/{record_id}' if should_save else None, 'saved': should_save})
+                if should_save:
                     path = DATA / 'images' / (record_id + '.jpg')
                     path.write_bytes(jpeg_bytes(crop))
                     files_written.append(path)
-                    db.execute('INSERT INTO records VALUES (?,?,?,?,?,?,?,?,?,?,?)',
+                    details = {key: detection.get(key) for key in ('quality','ocr_disagreement','valid_format','temporal')}
+                    db.execute('INSERT INTO records (id,created_at,source,plate,display_plate,detector_confidence,ocr_confidence,needs_review,bbox,image_id,crop_id,review_details) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)',
                                (record_id, now, source, detection['plate'], detection['display_plate'],
                                 detection['detector_confidence'], detection['ocr_confidence'],
-                                int(detection['needs_review']), json.dumps(detection['bbox']), request_id, record_id))
+                                int(detection['needs_review']), json.dumps(detection['bbox']), request_id, record_id, json.dumps(details)))
                 records.append(detection)
     except Exception:
         for path in files_written:
             path.unlink(missing_ok=True)
         raise
+    if session is not None:
+        for item in selected:
+            app.state.streams.mark_saved(session, item, sample_time)
     return {'request_id': request_id, 'created_at': now, 'width': image.shape[1], 'height': image.shape[0],
             'latency_ms': round((time.perf_counter()-start)*1000, 1), 'detections': records,
             'message': 'Không phát hiện biển số ở ngưỡng hiện tại.' if not records else None}
@@ -187,6 +239,7 @@ def history(plate: str = '', since: str = '', until: str = '',
         item = dict(row)
         item['bbox'] = json.loads(item['bbox'])
         item['needs_review'] = bool(item['needs_review'])
+        item['review_details'] = json.loads(item['review_details'])
         item['image_url'] = '/api/images/' + item.pop('image_id')
         item['crop_url'] = '/api/images/' + item.pop('crop_id')
         items.append(item)

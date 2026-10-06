@@ -1,5 +1,7 @@
 # Nhận diện video và tăng tần suất camera — 2026-10-06
 
+Snapshot v1.2.0. Phiên bản 1.3.0 đã bổ sung voting, gộp track, ROI và kiểm chứng video thật; xem RELEASE_VALIDATION.md để biết hành vi hiện tại.
+
 Ghi chú phạm vi giao diện: phần bãi giữ xe và xác nhận vào/ra đã tạm bỏ ở bản cập nhật tiếp theo cùng ngày; nhận diện ảnh/video/camera và tra cứu vẫn hoạt động. Dữ liệu/API bãi xe cũ được giữ, các mô tả luồng xác nhận bên dưới là phạm vi của phiên bản khi đo video.
 
 ## Cách sử dụng

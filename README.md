@@ -33,8 +33,8 @@ uvicorn app:app --host 127.0.0.1 --port 8000
 ## Sử dụng
 
 - **Nhận diện:** chọn/kéo thả ảnh JPG, PNG hoặc WebP; điều chỉnh ngưỡng phát hiện; xem vùng biển số, ký tự và độ tin cậy.
-- **Camera trình duyệt:** cho phép camera tại localhost/HTTPS. Yêu cầu hình xem trực tiếp 30 FPS; nhận diện mặc định 5 lượt/giây, chọn 1/2/5/10 và xem tốc độ thực đạt. Lấy khung rõ hơn trong 3 khung cách khoảng 33 ms, xử lý tuần tự rồi lấy khung mới, không dồn yêu cầu. Dừng khi đổi tab hoặc rời trang. Nếu bật lưu, mỗi khung có biển tạo bản ghi mới; bỏ chọn lưu khi quan sát để tránh ghi nhiều ảnh lặp.
-- **Video:** chọn MP4/WebM/OGV mà trình duyệt giải mã được, tối đa 500 MB và 10 phút. Chọn 1/2/5/10 khung mỗi giây video, bấm **Phân tích video**, tạm dừng/tiếp tục hoặc quét lại. Kết quả có mốc giây, nút xem lại khung và CSV; chỉ hiển thị 100 kết quả gần nhất, CSV chứa tất cả kết quả. Mặc định không lưu lịch sử; tích lưu để tra cứu khung về sau. Video được giải mã tại trình duyệt, chỉ các JPEG gửi đến API ảnh hiện có; không tải toàn bộ video lên server. Các khung mẫu đều được xử lý theo thứ tự, nên video có thể quét chậm hơn thời gian thực. Nhiều kết quả cùng biển không tương đương nhiều xe. AVI hoặc video dài dùng CLI.
+- **Camera trình duyệt:** cho phép camera tại localhost/HTTPS. Yêu cầu hình xem trực tiếp 30 FPS; nhận diện mặc định 5 lượt/giây, chọn 1/2/5/10 và xem tốc độ thực đạt. Lấy khung rõ hơn trong 3 khung cách khoảng 33 ms, xử lý tuần tự rồi lấy khung mới, không dồn yêu cầu. Dừng khi đổi tab hoặc rời trang. Nếu bật lưu, chỉ khung rõ với biển ổn định qua ít nhất 3 lần đọc mới được lưu một lần cho cùng track. Cùng biển quay lại trong 30 giây được chống lặp; khởi động phiên mới hoặc API mới sẽ đặt lại bộ nhớ chống lặp.
+- **Video:** chọn MP4/WebM/OGV mà trình duyệt giải mã được, tối đa 500 MB và 10 phút. Chọn 1/2/5/10 khung mỗi giây video, bấm **Phân tích video**, tạm dừng/tiếp tục hoặc quét lại. Bảng và CSV gộp các khung ổn định theo track và biển số, có mốc bắt đầu/kết thúc, số khung ổn định và nút xem ảnh tại mốc đầu. Kết quả chưa ổn định vẫn hiện trên ảnh. Bảng giữ 100 lượt gần nhất, CSV giữ tất cả lượt ổn định. Mặc định không lưu lịch sử; tích lưu để tra cứu khung về sau. Video được giải mã tại trình duyệt, chỉ các JPEG gửi đến API ảnh hiện có; không tải toàn bộ video lên server. Các khung mẫu đều được xử lý theo thứ tự, nên video có thể quét chậm hơn thời gian thực. Nhiều kết quả cùng biển không tương đương nhiều xe. AVI hoặc video dài dùng CLI.
 - **Tra cứu:** tìm một phần hoặc toàn bộ biển số, lọc thời điểm, xem ảnh nguồn, xuất CSV, xóa lượt nhận diện. Thời gian giao diện theo Việt Nam (UTC+7); API/CSV dùng UTC.
 - **Kết quả mô hình:** hiển thị các phép đo từ `reports/`. mAP là kết quả phát hiện vùng biển số, không phải tỷ lệ đọc đúng ký tự.
 
@@ -152,7 +152,7 @@ Run đã tồn tại sẽ bị từ chối để giữ checkpoint; dùng tên m�
 - `reports/hardening.json`: so sánh baseline/candidate, tiêu chí chọn bằng validation và kết quả test sau khi đã chốt model.
 - `reports/robustness_extended.json`: bảy điều kiện detector mô phỏng với before/after trên cùng ảnh.
 - `reports/VALIDATION.md`: kết quả cuối cùng và phạm vi các kiểm tra chạy thực tế.
-- [Báo cáo kỹ thuật DOCX](reports/Bao_cao_nhan_dien_bien_so_va_bai_giu_xe.docx): 25 trang của phiên bản nền tại commit `7f584eb`; kết quả cập nhật sau đó xem `VALIDATION.md` và các JSON hiện tại.
+- [Báo cáo kỹ thuật DOCX](reports/Bao_cao_do_an_nhan_dien_bien_so.docx): báo cáo đồ án cập nhật phiên bản 1.3.0, bao gồm lý thuyết, huấn luyện, kiểm chứng video thật, vận hành và giới hạn.
 
 Dataset không có camera/vehicle IDs, nhãn thời tiết hoặc nhãn ngày/đêm. Chia nhóm và loại trùng pixel giảm rò rỉ, nhưng **không chứng minh không còn cùng biển số ở các split**. Kiểm tra mô phỏng và mẫu OCR nhỏ không chứng minh chất lượng cho mọi camera ban đêm, trời mưa, biển bị lóa, che khuất hoặc rất nhỏ. Trước khi dùng camera thực tế, cần một tập test theo camera/phiên quay với ngày/đêm/mưa được gán nhãn riêng. Crop OCR dùng phép ghép hai dòng đơn giản; biển nghiêng mạnh có thể cần model keypoint để nắn phối cảnh.
 
@@ -172,10 +172,30 @@ Contract checks dùng inference giả để kiểm tra upload, xác thực, lưu
 
 Mặc định server chỉ lắng nghe `127.0.0.1`. Biến môi trường: `PLATE_DEVICE=cpu` hoặc `0`, `PLATE_DATA_DIR` để đổi thư mục lưu, `PLATE_API_KEY` để bảo vệ API. File `.env.example` là ví dụ; ứng dụng không tự đọc `.env`.
 
-Nếu mở trong LAN/Internet, đặt API key, reverse proxy HTTPS và giới hạn request; HTTPS cần cho camera trong browser ở máy khác. Giao diện cho nhập key và chỉ giữ trong sessionStorage, gửi bằng `X-API-Key`; không đưa key vào URL ảnh. Chưa có tài khoản nhiều người hoặc phân quyền từng bản ghi. Khóa inference toàn cục phù hợp một máy thực hành; chưa phải dịch vụ nhiều camera có hàng đợi và tracking.
+Nếu mở trong LAN/Internet, đặt API key, reverse proxy HTTPS và giới hạn request; HTTPS cần cho camera trong browser ở máy khác. Giao diện cho nhập key và chỉ giữ trong sessionStorage, gửi bằng `X-API-Key`; không đưa key vào URL ảnh. Chưa có tài khoản nhiều người hoặc phân quyền từng bản ghi. Chạy **một worker**: bộ gán track, voting và chống lặp ở RAM theo phiên, tối đa 128 phiên, phiên nhàn rỗi hết hạn sau 10 phút. Khóa inference toàn cục phù hợp một máy và lưu lượng nhỏ; chưa đo tải nhiều camera.
 
-Thư mục `runtime/` chứa ảnh/lịch sử; sao lưu cả SQLite lẫn thư mục ảnh khi server dừng. Có thể xóa từng lượt từ giao diện. Dữ liệu camera, dữ liệu train, môi trường, log, token và OCR download không đưa lên Git. Repo lưu code, model detector đã train và các báo cáo. Không có API key được hardcode.
+Thư mục `runtime/` chứa ảnh/lịch sử. `scripts/maintenance.py backup` tạo snapshot SQLite cùng ảnh có tham chiếu, kiểm tra hash trước khi hoàn thành; dọn lịch sử mặc định dry-run và giữ các ảnh đã dùng làm bằng chứng cũ. Có thể xóa từng lượt từ giao diện. Dữ liệu camera, dữ liệu train, môi trường, log, token và OCR download không đưa lên Git. Repo lưu code, model detector đã train và các báo cáo. Không có API key được hardcode.
 
 ## Nguồn và giấy phép
 
 Code dự án theo AGPL-3.0, cùng chế độ mã nguồn mở của [Ultralytics](https://github.com/ultralytics/ultralytics). OCR lấy từ dự án MIT của [ankandrew/fast-plate-ocr](https://github.com/ankandrew/fast-plate-ocr). Dataset Hugging Face hiện không có README hoặc thông tin giấy phép rõ ràng; dữ liệu nguồn không được phân phối trong repo, cần xác nhận quyền dùng trước khi dùng thương mại. Repo này không thay đổi quyền hoặc giấy phép của dữ liệu/model bên thứ ba.
+
+## Vận hành phiên bản 1.3.0
+
+- **Vùng nhận diện:** mở mục Vùng nhận diện camera và video, nhập x/y/rộng/cao theo % từ góc trên trái. Áp dụng sẽ dừng camera và bắt đầu video lại. Ảnh bằng chứng là vùng đã cắt, không phải toàn cảnh. CLI có `--roi "0,15,50,80"`. Vùng cắt chỉ hữu ích nếu chứa đúng làn; không bảo đảm tăng độ chính xác.
+- **Kiểm chứng theo thời gian:** dự đoán vận tốc hộp và ghép IoU, tối đa 7 quan sát; ít nhất 3 lần đọc rõ cùng chuỗi và chiếm ≥60% quan sát. Khung mờ/thiếu sáng/biển nhỏ hoặc OCR bất đồng vẫn cần kiểm tra. Voting không khôi phục chữ đã mất, không chứng minh biển thật hoặc danh tính xe.
+- **API camera/video:** gửi `stream_id` UUID mới khi bắt đầu/quét lại, `sample_time` tăng dần theo giây. Gửi lại đúng khung/mốc trả cùng kết quả, không lưu trùng. Mốc cũ hoặc nội dung khác ở cùng mốc trả 409. `save=false` vẫn voting nhưng không lưu. API ảnh cũ không có hai trường này vẫn giữ hành vi lưu từng ảnh.
+- **Lý do cần kiểm tra:** bản ghi mới lưu chất lượng/định dạng/bất đồng OCR; bản ghi cũ vẫn được giữ và có thể chưa có lý do chi tiết.
+
+```powershell
+.\.venv\Scripts\python.exe scripts\maintenance.py backup --output .local/backups/history.zip
+.\.venv\Scripts\python.exe scripts\maintenance.py verify .local/backups/history.zip
+.\.venv\Scripts\python.exe scripts\maintenance.py prune --days 30
+# Chỉ thực thi xóa sau khi đã sao lưu và xem kết quả dry-run:
+.\.venv\Scripts\python.exe scripts\maintenance.py prune --days 30 --apply
+.\.venv\Scripts\python.exe scripts\evaluate_video.py --device auto
+```
+
+[Hướng dẫn vận hành và khôi phục](reports/OPERATIONS.md), [kiểm chứng phiên bản hiện tại](reports/RELEASE_VALIDATION.md). Video nguồn chỉ dùng đánh giá cục bộ, không đưa lên repo; URL revision/hash và nhãn mục tiêu trong `reports/video_ground_truth.json`, kết quả từng khung trong `reports/real_video.json`. Các clip này là bộ hồi quy phát triển, không phải tập nghiệm thu độc lập.
+
+Để dựng lại DOCX, cài dependency authoring trong môi trường riêng với `python -m pip install -r requirements-report.txt`, rồi chạy `python scripts/build_report.py`. Mở Word và cập nhật mục lục/fields bằng Ctrl+A, F9 trước khi xuất bản. File bàn giao đã được cập nhật mục lục và kiểm tra bố cục đủ 24 trang.

@@ -2,6 +2,7 @@
 const $ = id => document.getElementById(id);
 let selectedFile, stream, cameraTimer, cameraGeneration = 0, busy = false, historyOffset = 0, imageUrls = [];
 let noticeTimer;
+let cameraSession = null, cameraStarted = 0;
 const key = () => sessionStorage.getItem('plate-api-key') || '';
 $('api-key').value = key();
 function notice(message, error = false) {
@@ -25,6 +26,7 @@ async function imageUrl(url) { const blob = await (await api(url)).blob(); const
 function busyState(value) {
   busy = value; $('recognize-btn').disabled = value || !selectedFile || !!stream || videoRunning;
   $('camera-start').disabled = value || !!stream || videoRunning; $('video-start').disabled = value || videoRunning || !videoURL || !!stream;
+  $('roi-apply').disabled = value;
   $('latency').textContent = value ? 'ĐANG XỬ LÝ…' : 'SẴN SÀNG';
 }
 function draw(image, detections = []) {
@@ -61,23 +63,28 @@ function renderResults(data) {
     const qualityLabels={low_light:'Vùng biển thiếu sáng',low_detail:'Vùng biển ít chi tiết hoặc mờ',small_plate:'Biển quá nhỏ trong ảnh'};
     if(item.quality?.issues?.length) info.append(element('p','hint',item.quality.issues.map(issue=>qualityLabels[issue] || issue).join(' · ')+'. Lấy ảnh rõ hơn và đối chiếu ký tự.'));
     if(item.ocr_disagreement) info.append(element('p','hint','Các biến thể ảnh trả ký tự khác nhau. Đối chiếu biển số dù điểm OCR cao.'));
-    row.append(info,element('span',`badge${item.needs_review ? ' review' : ''}`,item.needs_review ? 'Cần kiểm tra' : 'Đã đọc'));
+    const status = item.temporal?.status;
+    if(item.temporal) info.append(element('p','hint',`${item.temporal.votes}/${item.temporal.observations} khung cùng kết quả · ${item.saved ? 'Đã lưu lần xuất hiện này' : 'Chưa lưu thêm ảnh'}`));
+    const label = status === 'stable' ? 'Ổn định qua nhiều khung' : status === 'pending' ? 'Đang kiểm chứng' : item.needs_review || status === 'review' ? 'Cần kiểm tra' : 'Đã đọc';
+    row.append(info,element('span',`badge${item.needs_review || status && status !== 'stable' ? ' review' : ''}`,label));
     $('results').append(row);
   }
   if (!data.detections.length) $('results').append(element('p','hint','Không phát hiện biển số. Thử ảnh rõ hơn hoặc giảm ngưỡng phát hiện.'));
   $('latency').textContent = `${data.latency_ms.toFixed(0)} MS · ${data.detections.length} BIỂN SỐ`;
 }
-async function processFile(file, source, image, active = ()=>true, save = $('save-history').checked) {
+async function processFile(file, source, image, active = ()=>true, save = $('save-history').checked, streamInfo = null) {
   if (busy || !active()) return null;
   busyState(true);
+  const controller = new AbortController(), timeout = setTimeout(()=>controller.abort(),30000);
   try {
     const form = new FormData(); form.append('file',file,'frame.jpg'); form.append('source',source); form.append('confidence',$('threshold').value); form.append('save',save);
-    const data = await (await api('/api/recognize',{method:'POST',body:form})).json();
+    if(streamInfo) {form.append('stream_id',streamInfo.id);form.append('sample_time',streamInfo.time);}
+    const data = await (await api('/api/recognize',{method:'POST',body:form,signal:controller.signal})).json();
     if (!active()) return null;
     draw(image,data.detections); busyState(false); renderResults(data);
     return data;
-  } catch (error) { if (active()) {notice(error.message,true);if (source === 'camera') stopCamera();}return null; }
-  finally {if(busy) busyState(false);}
+  } catch (error) { if (active()) {notice(error.name === 'AbortError' ? 'API quá thời gian 30 giây. Kiểm tra máy chủ rồi thử lại.' : error.message,true);if (source === 'camera') stopCamera();}return null; }
+  finally {clearTimeout(timeout);if(busy) busyState(false);}
 }
 $('image-file').addEventListener('change', event => loadFile(event.target.files[0]));
 $('drop-zone').addEventListener('keydown', event => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); $('image-file').click(); } });
@@ -85,6 +92,16 @@ for (const event of ['dragenter','dragover']) $('drop-zone').addEventListener(ev
 for (const event of ['dragleave','drop']) $('drop-zone').addEventListener(event,e => { e.preventDefault(); $('drop-zone').classList.remove('drag'); });
 $('drop-zone').addEventListener('drop', event => loadFile(event.dataTransfer.files[0]));
 $('threshold').addEventListener('input',()=> $('threshold-value').textContent = Number($('threshold').value).toFixed(2));
+$('roi-apply').addEventListener('click',()=> {
+  if(busy) return;
+  const region = ['roi-x','roi-y','roi-width','roi-height'].map(id=>Number($(id).value));
+  const [x,y,width,height] = region;
+  if(region.some(value=>!Number.isFinite(value)) || x<0 || y<0 || width<=0 || height<=0 || x+width>100 || y+height>100) {notice('Vùng cần nằm trong ảnh, tính theo phần trăm. Chiều rộng và cao phải lớn hơn 0.',true);return;}
+  stopCamera();stopVideo();recognitionRegion=region;videoNextIndex=0;videoSession=null;videoRows=[];videoEvents.clear();$('video-body').replaceChildren();$('video-progress').value=0;$('video-export').disabled=true;
+  $('video-start').textContent='Phân tích video';$('video-status').textContent=videoURL ? 'Vùng nhận diện đã đổi. Phân tích video lại từ đầu.' : 'Chưa chọn video.';
+  $('results').replaceChildren(element('p','hint','Chờ nhận diện vùng mới.'));$('frame-caption').textContent='Khung trước khi áp dụng vùng · chưa phân tích lại';
+  $('roi-status').textContent=`Đã áp dụng x ${x}%, y ${y}%, rộng ${width}%, cao ${height}%. Bật camera hoặc quét video lại.`;
+});
 $('recognize-btn').addEventListener('click',async()=> { if (!selectedFile || busy) return; const image = await createImageBitmap(selectedFile); try { await processFile(selectedFile,'upload',image); } finally { image.close(); } });
 function stopCamera() {
   cameraGeneration++; clearTimeout(cameraTimer); if (stream) stream.getTracks().forEach(track=>track.stop()); stream = null;
@@ -99,6 +116,7 @@ $('camera-start').addEventListener('click',async()=> {
     const acquired = await navigator.mediaDevices.getUserMedia({video:{width:{ideal:1280},height:{ideal:720},frameRate:{ideal:30,max:60},facingMode:'environment'},audio:false});
     if (generation !== cameraGeneration) { acquired.getTracks().forEach(track=>track.stop()); return; }
     stream = acquired; $('camera-video').srcObject = stream; await $('camera-video').play(); $('camera-video').hidden = false; $('preview-empty').hidden = true; $('camera-stop').disabled = false; busyState(false);
+    cameraSession = crypto.randomUUID(); cameraStarted = performance.now();
     $('filename').textContent = 'Camera trực tiếp · khung nhận diện hiển thị phía dưới';
     $('frame-caption').textContent = 'Khung đã phân tích · hình xem trực tiếp phía trên chạy độc lập.';
     const previewFPS = stream.getVideoTracks()[0].getSettings().frameRate, completed = [];
@@ -110,7 +128,7 @@ $('camera-start').addEventListener('click',async()=> {
       const blob = await new Promise(resolve=>frame.toBlob(resolve,'image/jpeg',.9));
       if (!blob) throw new Error('Không lấy được ảnh từ camera.');
       if (!stream || generation !== cameraGeneration) return;
-      const data = await processFile(blob,'camera',frame,active);
+      const data = await processFile(blob,'camera',frame,active,$('save-history').checked,{id:cameraSession,time:(start-cameraStarted)/1000});
       if (!active()) return;
       if (!data) {stopCamera();return;}
       completed.push(performance.now()); if(completed.length>10) completed.shift();
@@ -140,6 +158,14 @@ async function showHistory() {
       imageUrl(item.crop_url).then(url=>crop.src=url).catch(()=>crop.alt='Ảnh không khả dụng');
       row.append(element('td','',new Date(item.created_at).toLocaleString('vi-VN',{timeZone:'Asia/Ho_Chi_Minh'})),element('td','',item.source),element('td','',`${(item.ocr_confidence*100).toFixed(1)}%`));
       const stateCell = element('td'); stateCell.append(element('span',`badge${item.needs_review ? ' review' : ''}`,item.needs_review ? 'Cần kiểm tra' : 'Đã đọc')); row.append(stateCell);
+      if(item.needs_review) {
+        const details=item.review_details || {}, labels={low_light:'Thiếu sáng',low_detail:'Mờ hoặc ít chi tiết',small_plate:'Biển nhỏ'};
+        const reasons=(details.quality?.issues || []).map(issue=>labels[issue] || issue);
+        if(details.ocr_disagreement) reasons.push('Các cách xử lý ảnh đọc khác nhau');
+        if(details.valid_format===false) reasons.push('Chưa đúng định dạng');
+        if(item.ocr_confidence<.8) reasons.push('Điểm OCR thấp');
+        stateCell.append(element('p','hint',reasons.join(' · ') || 'Bản ghi cũ chưa lưu lý do chi tiết'));
+      }
       const action = element('td'), view = element('button','','Xem ảnh'), remove = element('button','','Xóa');
       view.addEventListener('click',async()=> { try { $('dialog-image').src=await imageUrl(item.image_url); $('image-dialog').showModal(); } catch(error) { notice(error.message,true); } });
       remove.addEventListener('click',async()=> { if (!confirm('Xóa lượt nhận diện và ảnh lưu của lượt này?')) return; try { await api('/api/history/'+item.id,{method:'DELETE'}); await showHistory(); } catch(error) { notice(error.message,true); } });
@@ -171,7 +197,14 @@ async function showModel() {
       const before=data.hardening?.baseline?.test?.ocr_weather?.conditions?.[name];
       if(before) card.append(element('span','',`Trước cập nhật: ${(before.pipeline_exact_match*100).toFixed(1)}% · cùng mẫu OCR`));
     }
-    if(data.ocr_weather) $('metrics').append(element('p','hint','OCR điều kiện khó: dùng cùng mẫu đọc được ở ảnh gốc, không loại thêm mẫu sau khi làm mờ/thiếu sáng. Chưa kiểm chứng camera thực.'));
+    if(data.ocr_weather) $('metrics').append(element('p','hint','OCR điều kiện khó: dùng cùng mẫu đọc được ở ảnh gốc, không loại thêm mẫu sau khi làm mờ/thiếu sáng. Chưa nghiệm thu trên camera triển khai.'));
+    if(data.real_video) {
+      for(const clip of data.real_video.clips) {
+        const label=clip.file==='moving-car.MOV' ? 'Giao thông ban ngày' : clip.file==='video1.mp4' ? 'Xe máy trong nhà' : 'Giao thông ban đêm';
+        const card=element('div','metric');card.append(element('b','',`${clip.targets_read_stably.length}/${clip.selected_targets.length}`),element('span','',`${label}${clip.roi_percent ? ' · có vùng cắt' : ''} · biển đã chọn đọc ổn định`));$('metrics').append(card);
+      }
+      $('metrics').append(element('p','hint','Video thật công khai, nhãn chọn bằng mắt; mẫu phát triển nhỏ, chưa nghiệm thu độc lập hoặc đo mọi xe. Chưa có video mưa thật.'));
+    }
   } catch(error) { notice(error.message,true); }
 }
 document.querySelectorAll('[data-tab]').forEach(button=>button.addEventListener('click',()=> {

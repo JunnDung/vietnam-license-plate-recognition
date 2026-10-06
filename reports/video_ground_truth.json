@@ -1,0 +1,58 @@
+{
+  "date": "2026-10-06",
+  "annotation": "Assistant manually transcribed readable selected targets from source frames BEFORE inference. Not independently reviewed. Selected target recall only; not exhaustive precision or camera acceptance. Training overlap unknown. No rain footage obtained. These clips also exposed and were used to fix motion association; they are a development regression set, not a held-out benchmark.",
+  "sampling_fps": 5,
+  "protocol": "All frames sampled at 5 Hz; max side 1280, detector 640 FP32, confidence 0.35, same OCR and conservative 3-of-7 temporal policy. Evaluate full frame and the predefined ROI separately. No model weight or detector confidence tuning on these clips; motion association was debugged using their trajectories.",
+  "clips": [
+    {
+      "file": "moving-car.MOV",
+      "url": "https://raw.githubusercontent.com/longphungtuan94/ALPR_System/0a6d781137870ac362262bb1fa9b0fdf4d99e49d/test_videos/test.MOV",
+      "sha256": "1e92566dfd9b1ad0a920f9fd3f85265e50647ba53d6e83bd3face3b50a2fa26c",
+      "bytes": 58718036,
+      "license": "Repository Apache-2.0; source retained for attribution, video not redistributed.",
+      "local_file": ".local/real-video/moving-car.MOV",
+      "condition": "Daylight moving traffic",
+      "selected_expected_plates": [
+        "29A33185",
+        "30A61235",
+        "29A90101",
+        "30A61329",
+        "30V4495"
+      ],
+      "roi_percent": null
+    },
+    {
+      "file": "video1.mp4",
+      "url": "https://raw.githubusercontent.com/ddkhoa2605/LicensePlateDetection/f1c732e2270becc44df1de6529372f63ef251076/Video_Test/video1.mp4",
+      "sha256": "c94e8b3a90f2cfdcd294dd00c24fcc3d917c0b7adee5cdec9febd3331f99020d",
+      "bytes": 4729251,
+      "license": "No license declaration found; local evaluation only, videos not redistributed.",
+      "local_file": ".local/real-video/video1.mp4",
+      "condition": "Indoor handheld camera at parked motorcycle",
+      "selected_expected_plates": [
+        "59V184625"
+      ],
+      "roi_percent": null
+    },
+    {
+      "file": "cam_20250922_181322.mp4",
+      "url": "https://raw.githubusercontent.com/ddkhoa2605/LicensePlateDetection/f1c732e2270becc44df1de6529372f63ef251076/Video_Test/cam_20250922_181322.mp4",
+      "sha256": "0c6b1c72f4f13b0c37fc1582a3f8dd295c5bbd412d815241ebc318230d229023",
+      "bytes": 9241199,
+      "license": "No license declaration found; local evaluation only, videos not redistributed.",
+      "local_file": ".local/real-video/cam_20250922_181322.mp4",
+      "condition": "Night grayscale traffic selected three car plates",
+      "selected_expected_plates": [
+        "65A18114",
+        "83A17893",
+        "69H02055"
+      ],
+      "roi_percent": [
+        0,
+        15,
+        50,
+        80
+      ]
+    }
+  ]
+}

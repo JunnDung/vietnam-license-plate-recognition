@@ -12,7 +12,7 @@ function node(id='') {
 const $=id=>{if(!nodes.has(id)) nodes.set(id,node(id));return nodes.get(id);};
 $('video-fps').value='5';$('video-file').files=[{name:'public.webm'}];
 const calls=[],notices=[];let pending=null,hold=false;
-const context={$,setTimeout,clearTimeout,performance,URL,Blob,selectedFile:null,busy:false,
+const context={$,setTimeout,clearTimeout,performance,URL,Blob,crypto:require('node:crypto').webcrypto,selectedFile:null,busy:false,
   element:()=>node(),notice:message=>notices.push(message),stopCamera(){},draw(){},renderResults(){},
   frameCanvas:()=>({toBlob:callback=>callback(new Blob(['frame']))}),
   busyState(value){context.busy=value;},
@@ -38,5 +38,17 @@ vm.runInContext("videoURL='blob:demo'",context);
   assert.equal($('video-body').children.length,0,'Stopped response must not add stale rows');
   assert.equal(vm.runInContext('videoNextIndex',context),0,'Stopped frame is retried on resume');
   hold=false;calls.length=0;await $('video-start').handlers.click();assert.equal(calls.length,2);
+  vm.runInContext("videoRows=[];videoEvents.clear()",context);$('video-body').replaceChildren();
+  const stable={detections:[{plate:'51A12345',display_plate:'51A-123.45',ocr_confidence:.95,needs_review:false,temporal:{track_id:'same',status:'stable'}}]};
+  context.addVideoRows(0,stable);context.addVideoRows(.2,stable);
+  assert.equal($('video-body').children.length,1,'A stable plate track must be grouped');
+  assert.equal(vm.runInContext('videoRows[0].frames',context),2);
+  context.addVideoRows(.4,{detections:[{...stable.detections[0],temporal:{track_id:'pending',status:'pending'}}]});
+  assert.equal($('video-body').children.length,1,'Unstable tracks must not enter stable CSV/events');
+  let exported=null;context.URL={createObjectURL(blob){exported=blob;return 'blob:csv';},revokeObjectURL(){}};
+  $('video-export').handlers.click();
+  const csv=await exported.text();
+  assert(csv.includes('first_stable_seconds'));assert.equal(csv.trim().split('\r\n').length,2,'Grouped CSV contains one event');
+  assert(csv.includes('"0.00","0.20","51A12345"'));
   assert.equal(notices.length,0);console.log('PASS: exact video timestamps, no implicit saving, cancellation, no overlapping requests and replay with a different FPS.');
 })().catch(error=>{console.error(error);process.exitCode=1;});

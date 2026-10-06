@@ -1,5 +1,6 @@
 'use strict';
 let videoURL = null, videoRunning = false, videoGeneration = 0, videoNextIndex = 0, videoSampleFPS = 5, videoRows = [];
+let videoSession = null, videoEvents = new Map();
 function stopVideo() {
   videoGeneration++; videoRunning = false; $('file-video').pause(); $('file-video').controls = true;
   $('video-stop').disabled = true; busyState(busy);
@@ -7,6 +8,7 @@ function stopVideo() {
 }
 function clearVideo() {
   stopVideo(); if(videoURL) URL.revokeObjectURL(videoURL); videoURL = null; videoNextIndex = 0; videoRows = [];
+  videoSession = null; videoEvents.clear();
   $('file-video').removeAttribute('src'); $('file-video').load(); $('file-video').hidden = true;
   $('video-body').replaceChildren(); $('video-results').hidden = true; $('video-export').disabled = true;
   $('results').replaceChildren(element('p','hint','Chờ nhận diện khung mới.')); $('video-status').textContent='Chưa chọn video.';
@@ -27,9 +29,15 @@ async function seekVideo(time) {
 }
 function addVideoRows(time,data) {
   for(const item of data.detections) {
-    videoRows.push({time,plate:item.plate,ocr:item.ocr_confidence,review:item.needs_review});
+    if(item.temporal && item.temporal.status !== 'stable') continue;
+    const eventKey = item.temporal ? `${item.temporal.track_id}:${item.plate}` : null;
+    const existing = eventKey && videoEvents.get(eventKey);
+    if(existing) {existing.last=time;existing.frames++;existing.timeCell.textContent=`${existing.time.toFixed(2)}–${time.toFixed(2)}`;continue;}
+    const record={time,last:time,plate:item.plate,ocr:item.ocr_confidence,review:item.needs_review,track:item.temporal?.track_id || '',frames:1};
+    videoRows.push(record);if(eventKey) videoEvents.set(eventKey,record);
     const row=element('tr'), action=element('td'), view=element('button','','Xem');
-    row.append(element('td','',item.display_plate || 'Chưa đọc được'),element('td','',time.toFixed(2)),element('td','',`${(item.ocr_confidence*100).toFixed(1)}%`),element('td','',item.needs_review ? 'Cần kiểm tra' : 'Đã đọc'));
+    record.timeCell=element('td','',time.toFixed(2));
+    row.append(element('td','',item.display_plate || 'Chưa đọc được'),record.timeCell,element('td','',`${(item.ocr_confidence*100).toFixed(1)}%`),element('td','',item.temporal ? 'Ổn định' : item.needs_review ? 'Cần kiểm tra' : 'Đã đọc'));
     view.addEventListener('click',async()=> {
       if(busy) {notice('Chờ lượt đang xử lý xong trước khi xem khung.');return;}
       stopVideo(); const generation=videoGeneration;
@@ -60,7 +68,8 @@ $('video-start').addEventListener('click',async()=> {
   if(busy || videoRunning || !videoURL) return;
   stopCamera(); const generation=++videoGeneration, active=()=>videoRunning && generation===videoGeneration;
   const video=$('file-video');
-  if($('video-progress').value===1) {videoNextIndex=0;videoRows=[];$('video-body').replaceChildren();$('video-export').disabled=true;$('video-progress').value=0;}
+  if($('video-progress').value===1) {videoNextIndex=0;videoRows=[];videoEvents.clear();videoSession=null;$('video-body').replaceChildren();$('video-export').disabled=true;$('video-progress').value=0;}
+  if(!videoSession) videoSession=crypto.randomUUID();
   videoSampleFPS=Number($('video-fps').value); videoRunning=true;video.pause();video.controls=false;
   $('video-fps').disabled=true;$('video-stop').disabled=false;$('video-start').disabled=true;$('camera-start').disabled=true;
   $('video-status').textContent=`Đang phân tích từ ${(videoNextIndex/videoSampleFPS).toFixed(1)} giây…`;
@@ -70,11 +79,11 @@ $('video-start').addEventListener('click',async()=> {
       const time=videoNextIndex/videoSampleFPS;await seekVideo(time);if(!active()) break;
       const frame=frameCanvas(video);if(!frame) throw new Error('Không lấy được khung video.');
       const blob=await new Promise(resolve=>frame.toBlob(resolve,'image/jpeg',.9));if(!blob) throw new Error('Không mã hóa được khung video.');
-      const data=await processFile(blob,`video:${$('video-file').files[0].name.slice(0,40)}:${time.toFixed(2)}s`,frame,active,$('video-save').checked);
+      const data=await processFile(blob,`video:${$('video-file').files[0].name.slice(0,40)}:${time.toFixed(2)}s`,frame,active,$('video-save').checked,{id:videoSession,time});
       if(!active()) break;if(!data) throw new Error('Đã dừng vì API không xử lý được khung video.');
       addVideoRows(time,data);videoNextIndex++;processed++;
       $('video-progress').value=Math.min(1,videoNextIndex/videoSampleFPS/video.duration);
-      $('video-status').textContent=`${Math.min(video.duration,videoNextIndex/videoSampleFPS).toFixed(1)} / ${video.duration.toFixed(1)} giây · ${videoNextIndex} khung · ${videoRows.length} kết quả · ${(1000*processed/(performance.now()-start)).toFixed(1)} lượt/giây xử lý`;
+      $('video-status').textContent=`${Math.min(video.duration,videoNextIndex/videoSampleFPS).toFixed(1)} / ${video.duration.toFixed(1)} giây · ${videoNextIndex} khung · ${videoRows.length} lượt biển ổn định · ${(1000*processed/(performance.now()-start)).toFixed(1)} lượt/giây xử lý`;
       $('frame-caption').textContent=`Khung đã phân tích tại ${time.toFixed(2)} giây video`;
     }
     if(active()) {$('video-progress').value=1;$('video-status').textContent+=' · Hoàn tất';$('video-start').textContent='Quét lại';$('video-fps').disabled=false;}
@@ -83,6 +92,6 @@ $('video-start').addEventListener('click',async()=> {
 });
 $('video-export').addEventListener('click',()=> {
   const safe=value=>{const text=String(value);return '"'+(/^[=+@\-\t\r\n]/.test(text) ? "'" : '')+text.replaceAll('"','""')+'"';};
-  const csv='\ufeff'+[['video_seconds','plate','ocr_confidence','needs_review'],...videoRows.map(row=>[row.time.toFixed(2),row.plate,row.ocr,row.review])].map(row=>row.map(safe).join(',')).join('\r\n');
+  const csv='\ufeff'+[['first_stable_seconds','last_stable_seconds','plate','ocr_confidence','needs_review','track_id','stable_frames'],...videoRows.map(row=>[row.time.toFixed(2),row.last.toFixed(2),row.plate,row.ocr,row.review,row.track,row.frames])].map(row=>row.map(safe).join(',')).join('\r\n');
   const url=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'})),anchor=element('a');anchor.href=url;anchor.download='video-plates.csv';anchor.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
 });

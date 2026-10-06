@@ -1,4 +1,5 @@
 'use strict';
+let recognitionRegion = null;
 // Whole-frame detail is a heuristic; it does not measure plate readability.
 function frameSharpness(frame) {
   const probe = document.createElement('canvas');
@@ -19,10 +20,12 @@ function frameSharpness(frame) {
   return count ? squares/count-(total/count)**2 : 0;
 }
 function frameCanvas(video) {
-  const frame = document.createElement('canvas'), scale = Math.min(1,1280/Math.max(video.videoWidth,video.videoHeight));
-  frame.width = Math.round(video.videoWidth*scale); frame.height = Math.round(video.videoHeight*scale);
+  const region = recognitionRegion || [0,0,100,100];
+  const [x,y,width,height] = region.map((value,index)=>value/100*(index%2===0 ? video.videoWidth : video.videoHeight));
+  const frame = document.createElement('canvas'), scale = Math.min(1,1280/Math.max(width,height));
+  frame.width = Math.round(width*scale); frame.height = Math.round(height*scale);
   if (!frame.width || !frame.height) return null;
-  frame.getContext('2d').drawImage(video,0,0,frame.width,frame.height);
+  frame.getContext('2d').drawImage(video,x,y,width,height,0,0,frame.width,frame.height);
   return frame;
 }
 function frameDelay(start, fps) { return Math.max(0,1000/fps-(performance.now()-start)); }

@@ -66,4 +66,4 @@ Dùng cùng 37 biển nguồn có thể đọc trong 40 ảnh chọn trước d�
 
 Người dùng hiện chưa có camera USB/RTSP để thử. Chưa kiểm chứng ban đêm, mưa, IR, lóa, giọt nước trên kính, shutter, camera trình duyệt vật lý hay USB/RTSP dài hạn. Dataset chưa có camera/vehicle IDs nên có thể cùng biển ở nhiều split.
 
-Bản hiện tại phục vụ thử nghiệm bãi xe có người xác nhận, phù hợp nhận diện khung rõ khi xe chậm/dừng. Chưa tự điều khiển barrier, tính phí, RFID hoặc xác định quyền nhận xe. Tham khảo [hướng dẫn camera](CAMERA_GUIDE.md) để hiệu chỉnh và tạo tập nghiệm thu độc lập. DOCX 25 trang giữ nguyên snapshot phiên bản nền `7f584eb`; báo cáo này ghi kết quả cập nhật.
+Bản hiện tại phục vụ thử nghiệm bãi xe có người xác nhận, phù hợp nhận diện khung rõ khi xe chậm/dừng. Chưa tự điều khiển barrier, tính phí, RFID hoặc xác định quyền nhận xe. Tham khảo [hướng dẫn camera](CAMERA_GUIDE.md) để hiệu chỉnh và tạo tập nghiệm thu độc lập. Báo cáo này giữ kết quả giai đoạn chống mờ; DOCX mới và RELEASE_VALIDATION.md tổng hợp phiên bản 1.3.0, giao diện đã bỏ phần bãi xe.
