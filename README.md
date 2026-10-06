@@ -31,7 +31,7 @@ uvicorn app:app --host 127.0.0.1 --port 8000
 ## Sử dụng
 
 - **Nhận diện:** chọn/kéo thả ảnh JPG, PNG hoặc WebP; điều chỉnh ngưỡng phát hiện; xem vùng biển số, ký tự và độ tin cậy.
-- **Camera trình duyệt:** cho phép camera tại localhost/HTTPS. Đọc một khung hình mỗi 3 giây sau khi lượt trước hoàn tất; dừng khi đổi tab hoặc rời trang. Nếu bật lưu, mỗi khung hình có biển số tạo bản ghi mới; bỏ chọn lưu để quan sát mà không ghi lịch sử.
+- **Camera trình duyệt:** cho phép camera tại localhost/HTTPS. Chọn khung rõ hơn trong 3 khung liên tiếp, chờ 3 giây sau khi lượt trước hoàn tất; dừng khi đổi tab hoặc rời trang. Nếu bật lưu, mỗi khung hình có biển số tạo bản ghi mới; bỏ chọn lưu để quan sát mà không ghi lịch sử.
 - **Tra cứu:** tìm một phần hoặc toàn bộ biển số, lọc thời điểm, xem ảnh nguồn, xuất CSV, xóa lượt nhận diện. Thời gian giao diện theo Việt Nam (UTC+7); API/CSV dùng UTC.
 - **Bãi giữ xe:** sau khi nhận diện ảnh đã lưu, chọn **Xe vào** hoặc **Xe ra**. Đối chiếu ảnh, sửa biển số khi cần, tích xác nhận rồi ghi nhận. Khi xe ra, giao diện tìm lượt vào còn mở và hiển thị ảnh lúc vào để đối chiếu. Xem xe đang trong bãi, lượt đã ra, thời gian gửi và lượt vào/ra hôm nay.
 - **Kết quả mô hình:** hiển thị các phép đo từ `reports/`. mAP là kết quả phát hiện vùng biển số, không phải tỷ lệ đọc đúng ký tự.
@@ -49,6 +49,8 @@ Camera USB, file video hoặc RTSP cũng có thể chạy bằng CLI:
 ```
 
 CLI mở nguồn camera ở phía máy chạy script rồi gửi ảnh đến API; server không truy cập URL camera do người dùng gửi lên. CLI mặc định không lưu; thêm `--save` nếu muốn ghi lịch sử. Ctrl+C để dừng.
+
+CLI chọn khung có điểm chi tiết cao hơn trong 3 khung liên tiếp; `--burst 1` tắt và `--burst 5` tăng số khung so sánh. Đây là điểm trên toàn ảnh, không bảo đảm biển số rõ. Hướng dẫn ban đêm, trời mưa, màn trập và nghiệm thu: [CAMERA_GUIDE.md](reports/CAMERA_GUIDE.md).
 
 ## API xử lý ảnh
 
@@ -119,6 +121,22 @@ Model khởi tạo từ `yolo11n.pt`; augment độ sáng, quay nhẹ, scale và
 
 OCR là mô hình pretrained [fast-plate-ocr](https://github.com/ankandrew/fast-plate-ocr), không được fine-tune ở dự án này vì dataset không có phiên âm đầy đủ. Pipeline thử crop gốc, ghép hai dòng cho biển vuông và CLAHE. Cần nhãn ký tự thực tế để fine-tune OCR riêng cho camera của bạn.
 
+### Fine-tune chống mờ và chọn model
+
+Bản cập nhật đã hoàn thành **18 epoch bổ sung sau 40 epoch nền**. Recall detector mờ ngang mô phỏng tăng **80.43% → 97.39%**, mờ chéo **44.78% → 95.65%**, mưa kèm mờ **76.52% → 97.39%**. Ở ngưỡng 0.35, recall ảnh gốc/tối/mưa đơn giảm nhẹ; bảng đầy đủ trong [VALIDATION.md](reports/VALIDATION.md). OCR mờ nặng vẫn chỉ đúng **3/37**, nên cần khung rõ và người xác nhận.
+
+`train_robust.py` chỉ tạo candidate; `validate_robust.py` chọn bằng validation rồi mới đo test và thay model. Để tái lập từ v1, trích file nhị phân và báo cáo bằng Python (không dùng chuyển hướng văn bản PowerShell cho `.pt`):
+
+```powershell
+.\.venv\Scripts\python.exe scripts\prepare_data.py
+.\.venv\Scripts\python.exe -c "from pathlib import Path; import subprocess; p=Path('.local/v1'); p.mkdir(parents=True,exist_ok=True); names=['models/plate_detector.pt','reports/training.json','reports/robustness.json','reports/ocr_evaluation.json']; [(p/Path(n).name).write_bytes(subprocess.check_output(['git','show','7f584eb:'+n])) for n in names]"
+.\.venv\Scripts\python.exe scripts\evaluate_ocr.py --weights .local/v1/plate_detector.pt --weather --output .local/v1/ocr_weather.json
+.\.venv\Scripts\python.exe scripts\train_robust.py --weights .local/v1/plate_detector.pt --name plate_robust_replay --device 0
+.\.venv\Scripts\python.exe scripts\validate_robust.py --baseline .local/v1/plate_detector.pt --baseline-report-dir .local/v1 --baseline-ocr-weather .local/v1/ocr_weather.json --run plate_robust_replay --device 0
+```
+
+Run đã tồn tại sẽ bị từ chối để giữ checkpoint; dùng tên mới khi lặp thí nghiệm. Sau khi thay model cần khởi động lại server. `evaluate_robustness.py --extended --output reports/robustness_extra.json` đo thêm thiếu sáng xám có nhiễu, mờ chéo và mưa kèm mờ. Không dùng kết quả test để chọn checkpoint/ngưỡng; test hiện tại đã được dùng chẩn đoán v1 nên là benchmark hồi quy, vẫn cần tập độc lập theo camera.
+
 ## Đánh giá và giới hạn
 
 - `reports/training.json`: cấu hình, GPU, hash model và mAP/precision/recall trên tập test.
@@ -126,8 +144,11 @@ OCR là mô hình pretrained [fast-plate-ocr](https://github.com/ankandrew/fast-
 - `reports/robustness.json`: kiểm tra cùng 200 ảnh test với thiếu sáng, mưa/sương và mờ chuyển động **mô phỏng**, cùng ngưỡng confidence 0.35, matching đúng lớp tại IoU ≥ 0.5.
 - `reports/ocr_ground_truth.json`: mẫu test được chọn trước dự đoán, phiên âm trực tiếp bằng mắt, ghi các mẫu không thể đọc và ghi chú sửa nhãn sau kiểm tra phóng to. Cần người khác kiểm tra độc lập nhãn này.
 - `reports/ocr_evaluation.json`: tỷ lệ đọc đúng cả biển, CER trên crop và tỷ lệ đúng cả quy trình trên mẫu nhỏ đã phiên âm.
+- `reports/ocr_weather.json`: cùng mẫu OCR dưới các biến đổi thiếu sáng/mưa/mờ, không loại thêm ảnh sau biến đổi.
+- `reports/hardening.json`: so sánh baseline/candidate, tiêu chí chọn bằng validation và kết quả test sau khi đã chốt model.
+- `reports/robustness_extended.json`: bảy điều kiện detector mô phỏng với before/after trên cùng ảnh.
 - `reports/VALIDATION.md`: kết quả cuối cùng và phạm vi các kiểm tra chạy thực tế.
-- [Báo cáo kỹ thuật DOCX](reports/Bao_cao_nhan_dien_bien_so_va_bai_giu_xe.docx): 25 trang trình bày cơ sở lý thuyết, dữ liệu, huấn luyện, kết quả thực nghiệm, API, nghiệp vụ bãi xe và hướng dẫn tái lập.
+- [Báo cáo kỹ thuật DOCX](reports/Bao_cao_nhan_dien_bien_so_va_bai_giu_xe.docx): 25 trang của phiên bản nền tại commit `7f584eb`; kết quả cập nhật sau đó xem `VALIDATION.md` và các JSON hiện tại.
 
 Dataset không có camera/vehicle IDs, nhãn thời tiết hoặc nhãn ngày/đêm. Chia nhóm và loại trùng pixel giảm rò rỉ, nhưng **không chứng minh không còn cùng biển số ở các split**. Kiểm tra mô phỏng và mẫu OCR nhỏ không chứng minh chất lượng cho mọi camera ban đêm, trời mưa, biển bị lóa, che khuất hoặc rất nhỏ. Trước khi dùng camera thực tế, cần một tập test theo camera/phiên quay với ngày/đêm/mưa được gán nhãn riêng. Crop OCR dùng phép ghép hai dòng đơn giản; biển nghiêng mạnh có thể cần model keypoint để nắn phối cảnh.
 
@@ -136,6 +157,7 @@ Dataset không có camera/vehicle IDs, nhãn thời tiết hoặc nhãn ngày/đ
 ```powershell
 .\.venv\Scripts\python.exe -m unittest discover -s tests -v
 node --check web/app.js
+node tests/check_camera_js.cjs
 # Khi API đang chạy:
 .\.venv\Scripts\python.exe tests\check_camera.py
 ```

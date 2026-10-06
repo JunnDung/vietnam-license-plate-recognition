@@ -51,6 +51,9 @@ function renderResults(data) {
   for (const item of data.detections) {
     const row = element('div','result-row'), info = element('div');
     info.append(element('div','result-plate',item.display_plate || 'Chưa đọc được'),element('div','result-meta',`Phát hiện ${(item.detector_confidence*100).toFixed(1)}% · OCR ${(item.ocr_confidence*100).toFixed(1)}% · ${item.layout === 'two_lines' ? 'Biển hai dòng' : 'Biển một dòng'}`));
+    const qualityLabels={low_light:'Vùng biển thiếu sáng',low_detail:'Vùng biển ít chi tiết hoặc mờ',small_plate:'Biển quá nhỏ trong ảnh'};
+    if(item.quality?.issues?.length) info.append(element('p','hint',item.quality.issues.map(issue=>qualityLabels[issue] || issue).join(' · ')+'. Lấy ảnh rõ hơn và đối chiếu ký tự.'));
+    if(item.ocr_disagreement) info.append(element('p','hint','Các biến thể ảnh trả ký tự khác nhau. Đối chiếu biển số dù điểm OCR cao.'));
     row.append(info,element('span',`badge${item.needs_review ? ' review' : ''}`,item.needs_review ? 'Cần kiểm tra' : 'Đã đọc'));
     const actions=element('div','gate-actions');
     if(item.image_url) for(const [direction,label] of [['in','Xe vào →'],['out','Xe ra →']]) { const button=element('button','',label);button.addEventListener('click',()=>openParkingConfirm(item,direction));actions.append(button); }
@@ -88,11 +91,13 @@ $('camera-start').addEventListener('click',async()=> {
     const acquired = await navigator.mediaDevices.getUserMedia({video:{width:{ideal:1280},height:{ideal:720},facingMode:'environment'},audio:false});
     if (generation !== cameraGeneration) { acquired.getTracks().forEach(track=>track.stop()); return; }
     stream = acquired; $('camera-video').srcObject = stream; await $('camera-video').play(); $('camera-stop').disabled = false; $('recognize-btn').disabled = true;
-    $('filename').textContent = 'Camera trực tiếp · mỗi 3 giây sau khi xử lý';
+    $('filename').textContent = 'Camera · chọn khung rõ hơn trong 3 khung · chu kỳ 3 giây';
     async function capture() {
       if (!stream || generation !== cameraGeneration) return;
-      const video = $('camera-video'), frame = document.createElement('canvas'); frame.width = video.videoWidth; frame.height = video.videoHeight;
-      frame.getContext('2d').drawImage(video,0,0); const blob = await new Promise(resolve=>frame.toBlob(resolve,'image/jpeg',.9));
+      const frame = await captureBestFrame($('camera-video'),()=>stream && generation===cameraGeneration);
+      if (!frame) return;
+      const blob = await new Promise(resolve=>frame.toBlob(resolve,'image/jpeg',.9));
+      if (!blob) throw new Error('Không lấy được ảnh từ camera.');
       if (!stream || generation !== cameraGeneration) return;
       await processFile(blob,'camera',frame);
       if (stream && generation === cameraGeneration) cameraTimer = setTimeout(capture,3000);
@@ -139,7 +144,18 @@ async function showModel() {
     for(const [label,value] of metrics) { const card=element('div','metric'); card.append(element('b','',value===undefined ? 'Chưa đo' : `${(value*100).toFixed(1)}%`),element('span','',label)); $('metrics').append(card); }
     if(data.ocr_evaluation) $('metrics').append(element('p','hint',`Mẫu OCR: ${data.ocr_evaluation.samples} biển số được phiên âm bằng mắt từ ảnh test. Mẫu nhỏ, không đại diện toàn bộ camera.`));
     const conditions={original:'Ảnh gốc',synthetic_dark:'Thiếu sáng mô phỏng',synthetic_rain_fog:'Mưa/sương mô phỏng',synthetic_motion_blur:'Mờ chuyển động mô phỏng'};
-    if(data.robustness) for(const [name,item] of Object.entries(data.robustness.conditions)) { const card=element('div','metric'); card.append(element('b','',`${(item.recall_at_iou50*100).toFixed(1)}%`),element('span','',`Recall @ IoU50 · ${conditions[name] || name} (${item.images} ảnh)`)); $('metrics').append(card); }
+    if(data.robustness) for(const [name,item] of Object.entries(data.robustness.conditions)) {
+      const card=element('div','metric'), before=data.hardening?.baseline?.test?.robustness?.conditions?.[name];
+      card.append(element('b','',`${(item.recall_at_iou50*100).toFixed(1)}%`),element('span','',`Recall detector @ IoU50 · ${conditions[name] || name} (${item.images} ảnh)`));
+      if(before) card.append(element('span','',`Trước cập nhật: ${(before.recall_at_iou50*100).toFixed(1)}% · cùng ảnh và ngưỡng`));
+      $('metrics').append(card);
+    }
+    if(data.ocr_weather) for(const [name,item] of Object.entries(data.ocr_weather.conditions)) {
+      const card=element('div','metric'); card.append(element('b',item.pipeline_exact_match<.8 ? 'low-metric' : '',`${(item.pipeline_exact_match*100).toFixed(1)}%`),element('span','',`Phát hiện + đọc đúng cả biển · ${conditions[name] || name} (${item.samples} mẫu)`)); $('metrics').append(card);
+      const before=data.hardening?.baseline?.test?.ocr_weather?.conditions?.[name];
+      if(before) card.append(element('span','',`Trước cập nhật: ${(before.pipeline_exact_match*100).toFixed(1)}% · cùng mẫu OCR`));
+    }
+    if(data.ocr_weather) $('metrics').append(element('p','hint','OCR điều kiện khó: dùng cùng mẫu đọc được ở ảnh gốc, không loại thêm mẫu sau khi làm mờ/thiếu sáng. Chưa kiểm chứng camera thực.'));
   } catch(error) { notice(error.message,true); }
 }
 function vnTime(value) {return value ? new Date(value).toLocaleString('vi-VN',{timeZone:'Asia/Ho_Chi_Minh'}) : '—';}

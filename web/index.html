@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#101820"><title>Biển Số Việt · Nhận diện phương tiện</title>
-  <link rel="stylesheet" href="/style.css">
+  <link rel="stylesheet" href="/style.css?v=2">
   <link rel="stylesheet" href="/parking.css">
 </head>
 <body>
@@ -22,7 +22,7 @@
       <button id="recognize-btn" class="primary" disabled>Nhận diện ảnh <span>→</span></button>
       <div class="divider"><span>HOẶC CAMERA</span></div>
       <div class="camera-controls"><button id="camera-start">Bật camera</button><button id="camera-stop" disabled>Dừng</button></div>
-      <p class="hint">Camera đọc một khung hình mỗi 3 giây sau khi xử lý xong. Cho phép trình duyệt truy cập camera tại localhost hoặc HTTPS.</p>
+      <p class="hint">Camera chọn khung rõ hơn trong 3 khung liên tiếp rồi xử lý, lặp lại sau 3 giây. Độ rõ toàn ảnh không bảo đảm ký tự biển số rõ. Cần quyền camera tại localhost hoặc HTTPS.</p>
       <p id="filename" class="file-name">Chưa chọn ảnh</p>
     </div>
     <div class="preview-panel card"><div class="section-title"><h2>Khung hình & kết quả</h2><span id="latency" class="tag">SẴN SÀNG</span></div>
@@ -52,5 +52,6 @@
 <footer><span>BIỂN SỐ VIỆT / LOCAL VISION LAB</span><span>Nhận diện có thể sai. Kiểm tra ảnh gốc trước khi sử dụng kết quả.</span></footer>
 <dialog id="image-dialog"><button id="dialog-close" aria-label="Đóng ảnh">Đóng ×</button><img id="dialog-image" alt="Ảnh nguồn của lượt nhận diện"></dialog>
 <dialog id="parking-dialog"><form id="parking-confirm-form"><div class="section-title"><h2 id="parking-confirm-title">Xác nhận xe vào</h2><button id="parking-cancel" type="button">Đóng ×</button></div><p class="hint">Đối chiếu ảnh và sửa ký tự nếu OCR đọc sai. Đây là biển số được dùng cho lượt gửi.</p><div class="confirm-images"><div><span>Khung hình vừa nhận diện</span><img id="parking-current-image" alt="Ảnh phương tiện tại cổng"><img id="parking-current-crop" alt="Biển số tại cổng"></div><div id="parking-entry-proof" hidden><span>Ảnh lúc vào bãi</span><img id="parking-entry-image" alt="Ảnh phương tiện đã lưu lúc vào"><p id="parking-entry-text" class="hint"></p></div></div><label>Biển số sau khi đối chiếu<input id="parking-plate" required maxlength="20" autocomplete="off"></label><p id="parking-confirm-info" class="hint"></p><label class="check"><input id="parking-ack" type="checkbox" required> Tôi đã đối chiếu ảnh và xác nhận biển số chính xác.</label><button id="parking-submit" class="primary" disabled type="submit">Ghi nhận xe vào</button></form></dialog>
+<script src="/camera.js" defer></script>
 <script src="/app.js" defer></script>
 </body></html>

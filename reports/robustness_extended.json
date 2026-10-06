@@ -1,0 +1,141 @@
+{
+  "weights_sha256": "37a282619e923cc5715f81fe1f236e5c7fb281322d546f2aa3ae9a2de8ce49f6",
+  "selected_before_additional_tests": true,
+  "baseline": {
+    "weights_sha256": "d8ead0e764779930aab6325848190852ed6594cce84b82faa01bfeed94f3b87e",
+    "split": "test",
+    "kind": "paired synthetic detector stress test",
+    "seed": 42,
+    "confidence": 0.35,
+    "iou_threshold": 0.5,
+    "limitations": "Synthetic brightness, blur, rain and fog on a subset of test images. Not actual day/night/weather labels. Not OCR accuracy.",
+    "sample_list_sha256": "757d51699043e33e04acfbcfeae57e9d4ef9cfb8bd817a0034386c9fd26d42bd",
+    "conditions": {
+      "original": {
+        "images": 200,
+        "ground_truth_plates": 230,
+        "predictions": 233,
+        "matched": 228,
+        "recall_at_iou50": 0.991304347826087,
+        "precision_at_iou50": 0.9785407725321889
+      },
+      "synthetic_dark": {
+        "images": 200,
+        "ground_truth_plates": 230,
+        "predictions": 232,
+        "matched": 226,
+        "recall_at_iou50": 0.9826086956521739,
+        "precision_at_iou50": 0.9741379310344828
+      },
+      "synthetic_rain_fog": {
+        "images": 200,
+        "ground_truth_plates": 230,
+        "predictions": 231,
+        "matched": 228,
+        "recall_at_iou50": 0.991304347826087,
+        "precision_at_iou50": 0.987012987012987
+      },
+      "synthetic_motion_blur": {
+        "images": 200,
+        "ground_truth_plates": 230,
+        "predictions": 189,
+        "matched": 185,
+        "recall_at_iou50": 0.8043478260869565,
+        "precision_at_iou50": 0.9788359788359788
+      },
+      "synthetic_night_noise": {
+        "images": 200,
+        "ground_truth_plates": 230,
+        "predictions": 227,
+        "matched": 222,
+        "recall_at_iou50": 0.9652173913043478,
+        "precision_at_iou50": 0.9779735682819384
+      },
+      "synthetic_diagonal_blur": {
+        "images": 200,
+        "ground_truth_plates": 230,
+        "predictions": 108,
+        "matched": 103,
+        "recall_at_iou50": 0.44782608695652176,
+        "precision_at_iou50": 0.9537037037037037
+      },
+      "synthetic_rain_blur": {
+        "images": 200,
+        "ground_truth_plates": 230,
+        "predictions": 181,
+        "matched": 176,
+        "recall_at_iou50": 0.7652173913043478,
+        "precision_at_iou50": 0.9723756906077348
+      }
+    }
+  },
+  "current": {
+    "weights_sha256": "37a282619e923cc5715f81fe1f236e5c7fb281322d546f2aa3ae9a2de8ce49f6",
+    "split": "test",
+    "kind": "paired synthetic detector stress test",
+    "seed": 42,
+    "confidence": 0.35,
+    "iou_threshold": 0.5,
+    "limitations": "Synthetic brightness, blur, rain and fog on a subset of test images. Not actual day/night/weather labels. Not OCR accuracy.",
+    "sample_list_sha256": "757d51699043e33e04acfbcfeae57e9d4ef9cfb8bd817a0034386c9fd26d42bd",
+    "conditions": {
+      "original": {
+        "images": 200,
+        "ground_truth_plates": 230,
+        "predictions": 227,
+        "matched": 223,
+        "recall_at_iou50": 0.9695652173913043,
+        "precision_at_iou50": 0.9823788546255506
+      },
+      "synthetic_dark": {
+        "images": 200,
+        "ground_truth_plates": 230,
+        "predictions": 228,
+        "matched": 223,
+        "recall_at_iou50": 0.9695652173913043,
+        "precision_at_iou50": 0.9780701754385965
+      },
+      "synthetic_rain_fog": {
+        "images": 200,
+        "ground_truth_plates": 230,
+        "predictions": 227,
+        "matched": 224,
+        "recall_at_iou50": 0.9739130434782609,
+        "precision_at_iou50": 0.986784140969163
+      },
+      "synthetic_motion_blur": {
+        "images": 200,
+        "ground_truth_plates": 230,
+        "predictions": 229,
+        "matched": 224,
+        "recall_at_iou50": 0.9739130434782609,
+        "precision_at_iou50": 0.9781659388646288
+      },
+      "synthetic_night_noise": {
+        "images": 200,
+        "ground_truth_plates": 230,
+        "predictions": 227,
+        "matched": 222,
+        "recall_at_iou50": 0.9652173913043478,
+        "precision_at_iou50": 0.9779735682819384
+      },
+      "synthetic_diagonal_blur": {
+        "images": 200,
+        "ground_truth_plates": 230,
+        "predictions": 226,
+        "matched": 220,
+        "recall_at_iou50": 0.9565217391304348,
+        "precision_at_iou50": 0.9734513274336283
+      },
+      "synthetic_rain_blur": {
+        "images": 200,
+        "ground_truth_plates": 230,
+        "predictions": 229,
+        "matched": 224,
+        "recall_at_iou50": 0.9739130434782609,
+        "precision_at_iou50": 0.9781659388646288
+      }
+    }
+  },
+  "limitations": "Additional synthetic grayscale noisy night, diagonal blur and rain + blur. No physical camera validation or OCR measurement for these additional conditions."
+}

@@ -1,5 +1,8 @@
 """YOLO detector + pretrained plate OCR. No fabricated text or registry lookup."""
 import io
+import hashlib
+import math
+import os
 import re
 import threading
 from pathlib import Path
@@ -52,6 +55,19 @@ def jpeg_bytes(image):
     return data.tobytes()
 
 
+def crop_quality(crop, min_detail=25., min_brightness=40.):
+    gray = cv2.cvtColor(crop, cv2.COLOR_BGR2GRAY)
+    brightness = float(gray.mean())
+    resized = cv2.resize(gray, (160, max(16, min(160, round(gray.shape[0]*160/gray.shape[1])))))
+    detail = float(cv2.Laplacian(resized, cv2.CV_64F).var())
+    # ponytail: texture is a blur proxy, not calibrated readability; tune thresholds on the gate camera.
+    issues = []
+    if brightness < min_brightness: issues.append('low_light')
+    if detail < min_detail: issues.append('low_detail')
+    if crop.shape[0] < 24 or crop.shape[1] < 48: issues.append('small_plate')
+    return {'brightness': round(brightness, 1), 'detail_score': round(detail, 1), 'issues': issues}
+
+
 def flatten_two_lines(crop):
     height, width = crop.shape[:2]
     gray = cv2.cvtColor(crop, cv2.COLOR_BGR2GRAY)
@@ -76,6 +92,7 @@ class PlateEngine:
         import torch
 
         torch.set_num_threads(2)
+        self.detector_weights_sha256 = hashlib.sha256((ROOT/'models/plate_detector.pt').read_bytes()).hexdigest() if detector is None else None
         self.detector = detector if detector is not None else YOLO(str(ROOT / 'models/plate_detector.pt'))
         options = ort.SessionOptions()
         options.intra_op_num_threads = 2
@@ -84,6 +101,10 @@ class PlateEngine:
             plate_config_path=ROOT / 'models/plate_ocr_config.yaml',
             providers=['CPUExecutionProvider'], sess_options=options)
         self.device = device
+        self.min_detail = float(os.getenv('PLATE_MIN_DETAIL', '25'))
+        self.min_brightness = float(os.getenv('PLATE_MIN_BRIGHTNESS', '40'))
+        if not math.isfinite(self.min_detail) or self.min_detail < 0 or not 0 <= self.min_brightness <= 255:
+            raise ValueError('Invalid image quality thresholds.')
         # ponytail: one inference at a time on a 6 GB workstation; use worker queues if throughput requires it.
         self.lock = threading.Lock()
 
@@ -104,7 +125,9 @@ class PlateEngine:
             confidence = float(probabilities.mean()) if len(probabilities) else 0.
             candidates.append({'plate': text, 'raw_text': prediction.plate,
                                'ocr_confidence': round(confidence, 4), 'valid_format': is_vietnamese_plate(text)})
-        return max(candidates, key=lambda item: (item['valid_format'], item['ocr_confidence']))
+        best = max(candidates, key=lambda item: (item['valid_format'], item['ocr_confidence']))
+        best['ocr_disagreement'] = len({item['plate'] for item in candidates if item['valid_format']}) > 1
+        return best
 
     def predict(self, image, confidence=.35):
         height, width = image.shape[:2]
@@ -122,10 +145,12 @@ class PlateEngine:
                 crop = image[y0:y1, x0:x1]
                 square = int(box.cls.item()) == 1
                 reading = self.read_crop(crop, square=square)
+                quality = crop_quality(crop, self.min_detail, self.min_brightness)
                 reading.update({'bbox': [x0, y0, x1, y1], 'display_plate': format_plate(reading['plate']),
                                 'detector_confidence': round(float(box.conf.item()), 4),
                                 'layout': 'two_lines' if square else 'one_line',
-                                'needs_review': not reading['valid_format'] or reading['ocr_confidence'] < .8,
+                                'needs_review': not reading['valid_format'] or reading['ocr_confidence'] < .8 or bool(quality['issues']) or reading.get('ocr_disagreement', False),
+                                'quality': quality,
                                 'crop': crop})
                 detections.append(reading)
             return detections

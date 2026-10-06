@@ -1,0 +1,1765 @@
+{
+  "created_at": "2026-10-06T08:24:59.471590+00:00",
+  "selection_rule": "Validation only: motion recall gain >= 3 percentage points; clean mAP50-95 drop <= 1.5 points; recall drop <= 1 point per condition; precision >= 95% per condition.",
+  "validation_samples": 200,
+  "baseline": {
+    "weights_sha256": "d8ead0e764779930aab6325848190852ed6594cce84b82faa01bfeed94f3b87e",
+    "training": {
+      "architecture": "YOLO11n",
+      "base_checkpoint": "yolo11n.pt",
+      "trained_locally": true,
+      "gpu": "NVIDIA GeForce RTX 3060 Laptop GPU",
+      "requested_epochs": 40,
+      "imgsz": 640,
+      "batch": 16,
+      "elapsed_seconds": 1796.2,
+      "test": {
+        "metrics/precision(B)": 0.9779517507777498,
+        "metrics/recall(B)": 0.9786498442592028,
+        "metrics/mAP50(B)": 0.9905621005247419,
+        "metrics/mAP50-95(B)": 0.8773995589405251,
+        "fitness": 0.8773995589405251
+      },
+      "weights_sha256": "d8ead0e764779930aab6325848190852ed6594cce84b82faa01bfeed94f3b87e",
+      "actual_epochs": 40,
+      "test_images": 665
+    },
+    "test": {
+      "robustness": {
+        "weights_sha256": "d8ead0e764779930aab6325848190852ed6594cce84b82faa01bfeed94f3b87e",
+        "kind": "paired synthetic detector stress test",
+        "seed": 42,
+        "confidence": 0.35,
+        "iou_threshold": 0.5,
+        "limitations": "Synthetic brightness, blur, rain and fog on a subset of test images. Not actual day/night/weather labels. Not OCR accuracy.",
+        "sample_list_sha256": "757d51699043e33e04acfbcfeae57e9d4ef9cfb8bd817a0034386c9fd26d42bd",
+        "conditions": {
+          "original": {
+            "images": 200,
+            "ground_truth_plates": 230,
+            "predictions": 233,
+            "matched": 228,
+            "recall_at_iou50": 0.991304347826087,
+            "precision_at_iou50": 0.9785407725321889
+          },
+          "synthetic_dark": {
+            "images": 200,
+            "ground_truth_plates": 230,
+            "predictions": 232,
+            "matched": 226,
+            "recall_at_iou50": 0.9826086956521739,
+            "precision_at_iou50": 0.9741379310344828
+          },
+          "synthetic_rain_fog": {
+            "images": 200,
+            "ground_truth_plates": 230,
+            "predictions": 231,
+            "matched": 228,
+            "recall_at_iou50": 0.991304347826087,
+            "precision_at_iou50": 0.987012987012987
+          },
+          "synthetic_motion_blur": {
+            "images": 200,
+            "ground_truth_plates": 230,
+            "predictions": 189,
+            "matched": 185,
+            "recall_at_iou50": 0.8043478260869565,
+            "precision_at_iou50": 0.9788359788359788
+          }
+        }
+      },
+      "ocr_evaluation": {
+        "weights_sha256": "d8ead0e764779930aab6325848190852ed6594cce84b82faa01bfeed94f3b87e",
+        "samples": 37,
+        "selected_before_predictions": true,
+        "annotation_audit": "After the preliminary pass, enlarged images were visually rechecked: index 30 is X1, index 37 ends in 9. Index 21 is physically occluded and the previously guessed prefix was removed. Independent human audit still recommended.",
+        "exact_match": 1.0,
+        "pipeline_exact_match": 1.0,
+        "character_error_rate": 0.0,
+        "mean_ms_crop_plus_pipeline": 223.44746486900524,
+        "device": "cpu",
+        "limitations": "Small manually transcribed, readable subset of test data. Unreadable exclusions recorded. Not population accuracy or real-weather evaluation.",
+        "excluded": [
+          {
+            "index": 9,
+            "image": "images/test/8a65d81752a4f5d5.png",
+            "reason": "Too blurred for reliable manual transcription"
+          },
+          {
+            "index": 22,
+            "image": "images/test/21f18cab1b83f5a0.png",
+            "reason": "Too blurred for reliable manual transcription"
+          },
+          {
+            "index": 21,
+            "image": "images/test/9b5419108c306299.png",
+            "reason": "Barrier occludes the first characters; full plate cannot be independently transcribed"
+          }
+        ],
+        "results": [
+          {
+            "index": 0,
+            "expected": "54N46324",
+            "crop_ocr": "54N46324",
+            "pipeline": "54N46324",
+            "ocr_confidence": 0.9996
+          },
+          {
+            "index": 1,
+            "expected": "30A96805",
+            "crop_ocr": "30A96805",
+            "pipeline": "30A96805",
+            "ocr_confidence": 1.0
+          },
+          {
+            "index": 2,
+            "expected": "51F44614",
+            "crop_ocr": "51F44614",
+            "pipeline": "51F44614",
+            "ocr_confidence": 0.9999
+          },
+          {
+            "index": 3,
+            "expected": "67AL09797",
+            "crop_ocr": "67AL09797",
+            "pipeline": "67AL09797",
+            "ocr_confidence": 0.9999
+          },
+          {
+            "index": 4,
+            "expected": "54L36961",
+            "crop_ocr": "54L36961",
+            "pipeline": "54L36961",
+            "ocr_confidence": 0.9999
+          },
+          {
+            "index": 5,
+            "expected": "59H160591",
+            "crop_ocr": "59H160591",
+            "pipeline": "59H160591",
+            "ocr_confidence": 0.9997
+          },
+          {
+            "index": 6,
+            "expected": "71B197914",
+            "crop_ocr": "71B197914",
+            "pipeline": "71B197914",
+            "ocr_confidence": 1.0
+          },
+          {
+            "index": 7,
+            "expected": "59S109841",
+            "crop_ocr": "59S109841",
+            "pipeline": "59S109841",
+            "ocr_confidence": 0.9999
+          },
+          {
+            "index": 8,
+            "expected": "66P15739",
+            "crop_ocr": "66P15739",
+            "pipeline": "66P15739",
+            "ocr_confidence": 0.9997
+          },
+          {
+            "index": 10,
+            "expected": "60F128808",
+            "crop_ocr": "60F128808",
+            "pipeline": "60F128808",
+            "ocr_confidence": 0.9986
+          },
+          {
+            "index": 11,
+            "expected": "82H108866",
+            "crop_ocr": "82H108866",
+            "pipeline": "82H108866",
+            "ocr_confidence": 0.9998
+          },
+          {
+            "index": 12,
+            "expected": "54V79675",
+            "crop_ocr": "54V79675",
+            "pipeline": "54V79675",
+            "ocr_confidence": 0.9997
+          },
+          {
+            "index": 13,
+            "expected": "30A04180",
+            "crop_ocr": "30A04180",
+            "pipeline": "30A04180",
+            "ocr_confidence": 0.9998
+          },
+          {
+            "index": 14,
+            "expected": "94H41831",
+            "crop_ocr": "94H41831",
+            "pipeline": "94H41831",
+            "ocr_confidence": 0.9998
+          },
+          {
+            "index": 15,
+            "expected": "98A29814",
+            "crop_ocr": "98A29814",
+            "pipeline": "98A29814",
+            "ocr_confidence": 0.9999
+          },
+          {
+            "index": 16,
+            "expected": "88A23016",
+            "crop_ocr": "88A23016",
+            "pipeline": "88A23016",
+            "ocr_confidence": 0.9999
+          },
+          {
+            "index": 17,
+            "expected": "59L197457",
+            "crop_ocr": "59L197457",
+            "pipeline": "59L197457",
+            "ocr_confidence": 1.0
+          },
+          {
+            "index": 18,
+            "expected": "59F224643",
+            "crop_ocr": "59F224643",
+            "pipeline": "59F224643",
+            "ocr_confidence": 0.9999
+          },
+          {
+            "index": 19,
+            "expected": "50X109634",
+            "crop_ocr": "50X109634",
+            "pipeline": "50X109634",
+            "ocr_confidence": 0.9999
+          },
+          {
+            "index": 20,
+            "expected": "72C136087",
+            "crop_ocr": "72C136087",
+            "pipeline": "72C136087",
+            "ocr_confidence": 1.0
+          },
+          {
+            "index": 23,
+            "expected": "90A07718",
+            "crop_ocr": "90A07718",
+            "pipeline": "90A07718",
+            "ocr_confidence": 0.9999
+          },
+          {
+            "index": 24,
+            "expected": "54H33457",
+            "crop_ocr": "54H33457",
+            "pipeline": "54H33457",
+            "ocr_confidence": 0.9998
+          },
+          {
+            "index": 25,
+            "expected": "30E50207",
+            "crop_ocr": "30E50207",
+            "pipeline": "30E50207",
+            "ocr_confidence": 1.0
+          },
+          {
+            "index": 26,
+            "expected": "51G84904",
+            "crop_ocr": "51G84904",
+            "pipeline": "51G84904",
+            "ocr_confidence": 0.9999
+          },
+          {
+            "index": 27,
+            "expected": "47B142872",
+            "crop_ocr": "47B142872",
+            "pipeline": "47B142872",
+            "ocr_confidence": 0.9999
+          },
+          {
+            "index": 28,
+            "expected": "30A62043",
+            "crop_ocr": "30A62043",
+            "pipeline": "30A62043",
+            "ocr_confidence": 1.0
+          },
+          {
+            "index": 29,
+            "expected": "51H25905",
+            "crop_ocr": "51H25905",
+            "pipeline": "51H25905",
+            "ocr_confidence": 0.9999
+          },
+          {
+            "index": 30,
+            "expected": "59X143044",
+            "crop_ocr": "59X143044",
+            "pipeline": "59X143044",
+            "ocr_confidence": 0.9999
+          },
+          {
+            "index": 31,
+            "expected": "30G31697",
+            "crop_ocr": "30G31697",
+            "pipeline": "30G31697",
+            "ocr_confidence": 0.9999
+          },
+          {
+            "index": 32,
+            "expected": "61A22959",
+            "crop_ocr": "61A22959",
+            "pipeline": "61A22959",
+            "ocr_confidence": 0.9999
+          },
+          {
+            "index": 33,
+            "expected": "59T159973",
+            "crop_ocr": "59T159973",
+            "pipeline": "59T159973",
+            "ocr_confidence": 1.0
+          },
+          {
+            "index": 34,
+            "expected": "55X86970",
+            "crop_ocr": "55X86970",
+            "pipeline": "55X86970",
+            "ocr_confidence": 0.9998
+          },
+          {
+            "index": 35,
+            "expected": "75F129830",
+            "crop_ocr": "75F129830",
+            "pipeline": "75F129830",
+            "ocr_confidence": 0.9999
+          },
+          {
+            "index": 36,
+            "expected": "29D05685",
+            "crop_ocr": "29D05685",
+            "pipeline": "29D05685",
+            "ocr_confidence": 0.9996
+          },
+          {
+            "index": 37,
+            "expected": "81K45959",
+            "crop_ocr": "81K45959",
+            "pipeline": "81K45959",
+            "ocr_confidence": 0.9994
+          },
+          {
+            "index": 38,
+            "expected": "54S88080",
+            "crop_ocr": "54S88080",
+            "pipeline": "54S88080",
+            "ocr_confidence": 0.9998
+          },
+          {
+            "index": 39,
+            "expected": "78N25203",
+            "crop_ocr": "78N25203",
+            "pipeline": "78N25203",
+            "ocr_confidence": 0.9998
+          }
+        ]
+      },
+      "ocr_weather": {
+        "weights_sha256": "d8ead0e764779930aab6325848190852ed6594cce84b82faa01bfeed94f3b87e",
+        "kind": "paired synthetic OCR and pipeline stress test",
+        "ground_truth_sha256": "8925ef7a5bd28356bc6db0f95394982e471291d27484cf2bd8e7e97324f30caa",
+        "limitations": "37 small readable-source samples with assistant annotations; no additional exclusions under corruption. Not real-weather validation.",
+        "conditions": {
+          "original": {
+            "condition": "original",
+            "samples": 37,
+            "selected_before_predictions": true,
+            "annotation_audit": "After the preliminary pass, enlarged images were visually rechecked: index 30 is X1, index 37 ends in 9. Index 21 is physically occluded and the previously guessed prefix was removed. Independent human audit still recommended.",
+            "exact_match": 1.0,
+            "pipeline_exact_match": 1.0,
+            "character_error_rate": 0.0,
+            "mean_ms_crop_plus_pipeline": 301.41120000327055,
+            "device": "cpu",
+            "limitations": "Small manually transcribed, readable subset of test data. Unreadable exclusions recorded. Not population accuracy or real-weather evaluation.",
+            "excluded": [
+              {
+                "index": 9,
+                "image": "images/test/8a65d81752a4f5d5.png",
+                "reason": "Too blurred for reliable manual transcription"
+              },
+              {
+                "index": 22,
+                "image": "images/test/21f18cab1b83f5a0.png",
+                "reason": "Too blurred for reliable manual transcription"
+              },
+              {
+                "index": 21,
+                "image": "images/test/9b5419108c306299.png",
+                "reason": "Barrier occludes the first characters; full plate cannot be independently transcribed"
+              }
+            ],
+            "results": [
+              {
+                "index": 0,
+                "expected": "54N46324",
+                "crop_ocr": "54N46324",
+                "pipeline": "54N46324",
+                "ocr_confidence": 0.9996
+              },
+              {
+                "index": 1,
+                "expected": "30A96805",
+                "crop_ocr": "30A96805",
+                "pipeline": "30A96805",
+                "ocr_confidence": 1.0
+              },
+              {
+                "index": 2,
+                "expected": "51F44614",
+                "crop_ocr": "51F44614",
+                "pipeline": "51F44614",
+                "ocr_confidence": 0.9999
+              },
+              {
+                "index": 3,
+                "expected": "67AL09797",
+                "crop_ocr": "67AL09797",
+                "pipeline": "67AL09797",
+                "ocr_confidence": 0.9999
+              },
+              {
+                "index": 4,
+                "expected": "54L36961",
+                "crop_ocr": "54L36961",
+                "pipeline": "54L36961",
+                "ocr_confidence": 0.9999
+              },
+              {
+                "index": 5,
+                "expected": "59H160591",
+                "crop_ocr": "59H160591",
+                "pipeline": "59H160591",
+                "ocr_confidence": 0.9997
+              },
+              {
+                "index": 6,
+                "expected": "71B197914",
+                "crop_ocr": "71B197914",
+                "pipeline": "71B197914",
+                "ocr_confidence": 1.0
+              },
+              {
+                "index": 7,
+                "expected": "59S109841",
+                "crop_ocr": "59S109841",
+                "pipeline": "59S109841",
+                "ocr_confidence": 0.9999
+              },
+              {
+                "index": 8,
+                "expected": "66P15739",
+                "crop_ocr": "66P15739",
+                "pipeline": "66P15739",
+                "ocr_confidence": 0.9997
+              },
+              {
+                "index": 10,
+                "expected": "60F128808",
+                "crop_ocr": "60F128808",
+                "pipeline": "60F128808",
+                "ocr_confidence": 0.9986
+              },
+              {
+                "index": 11,
+                "expected": "82H108866",
+                "crop_ocr": "82H108866",
+                "pipeline": "82H108866",
+                "ocr_confidence": 0.9998
+              },
+              {
+                "index": 12,
+                "expected": "54V79675",
+                "crop_ocr": "54V79675",
+                "pipeline": "54V79675",
+                "ocr_confidence": 0.9997
+              },
+              {
+                "index": 13,
+                "expected": "30A04180",
+                "crop_ocr": "30A04180",
+                "pipeline": "30A04180",
+                "ocr_confidence": 0.9998
+              },
+              {
+                "index": 14,
+                "expected": "94H41831",
+                "crop_ocr": "94H41831",
+                "pipeline": "94H41831",
+                "ocr_confidence": 0.9998
+              },
+              {
+                "index": 15,
+                "expected": "98A29814",
+                "crop_ocr": "98A29814",
+                "pipeline": "98A29814",
+                "ocr_confidence": 0.9999
+              },
+              {
+                "index": 16,
+                "expected": "88A23016",
+                "crop_ocr": "88A23016",
+                "pipeline": "88A23016",
+                "ocr_confidence": 0.9999
+              },
+              {
+                "index": 17,
+                "expected": "59L197457",
+                "crop_ocr": "59L197457",
+                "pipeline": "59L197457",
+                "ocr_confidence": 1.0
+              },
+              {
+                "index": 18,
+                "expected": "59F224643",
+                "crop_ocr": "59F224643",
+                "pipeline": "59F224643",
+                "ocr_confidence": 0.9999
+              },
+              {
+                "index": 19,
+                "expected": "50X109634",
+                "crop_ocr": "50X109634",
+                "pipeline": "50X109634",
+                "ocr_confidence": 0.9999
+              },
+              {
+                "index": 20,
+                "expected": "72C136087",
+                "crop_ocr": "72C136087",
+                "pipeline": "72C136087",
+                "ocr_confidence": 1.0
+              },
+              {
+                "index": 23,
+                "expected": "90A07718",
+                "crop_ocr": "90A07718",
+                "pipeline": "90A07718",
+                "ocr_confidence": 0.9999
+              },
+              {
+                "index": 24,
+                "expected": "54H33457",
+                "crop_ocr": "54H33457",
+                "pipeline": "54H33457",
+                "ocr_confidence": 0.9998
+              },
+              {
+                "index": 25,
+                "expected": "30E50207",
+                "crop_ocr": "30E50207",
+                "pipeline": "30E50207",
+                "ocr_confidence": 1.0
+              },
+              {
+                "index": 26,
+                "expected": "51G84904",
+                "crop_ocr": "51G84904",
+                "pipeline": "51G84904",
+                "ocr_confidence": 0.9999
+              },
+              {
+                "index": 27,
+                "expected": "47B142872",
+                "crop_ocr": "47B142872",
+                "pipeline": "47B142872",
+                "ocr_confidence": 0.9999
+              },
+              {
+                "index": 28,
+                "expected": "30A62043",
+                "crop_ocr": "30A62043",
+                "pipeline": "30A62043",
+                "ocr_confidence": 1.0
+              },
+              {
+                "index": 29,
+                "expected": "51H25905",
+                "crop_ocr": "51H25905",
+                "pipeline": "51H25905",
+                "ocr_confidence": 0.9999
+              },
+              {
+                "index": 30,
+                "expected": "59X143044",
+                "crop_ocr": "59X143044",
+                "pipeline": "59X143044",
+                "ocr_confidence": 0.9999
+              },
+              {
+                "index": 31,
+                "expected": "30G31697",
+                "crop_ocr": "30G31697",
+                "pipeline": "30G31697",
+                "ocr_confidence": 0.9999
+              },
+              {
+                "index": 32,
+                "expected": "61A22959",
+                "crop_ocr": "61A22959",
+                "pipeline": "61A22959",
+                "ocr_confidence": 0.9999
+              },
+              {
+                "index": 33,
+                "expected": "59T159973",
+                "crop_ocr": "59T159973",
+                "pipeline": "59T159973",
+                "ocr_confidence": 1.0
+              },
+              {
+                "index": 34,
+                "expected": "55X86970",
+                "crop_ocr": "55X86970",
+                "pipeline": "55X86970",
+                "ocr_confidence": 0.9998
+              },
+              {
+                "index": 35,
+                "expected": "75F129830",
+                "crop_ocr": "75F129830",
+                "pipeline": "75F129830",
+                "ocr_confidence": 0.9999
+              },
+              {
+                "index": 36,
+                "expected": "29D05685",
+                "crop_ocr": "29D05685",
+                "pipeline": "29D05685",
+                "ocr_confidence": 0.9996
+              },
+              {
+                "index": 37,
+                "expected": "81K45959",
+                "crop_ocr": "81K45959",
+                "pipeline": "81K45959",
+                "ocr_confidence": 0.9994
+              },
+              {
+                "index": 38,
+                "expected": "54S88080",
+                "crop_ocr": "54S88080",
+                "pipeline": "54S88080",
+                "ocr_confidence": 0.9998
+              },
+              {
+                "index": 39,
+                "expected": "78N25203",
+                "crop_ocr": "78N25203",
+                "pipeline": "78N25203",
+                "ocr_confidence": 0.9998
+              }
+            ],
+            "weights_sha256": "d8ead0e764779930aab6325848190852ed6594cce84b82faa01bfeed94f3b87e"
+          },
+          "synthetic_dark": {
+            "condition": "synthetic_dark",
+            "samples": 37,
+            "selected_before_predictions": true,
+            "annotation_audit": "After the preliminary pass, enlarged images were visually rechecked: index 30 is X1, index 37 ends in 9. Index 21 is physically occluded and the previously guessed prefix was removed. Independent human audit still recommended.",
+            "exact_match": 1.0,
+            "pipeline_exact_match": 1.0,
+            "character_error_rate": 0.0,
+            "mean_ms_crop_plus_pipeline": 250.19478378188168,
+            "device": "cpu",
+            "limitations": "Small manually transcribed, readable subset of test data. Unreadable exclusions recorded. Not population accuracy or real-weather evaluation.",
+            "excluded": [
+              {
+                "index": 9,
+                "image": "images/test/8a65d81752a4f5d5.png",
+                "reason": "Too blurred for reliable manual transcription"
+              },
+              {
+                "index": 22,
+                "image": "images/test/21f18cab1b83f5a0.png",
+                "reason": "Too blurred for reliable manual transcription"
+              },
+              {
+                "index": 21,
+                "image": "images/test/9b5419108c306299.png",
+                "reason": "Barrier occludes the first characters; full plate cannot be independently transcribed"
+              }
+            ],
+            "results": [
+              {
+                "index": 0,
+                "expected": "54N46324",
+                "crop_ocr": "54N46324",
+                "pipeline": "54N46324",
+                "ocr_confidence": 0.9839
+              },
+              {
+                "index": 1,
+                "expected": "30A96805",
+                "crop_ocr": "30A96805",
+                "pipeline": "30A96805",
+                "ocr_confidence": 0.9999
+              },
+              {
+                "index": 2,
+                "expected": "51F44614",
+                "crop_ocr": "51F44614",
+                "pipeline": "51F44614",
+                "ocr_confidence": 0.9999
+              },
+              {
+                "index": 3,
+                "expected": "67AL09797",
+                "crop_ocr": "67AL09797",
+                "pipeline": "67AL09797",
+                "ocr_confidence": 0.9999
+              },
+              {
+                "index": 4,
+                "expected": "54L36961",
+                "crop_ocr": "54L36961",
+                "pipeline": "54L36961",
+                "ocr_confidence": 0.9998
+              },
+              {
+                "index": 5,
+                "expected": "59H160591",
+                "crop_ocr": "59H160591",
+                "pipeline": "59H160591",
+                "ocr_confidence": 0.9996
+              },
+              {
+                "index": 6,
+                "expected": "71B197914",
+                "crop_ocr": "71B197914",
+                "pipeline": "71B197914",
+                "ocr_confidence": 0.9999
+              },
+              {
+                "index": 7,
+                "expected": "59S109841",
+                "crop_ocr": "59S109841",
+                "pipeline": "59S109841",
+                "ocr_confidence": 0.9999
+              },
+              {
+                "index": 8,
+                "expected": "66P15739",
+                "crop_ocr": "66P15739",
+                "pipeline": "66P15739",
+                "ocr_confidence": 0.9993
+              },
+              {
+                "index": 10,
+                "expected": "60F128808",
+                "crop_ocr": "60F128808",
+                "pipeline": "60F128808",
+                "ocr_confidence": 0.9992
+              },
+              {
+                "index": 11,
+                "expected": "82H108866",
+                "crop_ocr": "82H108866",
+                "pipeline": "82H108866",
+                "ocr_confidence": 0.9997
+              },
+              {
+                "index": 12,
+                "expected": "54V79675",
+                "crop_ocr": "54V79675",
+                "pipeline": "54V79675",
+                "ocr_confidence": 0.9995
+              },
+              {
+                "index": 13,
+                "expected": "30A04180",
+                "crop_ocr": "30A04180",
+                "pipeline": "30A04180",
+                "ocr_confidence": 0.9999
+              },
+              {
+                "index": 14,
+                "expected": "94H41831",
+                "crop_ocr": "94H41831",
+                "pipeline": "94H41831",
+                "ocr_confidence": 0.9998
+              },
+              {
+                "index": 15,
+                "expected": "98A29814",
+                "crop_ocr": "98A29814",
+                "pipeline": "98A29814",
+                "ocr_confidence": 0.9999
+              },
+              {
+                "index": 16,
+                "expected": "88A23016",
+                "crop_ocr": "88A23016",
+                "pipeline": "88A23016",
+                "ocr_confidence": 0.9999
+              },
+              {
+                "index": 17,
+                "expected": "59L197457",
+                "crop_ocr": "59L197457",
+                "pipeline": "59L197457",
+                "ocr_confidence": 0.9999
+              },
+              {
+                "index": 18,
+                "expected": "59F224643",
+                "crop_ocr": "59F224643",
+                "pipeline": "59F224643",
+                "ocr_confidence": 0.9998
+              },
+              {
+                "index": 19,
+                "expected": "50X109634",
+                "crop_ocr": "50X109634",
+                "pipeline": "50X109634",
+                "ocr_confidence": 0.9999
+              },
+              {
+                "index": 20,
+                "expected": "72C136087",
+                "crop_ocr": "72C136087",
+                "pipeline": "72C136087",
+                "ocr_confidence": 1.0
+              },
+              {
+                "index": 23,
+                "expected": "90A07718",
+                "crop_ocr": "90A07718",
+                "pipeline": "90A07718",
+                "ocr_confidence": 0.9999
+              },
+              {
+                "index": 24,
+                "expected": "54H33457",
+                "crop_ocr": "54H33457",
+                "pipeline": "54H33457",
+                "ocr_confidence": 0.9997
+              },
+              {
+                "index": 25,
+                "expected": "30E50207",
+                "crop_ocr": "30E50207",
+                "pipeline": "30E50207",
+                "ocr_confidence": 0.9999
+              },
+              {
+                "index": 26,
+                "expected": "51G84904",
+                "crop_ocr": "51G84904",
+                "pipeline": "51G84904",
+                "ocr_confidence": 0.9999
+              },
+              {
+                "index": 27,
+                "expected": "47B142872",
+                "crop_ocr": "47B142872",
+                "pipeline": "47B142872",
+                "ocr_confidence": 0.9999
+              },
+              {
+                "index": 28,
+                "expected": "30A62043",
+                "crop_ocr": "30A62043",
+                "pipeline": "30A62043",
+                "ocr_confidence": 1.0
+              },
+              {
+                "index": 29,
+                "expected": "51H25905",
+                "crop_ocr": "51H25905",
+                "pipeline": "51H25905",
+                "ocr_confidence": 0.9998
+              },
+              {
+                "index": 30,
+                "expected": "59X143044",
+                "crop_ocr": "59X143044",
+                "pipeline": "59X143044",
+                "ocr_confidence": 0.9999
+              },
+              {
+                "index": 31,
+                "expected": "30G31697",
+                "crop_ocr": "30G31697",
+                "pipeline": "30G31697",
+                "ocr_confidence": 0.9999
+              },
+              {
+                "index": 32,
+                "expected": "61A22959",
+                "crop_ocr": "61A22959",
+                "pipeline": "61A22959",
+                "ocr_confidence": 1.0
+              },
+              {
+                "index": 33,
+                "expected": "59T159973",
+                "crop_ocr": "59T159973",
+                "pipeline": "59T159973",
+                "ocr_confidence": 0.9999
+              },
+              {
+                "index": 34,
+                "expected": "55X86970",
+                "crop_ocr": "55X86970",
+                "pipeline": "55X86970",
+                "ocr_confidence": 0.9998
+              },
+              {
+                "index": 35,
+                "expected": "75F129830",
+                "crop_ocr": "75F129830",
+                "pipeline": "75F129830",
+                "ocr_confidence": 0.9999
+              },
+              {
+                "index": 36,
+                "expected": "29D05685",
+                "crop_ocr": "29D05685",
+                "pipeline": "29D05685",
+                "ocr_confidence": 0.9997
+              },
+              {
+                "index": 37,
+                "expected": "81K45959",
+                "crop_ocr": "81K45959",
+                "pipeline": "81K45959",
+                "ocr_confidence": 0.9992
+              },
+              {
+                "index": 38,
+                "expected": "54S88080",
+                "crop_ocr": "54S88080",
+                "pipeline": "54S88080",
+                "ocr_confidence": 0.9998
+              },
+              {
+                "index": 39,
+                "expected": "78N25203",
+                "crop_ocr": "78N25203",
+                "pipeline": "78N25203",
+                "ocr_confidence": 0.9998
+              }
+            ]
+          },
+          "synthetic_rain_fog": {
+            "condition": "synthetic_rain_fog",
+            "samples": 37,
+            "selected_before_predictions": true,
+            "annotation_audit": "After the preliminary pass, enlarged images were visually rechecked: index 30 is X1, index 37 ends in 9. Index 21 is physically occluded and the previously guessed prefix was removed. Independent human audit still recommended.",
+            "exact_match": 1.0,
+            "pipeline_exact_match": 1.0,
+            "character_error_rate": 0.0,
+            "mean_ms_crop_plus_pipeline": 251.93582162437207,
+            "device": "cpu",
+            "limitations": "Small manually transcribed, readable subset of test data. Unreadable exclusions recorded. Not population accuracy or real-weather evaluation.",
+            "excluded": [
+              {
+                "index": 9,
+                "image": "images/test/8a65d81752a4f5d5.png",
+                "reason": "Too blurred for reliable manual transcription"
+              },
+              {
+                "index": 22,
+                "image": "images/test/21f18cab1b83f5a0.png",
+                "reason": "Too blurred for reliable manual transcription"
+              },
+              {
+                "index": 21,
+                "image": "images/test/9b5419108c306299.png",
+                "reason": "Barrier occludes the first characters; full plate cannot be independently transcribed"
+              }
+            ],
+            "results": [
+              {
+                "index": 0,
+                "expected": "54N46324",
+                "crop_ocr": "54N46324",
+                "pipeline": "54N46324",
+                "ocr_confidence": 0.9997
+              },
+              {
+                "index": 1,
+                "expected": "30A96805",
+                "crop_ocr": "30A96805",
+                "pipeline": "30A96805",
+                "ocr_confidence": 0.9999
+              },
+              {
+                "index": 2,
+                "expected": "51F44614",
+                "crop_ocr": "51F44614",
+                "pipeline": "51F44614",
+                "ocr_confidence": 0.9998
+              },
+              {
+                "index": 3,
+                "expected": "67AL09797",
+                "crop_ocr": "67AL09797",
+                "pipeline": "67AL09797",
+                "ocr_confidence": 0.9999
+              },
+              {
+                "index": 4,
+                "expected": "54L36961",
+                "crop_ocr": "54L36961",
+                "pipeline": "54L36961",
+                "ocr_confidence": 0.9998
+              },
+              {
+                "index": 5,
+                "expected": "59H160591",
+                "crop_ocr": "59H160591",
+                "pipeline": "59H160591",
+                "ocr_confidence": 0.9988
+              },
+              {
+                "index": 6,
+                "expected": "71B197914",
+                "crop_ocr": "71B197914",
+                "pipeline": "71B197914",
+                "ocr_confidence": 1.0
+              },
+              {
+                "index": 7,
+                "expected": "59S109841",
+                "crop_ocr": "59S109841",
+                "pipeline": "59S109841",
+                "ocr_confidence": 0.9999
+              },
+              {
+                "index": 8,
+                "expected": "66P15739",
+                "crop_ocr": "66P15739",
+                "pipeline": "66P15739",
+                "ocr_confidence": 0.9995
+              },
+              {
+                "index": 10,
+                "expected": "60F128808",
+                "crop_ocr": "60F128808",
+                "pipeline": "60F128808",
+                "ocr_confidence": 0.9989
+              },
+              {
+                "index": 11,
+                "expected": "82H108866",
+                "crop_ocr": "82H108866",
+                "pipeline": "82H108866",
+                "ocr_confidence": 0.9998
+              },
+              {
+                "index": 12,
+                "expected": "54V79675",
+                "crop_ocr": "54V79675",
+                "pipeline": "54V79675",
+                "ocr_confidence": 0.9998
+              },
+              {
+                "index": 13,
+                "expected": "30A04180",
+                "crop_ocr": "30A04180",
+                "pipeline": "30A04180",
+                "ocr_confidence": 0.9999
+              },
+              {
+                "index": 14,
+                "expected": "94H41831",
+                "crop_ocr": "94H41831",
+                "pipeline": "94H41831",
+                "ocr_confidence": 0.9998
+              },
+              {
+                "index": 15,
+                "expected": "98A29814",
+                "crop_ocr": "98A29814",
+                "pipeline": "98A29814",
+                "ocr_confidence": 0.9999
+              },
+              {
+                "index": 16,
+                "expected": "88A23016",
+                "crop_ocr": "88A23016",
+                "pipeline": "88A23016",
+                "ocr_confidence": 0.9999
+              },
+              {
+                "index": 17,
+                "expected": "59L197457",
+                "crop_ocr": "59L197457",
+                "pipeline": "59L197457",
+                "ocr_confidence": 1.0
+              },
+              {
+                "index": 18,
+                "expected": "59F224643",
+                "crop_ocr": "59F224643",
+                "pipeline": "59F224643",
+                "ocr_confidence": 0.9998
+              },
+              {
+                "index": 19,
+                "expected": "50X109634",
+                "crop_ocr": "50X109634",
+                "pipeline": "50X109634",
+                "ocr_confidence": 0.9999
+              },
+              {
+                "index": 20,
+                "expected": "72C136087",
+                "crop_ocr": "72C136087",
+                "pipeline": "72C136087",
+                "ocr_confidence": 1.0
+              },
+              {
+                "index": 23,
+                "expected": "90A07718",
+                "crop_ocr": "90A07718",
+                "pipeline": "90A07718",
+                "ocr_confidence": 0.9999
+              },
+              {
+                "index": 24,
+                "expected": "54H33457",
+                "crop_ocr": "54H33457",
+                "pipeline": "54H33457",
+                "ocr_confidence": 0.9998
+              },
+              {
+                "index": 25,
+                "expected": "30E50207",
+                "crop_ocr": "30E50207",
+                "pipeline": "30E50207",
+                "ocr_confidence": 1.0
+              },
+              {
+                "index": 26,
+                "expected": "51G84904",
+                "crop_ocr": "51G84904",
+                "pipeline": "51G84904",
+                "ocr_confidence": 0.9999
+              },
+              {
+                "index": 27,
+                "expected": "47B142872",
+                "crop_ocr": "47B142872",
+                "pipeline": "47B142872",
+                "ocr_confidence": 0.9999
+              },
+              {
+                "index": 28,
+                "expected": "30A62043",
+                "crop_ocr": "30A62043",
+                "pipeline": "30A62043",
+                "ocr_confidence": 1.0
+              },
+              {
+                "index": 29,
+                "expected": "51H25905",
+                "crop_ocr": "51H25905",
+                "pipeline": "51H25905",
+                "ocr_confidence": 0.9998
+              },
+              {
+                "index": 30,
+                "expected": "59X143044",
+                "crop_ocr": "59X143044",
+                "pipeline": "59X143044",
+                "ocr_confidence": 0.9999
+              },
+              {
+                "index": 31,
+                "expected": "30G31697",
+                "crop_ocr": "30G31697",
+                "pipeline": "30G31697",
+                "ocr_confidence": 0.9999
+              },
+              {
+                "index": 32,
+                "expected": "61A22959",
+                "crop_ocr": "61A22959",
+                "pipeline": "61A22959",
+                "ocr_confidence": 0.9999
+              },
+              {
+                "index": 33,
+                "expected": "59T159973",
+                "crop_ocr": "59T159973",
+                "pipeline": "59T159973",
+                "ocr_confidence": 1.0
+              },
+              {
+                "index": 34,
+                "expected": "55X86970",
+                "crop_ocr": "55X86970",
+                "pipeline": "55X86970",
+                "ocr_confidence": 0.9998
+              },
+              {
+                "index": 35,
+                "expected": "75F129830",
+                "crop_ocr": "75F129830",
+                "pipeline": "75F129830",
+                "ocr_confidence": 0.9999
+              },
+              {
+                "index": 36,
+                "expected": "29D05685",
+                "crop_ocr": "29D05685",
+                "pipeline": "29D05685",
+                "ocr_confidence": 0.9991
+              },
+              {
+                "index": 37,
+                "expected": "81K45959",
+                "crop_ocr": "81K45959",
+                "pipeline": "81K45959",
+                "ocr_confidence": 0.9995
+              },
+              {
+                "index": 38,
+                "expected": "54S88080",
+                "crop_ocr": "54S88080",
+                "pipeline": "54S88080",
+                "ocr_confidence": 0.9998
+              },
+              {
+                "index": 39,
+                "expected": "78N25203",
+                "crop_ocr": "78N25203",
+                "pipeline": "78N25203",
+                "ocr_confidence": 0.9999
+              }
+            ]
+          },
+          "synthetic_motion_blur": {
+            "condition": "synthetic_motion_blur",
+            "samples": 37,
+            "selected_before_predictions": true,
+            "annotation_audit": "After the preliminary pass, enlarged images were visually rechecked: index 30 is X1, index 37 ends in 9. Index 21 is physically occluded and the previously guessed prefix was removed. Independent human audit still recommended.",
+            "exact_match": 0.08108108108108109,
+            "pipeline_exact_match": 0.05405405405405406,
+            "character_error_rate": 0.7516129032258064,
+            "mean_ms_crop_plus_pipeline": 248.75545945975023,
+            "device": "cpu",
+            "limitations": "Small manually transcribed, readable subset of test data. Unreadable exclusions recorded. Not population accuracy or real-weather evaluation.",
+            "excluded": [
+              {
+                "index": 9,
+                "image": "images/test/8a65d81752a4f5d5.png",
+                "reason": "Too blurred for reliable manual transcription"
+              },
+              {
+                "index": 22,
+                "image": "images/test/21f18cab1b83f5a0.png",
+                "reason": "Too blurred for reliable manual transcription"
+              },
+              {
+                "index": 21,
+                "image": "images/test/9b5419108c306299.png",
+                "reason": "Barrier occludes the first characters; full plate cannot be independently transcribed"
+              }
+            ],
+            "results": [
+              {
+                "index": 0,
+                "expected": "54N46324",
+                "crop_ocr": "21V16",
+                "pipeline": "94L1622",
+                "ocr_confidence": 0.4406
+              },
+              {
+                "index": 1,
+                "expected": "30A96805",
+                "crop_ocr": "30A96805",
+                "pipeline": "30A96805",
+                "ocr_confidence": 0.9999
+              },
+              {
+                "index": 2,
+                "expected": "51F44614",
+                "crop_ocr": "SIF4474",
+                "pipeline": "SF44674",
+                "ocr_confidence": 0.5121
+              },
+              {
+                "index": 3,
+                "expected": "67AL09797",
+                "crop_ocr": "L0",
+                "pipeline": "GJL199",
+                "ocr_confidence": 0.4841
+              },
+              {
+                "index": 4,
+                "expected": "54L36961",
+                "crop_ocr": "L9",
+                "pipeline": "SLB6001",
+                "ocr_confidence": 0.4212
+              },
+              {
+                "index": 5,
+                "expected": "59H160591",
+                "crop_ocr": "",
+                "pipeline": "H",
+                "ocr_confidence": 0.0
+              },
+              {
+                "index": 6,
+                "expected": "71B197914",
+                "crop_ocr": "",
+                "pipeline": "1",
+                "ocr_confidence": 0.0
+              },
+              {
+                "index": 7,
+                "expected": "59S109841",
+                "crop_ocr": "1",
+                "pipeline": "50D1984",
+                "ocr_confidence": 0.6628
+              },
+              {
+                "index": 8,
+                "expected": "66P15739",
+                "crop_ocr": "TT15",
+                "pipeline": "GHD5139",
+                "ocr_confidence": 0.336
+              },
+              {
+                "index": 10,
+                "expected": "60F128808",
+                "crop_ocr": "",
+                "pipeline": "",
+                "ocr_confidence": 0.0
+              },
+              {
+                "index": 11,
+                "expected": "82H108866",
+                "crop_ocr": "",
+                "pipeline": "",
+                "ocr_confidence": 0.0
+              },
+              {
+                "index": 12,
+                "expected": "54V79675",
+                "crop_ocr": "1900",
+                "pipeline": "SL19005",
+                "ocr_confidence": 0.3911
+              },
+              {
+                "index": 13,
+                "expected": "30A04180",
+                "crop_ocr": "3TA041",
+                "pipeline": "",
+                "ocr_confidence": 0.5456
+              },
+              {
+                "index": 14,
+                "expected": "94H41831",
+                "crop_ocr": "D",
+                "pipeline": "D",
+                "ocr_confidence": 0.3882
+              },
+              {
+                "index": 15,
+                "expected": "98A29814",
+                "crop_ocr": "",
+                "pipeline": "",
+                "ocr_confidence": 0.0
+              },
+              {
+                "index": 16,
+                "expected": "88A23016",
+                "crop_ocr": "88A23078",
+                "pipeline": "88A23103",
+                "ocr_confidence": 0.8268
+              },
+              {
+                "index": 17,
+                "expected": "59L197457",
+                "crop_ocr": "15",
+                "pipeline": "SDD145",
+                "ocr_confidence": 0.478
+              },
+              {
+                "index": 18,
+                "expected": "59F224643",
+                "crop_ocr": "L",
+                "pipeline": "FL175",
+                "ocr_confidence": 0.2717
+              },
+              {
+                "index": 19,
+                "expected": "50X109634",
+                "crop_ocr": "",
+                "pipeline": "163",
+                "ocr_confidence": 0.0
+              },
+              {
+                "index": 20,
+                "expected": "72C136087",
+                "crop_ocr": "",
+                "pipeline": "1",
+                "ocr_confidence": 0.0
+              },
+              {
+                "index": 23,
+                "expected": "90A07718",
+                "crop_ocr": "90A07718",
+                "pipeline": "90H07718",
+                "ocr_confidence": 0.916
+              },
+              {
+                "index": 24,
+                "expected": "54H33457",
+                "crop_ocr": "94",
+                "pipeline": "SLH9447",
+                "ocr_confidence": 0.5595
+              },
+              {
+                "index": 25,
+                "expected": "30E50207",
+                "crop_ocr": "30E50200",
+                "pipeline": "30E51200",
+                "ocr_confidence": 0.943
+              },
+              {
+                "index": 26,
+                "expected": "51G84904",
+                "crop_ocr": "00",
+                "pipeline": "",
+                "ocr_confidence": 0.2073
+              },
+              {
+                "index": 27,
+                "expected": "47B142872",
+                "crop_ocr": "WPS7197",
+                "pipeline": "F27",
+                "ocr_confidence": 0.4351
+              },
+              {
+                "index": 28,
+                "expected": "30A62043",
+                "crop_ocr": "30A62043",
+                "pipeline": "30A62043",
+                "ocr_confidence": 0.9999
+              },
+              {
+                "index": 29,
+                "expected": "51H25905",
+                "crop_ocr": "",
+                "pipeline": "72",
+                "ocr_confidence": 0.0
+              },
+              {
+                "index": 30,
+                "expected": "59X143044",
+                "crop_ocr": "",
+                "pipeline": "",
+                "ocr_confidence": 0.0
+              },
+              {
+                "index": 31,
+                "expected": "30G31697",
+                "crop_ocr": "1",
+                "pipeline": "310E",
+                "ocr_confidence": 0.6755
+              },
+              {
+                "index": 32,
+                "expected": "61A22959",
+                "crop_ocr": "GAW220",
+                "pipeline": "",
+                "ocr_confidence": 0.3963
+              },
+              {
+                "index": 33,
+                "expected": "59T159973",
+                "crop_ocr": "",
+                "pipeline": "",
+                "ocr_confidence": 0.0
+              },
+              {
+                "index": 34,
+                "expected": "55X86970",
+                "crop_ocr": "10677",
+                "pipeline": "AB6",
+                "ocr_confidence": 0.3652
+              },
+              {
+                "index": 35,
+                "expected": "75F129830",
+                "crop_ocr": "",
+                "pipeline": "",
+                "ocr_confidence": 0.0
+              },
+              {
+                "index": 36,
+                "expected": "29D05685",
+                "crop_ocr": "29DC5685",
+                "pipeline": "",
+                "ocr_confidence": 0.9551
+              },
+              {
+                "index": 37,
+                "expected": "81K45959",
+                "crop_ocr": "01A5999",
+                "pipeline": "61A1191",
+                "ocr_confidence": 0.2996
+              },
+              {
+                "index": 38,
+                "expected": "54S88080",
+                "crop_ocr": "",
+                "pipeline": "SL3",
+                "ocr_confidence": 0.0
+              },
+              {
+                "index": 39,
+                "expected": "78N25203",
+                "crop_ocr": "61L511",
+                "pipeline": "161L571",
+                "ocr_confidence": 0.3994
+              }
+            ]
+          }
+        }
+      }
+    },
+    "validation": {
+      "clean": {
+        "metrics/precision(B)": 0.9908487288144501,
+        "metrics/recall(B)": 0.9928709484438036,
+        "metrics/mAP50(B)": 0.9943990409308205,
+        "metrics/mAP50-95(B)": 0.9028723168688699,
+        "fitness": 0.9028723168688699
+      },
+      "robustness": {
+        "weights_sha256": "d8ead0e764779930aab6325848190852ed6594cce84b82faa01bfeed94f3b87e",
+        "split": "val",
+        "kind": "paired synthetic detector stress test",
+        "seed": 42,
+        "confidence": 0.35,
+        "iou_threshold": 0.5,
+        "limitations": "Synthetic brightness, blur, rain and fog on a subset of test images. Not actual day/night/weather labels. Not OCR accuracy.",
+        "sample_list_sha256": "8901e4ed55b6c396504536225a4895c0264398e381c430bb48c82184284aca5a",
+        "conditions": {
+          "original": {
+            "images": 200,
+            "ground_truth_plates": 226,
+            "predictions": 230,
+            "matched": 226,
+            "recall_at_iou50": 1.0,
+            "precision_at_iou50": 0.9826086956521739
+          },
+          "synthetic_dark": {
+            "images": 200,
+            "ground_truth_plates": 226,
+            "predictions": 229,
+            "matched": 225,
+            "recall_at_iou50": 0.995575221238938,
+            "precision_at_iou50": 0.982532751091703
+          },
+          "synthetic_rain_fog": {
+            "images": 200,
+            "ground_truth_plates": 226,
+            "predictions": 229,
+            "matched": 225,
+            "recall_at_iou50": 0.995575221238938,
+            "precision_at_iou50": 0.982532751091703
+          },
+          "synthetic_motion_blur": {
+            "images": 200,
+            "ground_truth_plates": 226,
+            "predictions": 198,
+            "matched": 190,
+            "recall_at_iou50": 0.8407079646017699,
+            "precision_at_iou50": 0.9595959595959596
+          }
+        }
+      }
+    }
+  },
+  "training": {
+    "base_weights_sha256": "d8ead0e764779930aab6325848190852ed6594cce84b82faa01bfeed94f3b87e",
+    "run": "plate_robust",
+    "requested_epochs": 18,
+    "clean_train": 3189,
+    "synthetic_train": 3189,
+    "augmentation_manifest_sha256": "4bfac6c3ee44e89caa0caaa5b61a1ed14c545a6b262397c1458089bcd27438e6",
+    "elapsed_seconds": 1722.0,
+    "selection": "Candidate best/last must pass paired validation before deployment; test is not used to select."
+  },
+  "candidates": {
+    "best": {
+      "clean": {
+        "metrics/precision(B)": 0.9909298639862747,
+        "metrics/recall(B)": 0.9936174840374208,
+        "metrics/mAP50(B)": 0.9946849808314688,
+        "metrics/mAP50-95(B)": 0.9061938661087391,
+        "fitness": 0.9061938661087391
+      },
+      "robustness": {
+        "weights_sha256": "37a282619e923cc5715f81fe1f236e5c7fb281322d546f2aa3ae9a2de8ce49f6",
+        "split": "val",
+        "kind": "paired synthetic detector stress test",
+        "seed": 42,
+        "confidence": 0.35,
+        "iou_threshold": 0.5,
+        "limitations": "Synthetic brightness, blur, rain and fog on a subset of test images. Not actual day/night/weather labels. Not OCR accuracy.",
+        "sample_list_sha256": "8901e4ed55b6c396504536225a4895c0264398e381c430bb48c82184284aca5a",
+        "conditions": {
+          "original": {
+            "images": 200,
+            "ground_truth_plates": 226,
+            "predictions": 230,
+            "matched": 226,
+            "recall_at_iou50": 1.0,
+            "precision_at_iou50": 0.9826086956521739
+          },
+          "synthetic_dark": {
+            "images": 200,
+            "ground_truth_plates": 226,
+            "predictions": 228,
+            "matched": 225,
+            "recall_at_iou50": 0.995575221238938,
+            "precision_at_iou50": 0.9868421052631579
+          },
+          "synthetic_rain_fog": {
+            "images": 200,
+            "ground_truth_plates": 226,
+            "predictions": 230,
+            "matched": 226,
+            "recall_at_iou50": 1.0,
+            "precision_at_iou50": 0.9826086956521739
+          },
+          "synthetic_motion_blur": {
+            "images": 200,
+            "ground_truth_plates": 226,
+            "predictions": 229,
+            "matched": 226,
+            "recall_at_iou50": 1.0,
+            "precision_at_iou50": 0.9868995633187773
+          }
+        }
+      },
+      "passed": true
+    },
+    "last": {
+      "clean": {
+        "metrics/precision(B)": 0.9905088917552516,
+        "metrics/recall(B)": 0.9928709484438036,
+        "metrics/mAP50(B)": 0.9946729794160463,
+        "metrics/mAP50-95(B)": 0.8955548993482051,
+        "fitness": 0.8955548993482051
+      },
+      "robustness": {
+        "weights_sha256": "5dd95bec42a78bff94b8b292c5b932a94d8a1e1153161507d03ec1e9d7c890b3",
+        "split": "val",
+        "kind": "paired synthetic detector stress test",
+        "seed": 42,
+        "confidence": 0.35,
+        "iou_threshold": 0.5,
+        "limitations": "Synthetic brightness, blur, rain and fog on a subset of test images. Not actual day/night/weather labels. Not OCR accuracy.",
+        "sample_list_sha256": "8901e4ed55b6c396504536225a4895c0264398e381c430bb48c82184284aca5a",
+        "conditions": {
+          "original": {
+            "images": 200,
+            "ground_truth_plates": 226,
+            "predictions": 231,
+            "matched": 226,
+            "recall_at_iou50": 1.0,
+            "precision_at_iou50": 0.9783549783549783
+          },
+          "synthetic_dark": {
+            "images": 200,
+            "ground_truth_plates": 226,
+            "predictions": 230,
+            "matched": 225,
+            "recall_at_iou50": 0.995575221238938,
+            "precision_at_iou50": 0.9782608695652174
+          },
+          "synthetic_rain_fog": {
+            "images": 200,
+            "ground_truth_plates": 226,
+            "predictions": 230,
+            "matched": 226,
+            "recall_at_iou50": 1.0,
+            "precision_at_iou50": 0.9826086956521739
+          },
+          "synthetic_motion_blur": {
+            "images": 200,
+            "ground_truth_plates": 226,
+            "predictions": 230,
+            "matched": 226,
+            "recall_at_iou50": 1.0,
+            "precision_at_iou50": 0.9826086956521739
+          }
+        }
+      },
+      "passed": true
+    }
+  },
+  "limitations": "Synthetic corruptions and a small OCR subset, no physical night/rain camera or camera-independent split.",
+  "selected_candidate": "best",
+  "deployed_candidate": "best",
+  "selected_before_test": true,
+  "selection_weights_sha256": "37a282619e923cc5715f81fe1f236e5c7fb281322d546f2aa3ae9a2de8ce49f6",
+  "test": {
+    "clean": {
+      "metrics/precision(B)": 0.9796372810035943,
+      "metrics/recall(B)": 0.9810521501875515,
+      "metrics/mAP50(B)": 0.9910824998754094,
+      "metrics/mAP50-95(B)": 0.8749774402428707,
+      "fitness": 0.8749774402428707
+    },
+    "robustness": {
+      "weights_sha256": "37a282619e923cc5715f81fe1f236e5c7fb281322d546f2aa3ae9a2de8ce49f6",
+      "split": "test",
+      "kind": "paired synthetic detector stress test",
+      "seed": 42,
+      "confidence": 0.35,
+      "iou_threshold": 0.5,
+      "limitations": "Synthetic brightness, blur, rain and fog on a subset of test images. Not actual day/night/weather labels. Not OCR accuracy.",
+      "sample_list_sha256": "757d51699043e33e04acfbcfeae57e9d4ef9cfb8bd817a0034386c9fd26d42bd",
+      "conditions": {
+        "original": {
+          "images": 200,
+          "ground_truth_plates": 230,
+          "predictions": 227,
+          "matched": 223,
+          "recall_at_iou50": 0.9695652173913043,
+          "precision_at_iou50": 0.9823788546255506
+        },
+        "synthetic_dark": {
+          "images": 200,
+          "ground_truth_plates": 230,
+          "predictions": 228,
+          "matched": 223,
+          "recall_at_iou50": 0.9695652173913043,
+          "precision_at_iou50": 0.9780701754385965
+        },
+        "synthetic_rain_fog": {
+          "images": 200,
+          "ground_truth_plates": 230,
+          "predictions": 227,
+          "matched": 224,
+          "recall_at_iou50": 0.9739130434782609,
+          "precision_at_iou50": 0.986784140969163
+        },
+        "synthetic_motion_blur": {
+          "images": 200,
+          "ground_truth_plates": 230,
+          "predictions": 229,
+          "matched": 224,
+          "recall_at_iou50": 0.9739130434782609,
+          "precision_at_iou50": 0.9781659388646288
+        }
+      }
+    }
+  },
+  "deployed_weights_sha256": "37a282619e923cc5715f81fe1f236e5c7fb281322d546f2aa3ae9a2de8ce49f6",
+  "test_reuse_note": "The previous test results informed the diagnosis of v1 motion weakness. This reused test is a regression benchmark, not a never-observed independent holdout. Checkpoint selection in this run uses validation only."
+}

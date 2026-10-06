@@ -70,7 +70,7 @@ def authorized(request: Request):
         raise HTTPException(401, 'API key không hợp lệ.')
 
 
-app = FastAPI(title='Biển Số Việt · Recognition API', version='1.0.0', lifespan=lifespan)
+app = FastAPI(title='Biển Số Việt · Recognition API', version='1.1.0', lifespan=lifespan)
 
 
 @app.middleware('http')
@@ -94,13 +94,14 @@ def health():
     return {'status': 'ready' if getattr(app.state, 'engine', None) else 'model_unavailable',
             'detector': 'YOLO11n · fine-tuned Vietnamese plates', 'ocr': 'CCT S v2 · pretrained',
             'device': os.getenv('PLATE_DEVICE', 'cpu'), 'auth_required': bool(API_KEY),
+            'detector_weights_sha256': getattr(getattr(app.state, 'engine', None), 'detector_weights_sha256', None),
             'model_error': getattr(app.state, 'model_error', None)}
 
 
 @app.get('/api/model', dependencies=[Depends(authorized)])
 def model_report():
     reports = {}
-    for name in ('training', 'robustness', 'ocr_evaluation'):
+    for name in ('training', 'robustness', 'ocr_evaluation', 'hardening', 'ocr_weather'):
         path = ROOT / 'reports' / (name + '.json')
         if path.exists():
             reports[name] = json.loads(path.read_text(encoding='utf-8'))

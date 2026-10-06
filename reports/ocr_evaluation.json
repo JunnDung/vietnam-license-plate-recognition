@@ -1,12 +1,12 @@
 {
-  "weights_sha256": "d8ead0e764779930aab6325848190852ed6594cce84b82faa01bfeed94f3b87e",
+  "condition": "original",
   "samples": 37,
   "selected_before_predictions": true,
   "annotation_audit": "After the preliminary pass, enlarged images were visually rechecked: index 30 is X1, index 37 ends in 9. Index 21 is physically occluded and the previously guessed prefix was removed. Independent human audit still recommended.",
   "exact_match": 1.0,
   "pipeline_exact_match": 1.0,
   "character_error_rate": 0.0,
-  "mean_ms_crop_plus_pipeline": 223.44746486900524,
+  "mean_ms_crop_plus_pipeline": 278.59287567254205,
   "device": "cpu",
   "limitations": "Small manually transcribed, readable subset of test data. Unreadable exclusions recorded. Not population accuracy or real-weather evaluation.",
   "excluded": [
@@ -286,5 +286,6 @@
       "pipeline": "78N25203",
       "ocr_confidence": 0.9998
     }
-  ]
+  ],
+  "weights_sha256": "37a282619e923cc5715f81fe1f236e5c7fb281322d546f2aa3ae9a2de8ce49f6"
 }
