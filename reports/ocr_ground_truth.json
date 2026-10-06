@@ -1,0 +1,469 @@
+{
+  "selection": "First 40 test samples after random.Random(77) shuffle, first labeled plate per image",
+  "selected_before_predictions": true,
+  "annotation": "Visual manual transcription by assistant, needs independent human audit",
+  "samples": [
+    {
+      "index": 0,
+      "image": "images/test/2c2286e3a9c886aa.png",
+      "bbox": [
+        110,
+        79,
+        191,
+        150
+      ],
+      "layout": 1,
+      "expected": "54N46324"
+    },
+    {
+      "index": 1,
+      "image": "images/test/596dc0a91f5c07de.png",
+      "bbox": [
+        108,
+        147,
+        290,
+        296
+      ],
+      "layout": 1,
+      "expected": "30A96805"
+    },
+    {
+      "index": 2,
+      "image": "images/test/7d98d2a2f494f1db.png",
+      "bbox": [
+        183,
+        192,
+        283,
+        222
+      ],
+      "layout": 0,
+      "expected": "51F44614"
+    },
+    {
+      "index": 3,
+      "image": "images/test/98a57fef24ec9ea8.png",
+      "bbox": [
+        204,
+        389,
+        278,
+        438
+      ],
+      "layout": 1,
+      "expected": "67AL09797"
+    },
+    {
+      "index": 4,
+      "image": "images/test/2b5475fe3246fa39.png",
+      "bbox": [
+        194,
+        75,
+        277,
+        146
+      ],
+      "layout": 1,
+      "expected": "54L36961"
+    },
+    {
+      "index": 5,
+      "image": "images/test/442c82f22cfaaa3d.png",
+      "bbox": [
+        207,
+        42,
+        287,
+        113
+      ],
+      "layout": 1,
+      "expected": "59H160591"
+    },
+    {
+      "index": 6,
+      "image": "images/test/0ce710414e4c5f20.png",
+      "bbox": [
+        174,
+        148,
+        238,
+        204
+      ],
+      "layout": 1,
+      "expected": "71B197914"
+    },
+    {
+      "index": 7,
+      "image": "images/test/1a8e2d020fdf9e08.png",
+      "bbox": [
+        89,
+        33,
+        168,
+        99
+      ],
+      "layout": 1,
+      "expected": "59S109841"
+    },
+    {
+      "index": 8,
+      "image": "images/test/947089c68794feb8.png",
+      "bbox": [
+        149,
+        114,
+        233,
+        188
+      ],
+      "layout": 1,
+      "expected": "66P15739"
+    },
+    {
+      "index": 10,
+      "image": "images/test/c528d41b04052544.png",
+      "bbox": [
+        140,
+        386,
+        207,
+        431
+      ],
+      "layout": 1,
+      "expected": "60F128808"
+    },
+    {
+      "index": 11,
+      "image": "images/test/faf728bca07fd5ce.png",
+      "bbox": [
+        135,
+        134,
+        211,
+        200
+      ],
+      "layout": 1,
+      "expected": "82H108866"
+    },
+    {
+      "index": 12,
+      "image": "images/test/edde9491bc15fa7c.png",
+      "bbox": [
+        133,
+        98,
+        215,
+        169
+      ],
+      "layout": 1,
+      "expected": "54V79675"
+    },
+    {
+      "index": 13,
+      "image": "images/test/764a62aa35d08311.png",
+      "bbox": [
+        93,
+        63,
+        242,
+        103
+      ],
+      "layout": 0,
+      "expected": "30A04180"
+    },
+    {
+      "index": 14,
+      "image": "images/test/d2d909127096e40e.png",
+      "bbox": [
+        126,
+        64,
+        200,
+        127
+      ],
+      "layout": 1,
+      "expected": "94H41831"
+    },
+    {
+      "index": 15,
+      "image": "images/test/2a0015de48601030.png",
+      "bbox": [
+        165,
+        60,
+        263,
+        97
+      ],
+      "layout": 0,
+      "expected": "98A29814"
+    },
+    {
+      "index": 16,
+      "image": "images/test/285452b3bf7463c0.png",
+      "bbox": [
+        130,
+        134,
+        319,
+        258
+      ],
+      "layout": 0,
+      "expected": "88A23016"
+    },
+    {
+      "index": 17,
+      "image": "images/test/4d857bd5c4b2ba7e.png",
+      "bbox": [
+        111,
+        181,
+        183,
+        235
+      ],
+      "layout": 1,
+      "expected": "59L197457"
+    },
+    {
+      "index": 18,
+      "image": "images/test/f4538cba27d71694.png",
+      "bbox": [
+        293,
+        321,
+        354,
+        356
+      ],
+      "layout": 1,
+      "expected": "59F224643"
+    },
+    {
+      "index": 19,
+      "image": "images/test/9ea21c94f07ca6e1.png",
+      "bbox": [
+        143,
+        379,
+        219,
+        433
+      ],
+      "layout": 1,
+      "expected": "50X109634"
+    },
+    {
+      "index": 20,
+      "image": "images/test/d00a5668f7137a88.png",
+      "bbox": [
+        167,
+        126,
+        253,
+        203
+      ],
+      "layout": 1,
+      "expected": "72C136087"
+    },
+    {
+      "index": 23,
+      "image": "images/test/f8478ecb70f2ea87.png",
+      "bbox": [
+        93,
+        79,
+        260,
+        128
+      ],
+      "layout": 0,
+      "expected": "90A07718"
+    },
+    {
+      "index": 24,
+      "image": "images/test/f54957d2000d83bc.png",
+      "bbox": [
+        114,
+        72,
+        193,
+        142
+      ],
+      "layout": 1,
+      "expected": "54H33457"
+    },
+    {
+      "index": 25,
+      "image": "images/test/56df3c3a98aabee9.png",
+      "bbox": [
+        125,
+        140,
+        235,
+        221
+      ],
+      "layout": 1,
+      "expected": "30E50207"
+    },
+    {
+      "index": 26,
+      "image": "images/test/815d509c60b2f2c2.png",
+      "bbox": [
+        103,
+        157,
+        164,
+        203
+      ],
+      "layout": 1,
+      "expected": "51G84904"
+    },
+    {
+      "index": 27,
+      "image": "images/test/61d8a1c2a9f5ecf0.png",
+      "bbox": [
+        129,
+        147,
+        205,
+        209
+      ],
+      "layout": 1,
+      "expected": "47B142872"
+    },
+    {
+      "index": 28,
+      "image": "images/test/af75a0843721fbf2.png",
+      "bbox": [
+        58,
+        77,
+        294,
+        157
+      ],
+      "layout": 0,
+      "expected": "30A62043"
+    },
+    {
+      "index": 29,
+      "image": "images/test/233bccaca9432e14.png",
+      "bbox": [
+        34,
+        273,
+        86,
+        288
+      ],
+      "layout": 0,
+      "expected": "51H25905"
+    },
+    {
+      "index": 30,
+      "image": "images/test/7165c9177c090896.png",
+      "bbox": [
+        80,
+        418,
+        167,
+        480
+      ],
+      "layout": 1,
+      "expected": "59X143044"
+    },
+    {
+      "index": 31,
+      "image": "images/test/295b1f199e8eb8a1.png",
+      "bbox": [
+        135,
+        59,
+        216,
+        130
+      ],
+      "layout": 1,
+      "expected": "30G31697"
+    },
+    {
+      "index": 32,
+      "image": "images/test/ac1f6e030f569092.png",
+      "bbox": [
+        220,
+        185,
+        314,
+        217
+      ],
+      "layout": 0,
+      "expected": "61A22959"
+    },
+    {
+      "index": 33,
+      "image": "images/test/ebfbaeede578d374.png",
+      "bbox": [
+        98,
+        88,
+        181,
+        159
+      ],
+      "layout": 1,
+      "expected": "59T159973"
+    },
+    {
+      "index": 34,
+      "image": "images/test/d4e96007d6799105.png",
+      "bbox": [
+        154,
+        68,
+        231,
+        138
+      ],
+      "layout": 1,
+      "expected": "55X86970"
+    },
+    {
+      "index": 35,
+      "image": "images/test/b8c257addb88f296.png",
+      "bbox": [
+        146,
+        116,
+        219,
+        178
+      ],
+      "layout": 1,
+      "expected": "75F129830"
+    },
+    {
+      "index": 36,
+      "image": "images/test/658214d3b0f6af7f.png",
+      "bbox": [
+        63,
+        103,
+        249,
+        151
+      ],
+      "layout": 0,
+      "expected": "29D05685"
+    },
+    {
+      "index": 37,
+      "image": "images/test/d14e4333d4fb0dd6.png",
+      "bbox": [
+        158,
+        275,
+        271,
+        412
+      ],
+      "layout": 1,
+      "expected": "81K45959"
+    },
+    {
+      "index": 38,
+      "image": "images/test/bddb13b9e7aaf394.png",
+      "bbox": [
+        96,
+        102,
+        181,
+        177
+      ],
+      "layout": 1,
+      "expected": "54S88080"
+    },
+    {
+      "index": 39,
+      "image": "images/test/c0f0aa7ae11e490f.png",
+      "bbox": [
+        107,
+        104,
+        190,
+        181
+      ],
+      "layout": 1,
+      "expected": "78N25203"
+    }
+  ],
+  "excluded": [
+    {
+      "index": 9,
+      "image": "images/test/8a65d81752a4f5d5.png",
+      "reason": "Too blurred for reliable manual transcription"
+    },
+    {
+      "index": 22,
+      "image": "images/test/21f18cab1b83f5a0.png",
+      "reason": "Too blurred for reliable manual transcription"
+    },
+    {
+      "index": 21,
+      "image": "images/test/9b5419108c306299.png",
+      "reason": "Barrier occludes the first characters; full plate cannot be independently transcribed"
+    }
+  ],
+  "audit_note": "After the preliminary pass, enlarged images were visually rechecked: index 30 is X1, index 37 ends in 9. Index 21 is physically occluded and the previously guessed prefix was removed. Independent human audit still recommended."
+}

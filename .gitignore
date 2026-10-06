@@ -1,0 +1,14 @@
+.venv/
+__pycache__/
+*.pyc
+.env
+.local/
+.serena/
+data/
+runs/
+runtime/
+*.log
+yolo*.pt
+models/*.onnx
+models/*config.yaml
+!models/README.md

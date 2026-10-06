@@ -1,0 +1,20 @@
+{
+  "architecture": "YOLO11n",
+  "base_checkpoint": "yolo11n.pt",
+  "trained_locally": true,
+  "gpu": "NVIDIA GeForce RTX 3060 Laptop GPU",
+  "requested_epochs": 40,
+  "imgsz": 640,
+  "batch": 16,
+  "elapsed_seconds": 1796.2,
+  "test": {
+    "metrics/precision(B)": 0.9779517507777498,
+    "metrics/recall(B)": 0.9786498442592028,
+    "metrics/mAP50(B)": 0.9905621005247419,
+    "metrics/mAP50-95(B)": 0.8773995589405251,
+    "fitness": 0.8773995589405251
+  },
+  "weights_sha256": "d8ead0e764779930aab6325848190852ed6594cce84b82faa01bfeed94f3b87e",
+  "actual_epochs": 40,
+  "test_images": 665
+}
