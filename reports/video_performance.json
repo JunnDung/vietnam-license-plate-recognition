@@ -1,0 +1,45 @@
+{
+  "weights_sha256": "37a282619e923cc5715f81fe1f236e5c7fb281322d546f2aa3ae9a2de8ce49f6",
+  "method": "37 selected readable public source images, three warmups, FP32 detector + unchanged CPU OCR; excludes browser decoding, JPEG, HTTP, burst and storage.",
+  "hardware": "RTX 3060 Laptop 6 GB",
+  "inference": {
+    "cpu": {
+      "samples": 37,
+      "pipeline_exact": 37,
+      "mean_ms": 141.46076756485462,
+      "p50_ms": 131.11590000335127,
+      "p95_ms": 228.70826000580558,
+      "inference_fps": 7.069097794492995
+    },
+    "0": {
+      "samples": 37,
+      "pipeline_exact": 37,
+      "mean_ms": 107.9193243168521,
+      "p50_ms": 100.12910002842546,
+      "p95_ms": 191.20783999096582,
+      "inference_fps": 9.266181069332783
+    }
+  },
+  "date": "2026-10-06",
+  "browser_smoke": {
+    "synthetic_video_sha256": "b3a1938395a45e43fe22431e1e32673425087492fdbfa7ed37d804bcb563453d",
+    "duration_seconds": 4,
+    "source_fps": 10,
+    "sample_fps": 5,
+    "frames": 20,
+    "plate_rows": 10,
+    "expected_plate": "51F44614",
+    "first_video_time": 1.0,
+    "last_video_time": 2.8,
+    "observed_processing_fps": [
+      6.7,
+      10.4,
+      10.6
+    ],
+    "csv_verified": true,
+    "implicit_video_records": 0,
+    "pause_resume_verified": true,
+    "physical_camera_tested": false,
+    "limitation": "Static public image appears only from second 1 to 3, other frames blank; not a moving vehicle or camera throughput benchmark."
+  }
+}

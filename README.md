@@ -31,7 +31,8 @@ uvicorn app:app --host 127.0.0.1 --port 8000
 ## Sử dụng
 
 - **Nhận diện:** chọn/kéo thả ảnh JPG, PNG hoặc WebP; điều chỉnh ngưỡng phát hiện; xem vùng biển số, ký tự và độ tin cậy.
-- **Camera trình duyệt:** cho phép camera tại localhost/HTTPS. Chọn khung rõ hơn trong 3 khung liên tiếp, chờ 3 giây sau khi lượt trước hoàn tất; dừng khi đổi tab hoặc rời trang. Nếu bật lưu, mỗi khung hình có biển số tạo bản ghi mới; bỏ chọn lưu để quan sát mà không ghi lịch sử.
+- **Camera trình duyệt:** cho phép camera tại localhost/HTTPS. Yêu cầu hình xem trực tiếp 30 FPS; nhận diện mặc định 5 lượt/giây, chọn 1/2/5/10 và xem tốc độ thực đạt. Lấy khung rõ hơn trong 3 khung cách khoảng 33 ms, xử lý tuần tự rồi lấy khung mới, không dồn yêu cầu. Dừng khi đổi tab hoặc rời trang. Nếu bật lưu, mỗi khung có biển tạo bản ghi mới; bỏ chọn lưu khi quan sát để tránh ghi nhiều ảnh lặp.
+- **Video:** chọn MP4/WebM/OGV mà trình duyệt giải mã được, tối đa 500 MB và 10 phút. Chọn 1/2/5/10 khung mỗi giây video, bấm **Phân tích video**, tạm dừng/tiếp tục hoặc quét lại. Kết quả có mốc giây, nút xem lại khung và CSV; chỉ hiển thị 100 kết quả gần nhất, CSV chứa tất cả kết quả. Mặc định không lưu lịch sử; tích lưu nếu cần đối chiếu xe vào/ra. Video được giải mã tại trình duyệt, chỉ các JPEG gửi đến API ảnh hiện có; không tải toàn bộ video lên server. Các khung mẫu đều được xử lý theo thứ tự, nên video có thể quét chậm hơn thời gian thực. Nhiều kết quả cùng biển không tương đương nhiều xe. AVI hoặc video dài dùng CLI.
 - **Tra cứu:** tìm một phần hoặc toàn bộ biển số, lọc thời điểm, xem ảnh nguồn, xuất CSV, xóa lượt nhận diện. Thời gian giao diện theo Việt Nam (UTC+7); API/CSV dùng UTC.
 - **Bãi giữ xe:** sau khi nhận diện ảnh đã lưu, chọn **Xe vào** hoặc **Xe ra**. Đối chiếu ảnh, sửa biển số khi cần, tích xác nhận rồi ghi nhận. Khi xe ra, giao diện tìm lượt vào còn mở và hiển thị ảnh lúc vào để đối chiếu. Xem xe đang trong bãi, lượt đã ra, thời gian gửi và lượt vào/ra hôm nay.
 - **Kết quả mô hình:** hiển thị các phép đo từ `reports/`. mAP là kết quả phát hiện vùng biển số, không phải tỷ lệ đọc đúng ký tự.
@@ -44,13 +45,15 @@ Camera USB, file video hoặc RTSP cũng có thể chạy bằng CLI:
 
 ```powershell
 .\.venv\Scripts\python.exe scripts\camera.py --source 0
-.\.venv\Scripts\python.exe scripts\camera.py --source D:\video.mp4 --save
-.\.venv\Scripts\python.exe scripts\camera.py --source "rtsp://CAMERA_ADDRESS/stream" --interval 3
+.\.venv\Scripts\python.exe scripts\camera.py --source D:\video.mp4 --fps 5 --save
+.\.venv\Scripts\python.exe scripts\camera.py --source "rtsp://CAMERA_ADDRESS/stream" --fps 5
 ```
 
-CLI mở nguồn camera ở phía máy chạy script rồi gửi ảnh đến API; server không truy cập URL camera do người dùng gửi lên. CLI mặc định không lưu; thêm `--save` nếu muốn ghi lịch sử. Ctrl+C để dừng.
+CLI mở nguồn camera ở phía máy chạy script rồi gửi ảnh đến API; server không truy cập URL camera do người dùng gửi lên. CLI mặc định không lưu và lấy mẫu mục tiêu 5 lượt/giây; `--fps 1` đến `--fps 10` điều chỉnh, `--interval 3` giữ cách lấy mẫu cũ. JSON mỗi dòng có `video_time` và `processing_ms`; Ctrl+C để dừng. File video quét hết các mốc lấy mẫu, không nhất thiết thời gian thực. USB/RTSP yêu cầu 30 FPS và buffer 1 khung nhưng driver có thể bỏ qua, chưa kiểm chứng phần cứng.
 
-CLI chọn khung có điểm chi tiết cao hơn trong 3 khung liên tiếp; `--burst 1` tắt và `--burst 5` tăng số khung so sánh. Đây là điểm trên toàn ảnh, không bảo đảm biển số rõ. Hướng dẫn ban đêm, trời mưa, màn trập và nghiệm thu: [CAMERA_GUIDE.md](reports/CAMERA_GUIDE.md).
+CLI chọn khung có điểm chi tiết cao hơn trong tối đa 3 khung liên tiếp, giảm burst khi FPS nguồn thấp để giữ đủ mốc video; `--burst 1` tắt và `--burst 5` tăng số khung so sánh. Đây là điểm trên toàn ảnh, không bảo đảm biển số rõ. Hướng dẫn ban đêm, trời mưa, màn trập và nghiệm thu: [CAMERA_GUIDE.md](reports/CAMERA_GUIDE.md).
+
+API mặc định `PLATE_DEVICE=auto`: detector chạy CUDA khi có GPU phù hợp, nếu không dùng CPU; OCR vẫn dùng CPU. Đặt `PLATE_DEVICE=cpu` để ép CPU, rồi khởi động lại server. Không giảm input detector 640 hoặc đổi độ chính xác model để tăng FPS. Phép đo warmed inference trên 37 ảnh: CPU trung bình 141 ms, GPU 108 ms; chưa gồm trình duyệt, burst, HTTP và lưu ảnh. Kiểm chứng video/tốc độ: [VIDEO_VALIDATION.md](reports/VIDEO_VALIDATION.md).
 
 ## API xử lý ảnh
 

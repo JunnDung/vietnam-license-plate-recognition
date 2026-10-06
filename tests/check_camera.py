@@ -1,4 +1,4 @@
-"""Run against the live local API: a seven-second video must produce frames at 0, 3, 6 seconds."""
+"""Live API: legacy 0/3/6 sampling and default 5 FPS must preserve video timestamps."""
 import json
 import subprocess
 import sys
@@ -24,7 +24,13 @@ def main():
         frames = [json.loads(line) for line in result.stdout.splitlines() if line.strip()]
         assert len(frames) == 3, f'Expected 3 sampled frames, got {len(frames)}'
         assert all(item['detections'] == [] for item in frames), 'Blank video should not fabricate plates'
-        print('PASS: live API processed video frames at 0, 3 and 6 seconds; blank video returned no plates.')
+        result = subprocess.run([sys.executable, str(ROOT / 'scripts/camera.py'), '--source', str(video)],
+                                cwd=ROOT, capture_output=True, text=True, check=True)
+        faster = [json.loads(line) for line in result.stdout.splitlines() if line.strip()]
+        assert len(faster) == 35, f'Expected all 35 frames at 5 source FPS, got {len(faster)}'
+        assert all(abs(item['video_time']-index/5)<.001 for index,item in enumerate(faster))
+        assert all(item['detections']==[] for item in faster)
+        print('PASS: legacy 0/3/6 seconds and default 5 FPS process correct timestamps; blank video has no plates.')
 
 
 if __name__ == '__main__':

@@ -14,7 +14,7 @@ Nguồn về màn trập, ánh sáng và WDR: [Axis License Plate Capture](https
 
 ## Chọn khung và cảnh báo trong ứng dụng
 
-- Camera trình duyệt lấy 3 khung trong khoảng 200 ms và chọn khung có điểm chi tiết cao hơn, rồi chờ 3 giây sau khi xử lý. CLI mặc định so sánh 3 khung liên tiếp; `--burst 1` tắt lựa chọn, `--burst 5` tăng số khung. Số khung lớn hơn làm tăng độ trễ và có thể bỏ qua xe đi nhanh.
+- Camera trình duyệt lấy 3 khung cách khoảng 33 ms và chọn khung có điểm chi tiết cao hơn; nhận diện mặc định mục tiêu 5 lượt/giây, chỉnh 1–10. Hình xem trực tiếp yêu cầu 30 FPS, độc lập với khung đã phân tích; tốc độ thực được hiển thị và phụ thuộc camera/máy. CLI có `--fps 5`, tối đa burst 3 khung và giảm burst theo FPS file nguồn; `--burst 1` tắt lựa chọn, `--burst 5` tăng số khung. Số khung lớn hơn làm tăng độ trễ và có thể bỏ qua xe đi nhanh. Chưa xác nhận FPS bằng camera vật lý.
 - Điểm chọn khung là phương sai Laplacian sau giảm kích thước và làm mượt. Điểm tính trên cả ảnh, có thể ưu tiên nền nhiều cạnh hoặc nhiễu; không bảo đảm biển số rõ. Chưa có ROI được hiệu chỉnh theo cổng hoặc tracking từng xe.
 - API trả `quality.brightness`, `quality.detail_score`, `quality.issues` cho từng crop. `low_light`, `low_detail`, `small_plate` hoặc `ocr_disagreement=true` bật `needs_review`, kể cả OCR trả điểm cao. Điểm OCR không phải xác suất đúng đã được hiệu chuẩn.
 - `PLATE_MIN_DETAIL=25` và `PLATE_MIN_BRIGHTNESS=40` là ngưỡng heuristic mặc định. Hiệu chỉnh trên ảnh của chính camera, khởi động lại server để áp dụng; ngưỡng này không được đo như một bộ phân loại mờ chính xác. Cảnh báo không chặn người vận hành đối chiếu và sửa biển số.

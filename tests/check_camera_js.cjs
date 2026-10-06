@@ -13,7 +13,7 @@ function pattern(contrast) {
 }
 const clear = pattern(100), blurred = pattern(10), frames = [blurred, clear, blurred];
 const video = {videoWidth:width, videoHeight:height, frames};
-const context = {setTimeout, document:{createElement() {
+const context = {setTimeout, performance:{now:()=>150}, document:{createElement() {
   const canvas = {width:0,height:0,pixels:null};
   canvas.getContext = ()=>({drawImage(source) {canvas.pixels=source.frames ? source.frames.shift() : source.pixels;},
                             getImageData(){return {data:canvas.pixels};}});
@@ -25,5 +25,8 @@ vm.createContext(context);vm.runInContext(fs.readFileSync('web/camera.js','utf8'
   const selected=await context.captureBestFrame(video,()=>true);
   assert.equal(selected.pixels,clear);
   assert.equal(await context.captureBestFrame(video,()=>false),null);
-  console.log('PASS: browser burst selects sharper pixels and stops after cancellation.');
+  assert.equal(context.frameDelay(100,5),150);
+  assert.equal(context.frameDelay(0,10),0);
+  assert.equal(context.frameCanvas({videoWidth:1920,videoHeight:1080,frames:[clear]}).width,1280);
+  console.log('PASS: burst, cancellation, bounded frame size and target-rate timing without extra processing delay.');
 })().catch(error=>{console.error(error);process.exitCode=1;});

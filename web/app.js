@@ -24,7 +24,11 @@ function element(tag, className, text) {
 }
 function releaseImages() { imageUrls.forEach(URL.revokeObjectURL); imageUrls = []; }
 async function imageUrl(url) { const blob = await (await api(url)).blob(); const result = URL.createObjectURL(blob); imageUrls.push(result); return result; }
-function busyState(value) { busy = value; $('recognize-btn').disabled = value || !selectedFile || !!stream; $('latency').textContent = value ? 'ĐANG XỬ LÝ…' : 'SẴN SÀNG'; document.querySelectorAll('.gate-actions button').forEach(button=>button.disabled=value); }
+function busyState(value) {
+  busy = value; $('recognize-btn').disabled = value || !selectedFile || !!stream || videoRunning;
+  $('camera-start').disabled = value || !!stream || videoRunning; $('video-start').disabled = value || videoRunning || !videoURL || !!stream;
+  $('latency').textContent = value ? 'ĐANG XỬ LÝ…' : 'SẴN SÀNG'; document.querySelectorAll('.gate-actions button').forEach(button=>button.disabled=value);
+}
 function draw(image, detections = []) {
   const canvas = $('preview-canvas'); canvas.width = image.videoWidth || image.naturalWidth || image.width; canvas.height = image.videoHeight || image.naturalHeight || image.height;
   const context = canvas.getContext('2d'); context.drawImage(image, 0, 0, canvas.width, canvas.height);
@@ -33,14 +37,19 @@ function draw(image, detections = []) {
     const [x0,y0,x1,y1] = detection.bbox; context.strokeStyle = detection.needs_review ? '#ffb69d' : '#b5f369'; context.fillStyle = context.strokeStyle;
     context.strokeRect(x0, y0, x1-x0, y1-y0); context.fillText(detection.display_plate || 'Chưa đọc được', x0, Math.max(22,y0-7));
   }
-  canvas.hidden = false; $('preview-empty').hidden = true; $('camera-video').hidden = true;
+  canvas.hidden = false; $('preview-empty').hidden = true; $('camera-video').hidden = !stream;
+  $('frame-caption').hidden = !stream && !videoURL;
 }
 async function loadFile(file) {
   if (!file) return;
+  if (busy) {notice('Chờ lượt đang xử lý xong trước khi đổi ảnh.');return;}
   if (file.size > 10*1024*1024 || !['image/jpeg','image/png','image/webp'].includes(file.type)) { notice('Chọn JPG, PNG hoặc WebP, dung lượng tối đa 10 MB.', true); return; }
   stopCamera();
+  clearVideo();
+  const generation = cameraGeneration;
   const url = URL.createObjectURL(file), image = new Image();
   try { await new Promise((resolve,reject) => { image.onload = resolve; image.onerror = reject; image.src = url; });
+    if (generation !== cameraGeneration) return;
     if (image.naturalWidth * image.naturalHeight > 16000000) throw new Error('Ảnh vượt quá 16 triệu pixel.');
     draw(image); selectedFile = file; $('filename').textContent = `${file.name} · ${(file.size/1024).toFixed(0)} KB`;
     $('results').replaceChildren(element('p','hint','Đã chọn ảnh. Bấm Nhận diện ảnh để xử lý.')); $('recognize-btn').disabled = busy;
@@ -63,14 +72,17 @@ function renderResults(data) {
   if (!data.detections.length) $('results').append(element('p','hint','Không phát hiện biển số. Thử ảnh rõ hơn hoặc giảm ngưỡng phát hiện.'));
   $('latency').textContent = `${data.latency_ms.toFixed(0)} MS · ${data.detections.length} BIỂN SỐ`;
 }
-async function processFile(file, source, image) {
-  if (busy) return;
+async function processFile(file, source, image, active = ()=>true, save = $('save-history').checked) {
+  if (busy || !active()) return null;
   busyState(true);
   try {
-    const form = new FormData(); form.append('file',file,'frame.jpg'); form.append('source',source); form.append('confidence',$('threshold').value); form.append('save',$('save-history').checked);
+    const form = new FormData(); form.append('file',file,'frame.jpg'); form.append('source',source); form.append('confidence',$('threshold').value); form.append('save',save);
     const data = await (await api('/api/recognize',{method:'POST',body:form})).json();
+    if (!active()) return null;
     draw(image,data.detections); busyState(false); renderResults(data);
-  } catch (error) { busyState(false); notice(error.message,true); if (source === 'camera') stopCamera(); }
+    return data;
+  } catch (error) { if (active()) {notice(error.message,true);if (source === 'camera') stopCamera();}return null; }
+  finally {if(busy) busyState(false);}
 }
 $('image-file').addEventListener('change', event => loadFile(event.target.files[0]));
 $('drop-zone').addEventListener('keydown', event => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); $('image-file').click(); } });
@@ -81,26 +93,35 @@ $('threshold').addEventListener('input',()=> $('threshold-value').textContent = 
 $('recognize-btn').addEventListener('click',async()=> { if (!selectedFile || busy) return; const image = await createImageBitmap(selectedFile); try { await processFile(selectedFile,'upload',image); } finally { image.close(); } });
 function stopCamera() {
   cameraGeneration++; clearTimeout(cameraTimer); if (stream) stream.getTracks().forEach(track=>track.stop()); stream = null;
-  $('camera-video').srcObject = null; $('camera-stop').disabled = true; $('camera-start').disabled = false; $('recognize-btn').disabled = busy || !selectedFile;
+  $('camera-video').srcObject = null; $('camera-video').hidden = true; $('camera-stop').disabled = true; busyState(busy);
 }
 $('camera-stop').addEventListener('click',stopCamera);
 $('camera-start').addEventListener('click',async()=> {
   if (busy) { notice('Chờ xử lý ảnh xong trước khi bật camera.'); return; }
+  clearVideo();
   const generation = ++cameraGeneration; $('camera-start').disabled = true;
   try {
-    const acquired = await navigator.mediaDevices.getUserMedia({video:{width:{ideal:1280},height:{ideal:720},facingMode:'environment'},audio:false});
+    const acquired = await navigator.mediaDevices.getUserMedia({video:{width:{ideal:1280},height:{ideal:720},frameRate:{ideal:30,max:60},facingMode:'environment'},audio:false});
     if (generation !== cameraGeneration) { acquired.getTracks().forEach(track=>track.stop()); return; }
-    stream = acquired; $('camera-video').srcObject = stream; await $('camera-video').play(); $('camera-stop').disabled = false; $('recognize-btn').disabled = true;
-    $('filename').textContent = 'Camera · chọn khung rõ hơn trong 3 khung · chu kỳ 3 giây';
+    stream = acquired; $('camera-video').srcObject = stream; await $('camera-video').play(); $('camera-video').hidden = false; $('preview-empty').hidden = true; $('camera-stop').disabled = false; busyState(false);
+    $('filename').textContent = 'Camera trực tiếp · khung nhận diện hiển thị phía dưới';
+    $('frame-caption').textContent = 'Khung đã phân tích · hình xem trực tiếp phía trên chạy độc lập.';
+    const previewFPS = stream.getVideoTracks()[0].getSettings().frameRate, completed = [];
     async function capture() {
       if (!stream || generation !== cameraGeneration) return;
+      const start = performance.now(), active = ()=>stream && generation===cameraGeneration;
       const frame = await captureBestFrame($('camera-video'),()=>stream && generation===cameraGeneration);
       if (!frame) return;
       const blob = await new Promise(resolve=>frame.toBlob(resolve,'image/jpeg',.9));
       if (!blob) throw new Error('Không lấy được ảnh từ camera.');
       if (!stream || generation !== cameraGeneration) return;
-      await processFile(blob,'camera',frame);
-      if (stream && generation === cameraGeneration) cameraTimer = setTimeout(capture,3000);
+      const data = await processFile(blob,'camera',frame,active);
+      if (!active()) return;
+      if (!data) {stopCamera();return;}
+      completed.push(performance.now()); if(completed.length>10) completed.shift();
+      const rate = completed.length>1 ? 1000*(completed.length-1)/(completed.at(-1)-completed[0]) : null;
+      $('camera-rate').textContent = `Xem trực tiếp: ${previewFPS ? previewFPS.toFixed(0)+' FPS' : 'theo camera'} · mục tiêu ${$('camera-fps').value} lượt/giây · thực đạt ${rate===null ? 'đang đo' : rate.toFixed(1)+' lượt/giây'}`;
+      cameraTimer = setTimeout(()=>capture().catch(error=>{stopCamera();notice(error.message,true);}),frameDelay(start,Number($('camera-fps').value)));
     }
     await capture();
   } catch { stopCamera(); notice('Không mở được camera. Kiểm tra quyền truy cập, camera đang được sử dụng và kết nối localhost/HTTPS.',true); }
@@ -198,7 +219,7 @@ async function lookupParkingEntry() {
   }catch(error){$('parking-confirm-info').textContent=error.message;}
 }
 async function openParkingConfirm(item,direction) {
-  stopCamera();parkingCandidate=item;parkingDirection=direction;$('parking-confirm-title').textContent=direction==='in' ? 'Xác nhận xe vào' : 'Đối chiếu xe ra';
+  stopCamera();stopVideo();parkingCandidate=item;parkingDirection=direction;$('parking-confirm-title').textContent=direction==='in' ? 'Xác nhận xe vào' : 'Đối chiếu xe ra';
   parkingCurrentReady=false;parkingEntryReady=false;
   $('parking-submit').textContent=direction==='in' ? 'Ghi nhận xe vào' : 'Ghi nhận xe ra';$('parking-plate').value=item.display_plate || item.plate;
   $('parking-current-image').removeAttribute('src');$('parking-current-crop').removeAttribute('src');$('parking-dialog').showModal();await lookupParkingEntry();
@@ -220,7 +241,7 @@ $('parking-confirm-form').addEventListener('submit',async event=>{
   }catch(error){notice(error.message,true);$('parking-submit').disabled=false;}
 });
 document.querySelectorAll('[data-tab]').forEach(button=>button.addEventListener('click',()=> {
-  if(button.dataset.tab!=='recognize') stopCamera();
+  if(button.dataset.tab!=='recognize') {stopCamera();stopVideo();}
   document.querySelectorAll('[data-tab]').forEach(tab=> {const active=tab===button;tab.classList.toggle('active',active);tab.setAttribute('aria-selected',active);});
   document.querySelectorAll('.panel').forEach(panel=>panel.hidden=panel.id!==button.dataset.tab);
   if(button.dataset.tab==='history') showHistory(); if(button.dataset.tab==='model') showModel();if(button.dataset.tab==='parking') showParking();
@@ -228,4 +249,4 @@ document.querySelectorAll('[data-tab]').forEach(button=>button.addEventListener(
 $('key-save').addEventListener('click',()=> { sessionStorage.setItem('plate-api-key',$('api-key').value); notice('Đã áp dụng API key cho phiên trình duyệt này.'); });
 async function checkHealth() { try { const data=await (await api('/api/health')).json(); $('status').textContent=data.status==='ready' ? 'Mô hình sẵn sàng' : 'Chưa tải được mô hình'; $('status').classList.toggle('ready',data.status==='ready'); } catch { $('status').textContent='Mất kết nối API'; $('status').classList.remove('ready'); } }
 checkHealth(); setInterval(checkHealth,30000);
-window.addEventListener('pagehide',()=> {stopCamera();releaseImages();});
+window.addEventListener('pagehide',()=> {stopCamera();clearVideo();releaseImages();});

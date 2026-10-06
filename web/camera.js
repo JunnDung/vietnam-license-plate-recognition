@@ -18,16 +18,23 @@ function frameSharpness(frame) {
   }
   return count ? squares/count-(total/count)**2 : 0;
 }
+function frameCanvas(video) {
+  const frame = document.createElement('canvas'), scale = Math.min(1,1280/Math.max(video.videoWidth,video.videoHeight));
+  frame.width = Math.round(video.videoWidth*scale); frame.height = Math.round(video.videoHeight*scale);
+  if (!frame.width || !frame.height) return null;
+  frame.getContext('2d').drawImage(video,0,0,frame.width,frame.height);
+  return frame;
+}
+function frameDelay(start, fps) { return Math.max(0,1000/fps-(performance.now()-start)); }
 async function captureBestFrame(video, active) {
   let best = null, score = -1;
   for (let i = 0; i < 3; i++) {
     if (!active()) return null;
-    const frame = document.createElement('canvas'); frame.width = video.videoWidth; frame.height = video.videoHeight;
-    if (!frame.width || !frame.height) return null;
-    frame.getContext('2d').drawImage(video, 0, 0);
+    const frame = frameCanvas(video);
+    if (!frame) return null;
     const candidateScore = frameSharpness(frame);
     if (candidateScore > score) { best = frame; score = candidateScore; }
-    if (i < 2) await new Promise(resolve => setTimeout(resolve, 100));
+    if (i < 2) await new Promise(resolve => setTimeout(resolve, 33));
   }
   return active() ? best : null;
 }

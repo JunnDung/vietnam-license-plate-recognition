@@ -56,7 +56,7 @@ async def lifespan(application):
         db.execute('CREATE UNIQUE INDEX IF NOT EXISTS one_open_session ON parking_sessions(plate) WHERE exited_at IS NULL')
     if not getattr(application.state, 'engine', None):
         try:
-            application.state.engine = PlateEngine(device=os.getenv('PLATE_DEVICE', 'cpu'))
+            application.state.engine = PlateEngine(device=os.getenv('PLATE_DEVICE', 'auto'))
             application.state.model_error = None
         except Exception as error:
             log.exception('Cannot initialize recognition models')
@@ -70,7 +70,7 @@ def authorized(request: Request):
         raise HTTPException(401, 'API key không hợp lệ.')
 
 
-app = FastAPI(title='Biển Số Việt · Recognition API', version='1.1.0', lifespan=lifespan)
+app = FastAPI(title='Biển Số Việt · Recognition API', version='1.2.0', lifespan=lifespan)
 
 
 @app.middleware('http')
@@ -93,7 +93,7 @@ async def reject_large_requests(request, call_next):
 def health():
     return {'status': 'ready' if getattr(app.state, 'engine', None) else 'model_unavailable',
             'detector': 'YOLO11n · fine-tuned Vietnamese plates', 'ocr': 'CCT S v2 · pretrained',
-            'device': os.getenv('PLATE_DEVICE', 'cpu'), 'auth_required': bool(API_KEY),
+            'device': getattr(getattr(app.state, 'engine', None), 'device', None), 'auth_required': bool(API_KEY),
             'detector_weights_sha256': getattr(getattr(app.state, 'engine', None), 'detector_weights_sha256', None),
             'model_error': getattr(app.state, 'model_error', None)}
 

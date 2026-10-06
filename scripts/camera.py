@@ -38,10 +38,14 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--source', default='0', help='Webcam number, local video path or RTSP URL')
     parser.add_argument('--api', default='http://127.0.0.1:8000')
-    parser.add_argument('--interval', type=float, default=3)
+    parser.add_argument('--fps', type=float, default=5, help='Target recognition rate (1–10 frames/second); actual rate depends on API')
+    parser.add_argument('--interval', type=float, help='Legacy sampling interval in seconds; overrides --fps')
     parser.add_argument('--burst', type=int, default=3, help='Pick the sharpest of 1–15 consecutive frames')
     parser.add_argument('--save', action='store_true', help='Store frames with detections in history')
     args = parser.parse_args()
+    if not math.isfinite(args.fps) or not 1 <= args.fps <= 10:
+        parser.error('--fps must be between 1 and 10')
+    args.interval = args.interval if args.interval is not None else 1 / args.fps
     if not math.isfinite(args.interval) or args.interval <= 0:
         parser.error('--interval must be positive')
     if not 1 <= args.burst <= 15:
@@ -51,6 +55,11 @@ def main():
     capture = cv2.VideoCapture(source)
     if not capture.isOpened():
         raise SystemExit('Cannot open the camera/video source.')
+    source_fps = capture.get(cv2.CAP_PROP_FPS)
+    burst = min(args.burst, max(1, int(source_fps * args.interval))) if is_video and math.isfinite(source_fps) and source_fps > 0 else args.burst
+    if not is_video:
+        capture.set(cv2.CAP_PROP_FPS, 30)
+        capture.set(cv2.CAP_PROP_BUFFERSIZE, 1)
     next_frame = 0
     try:
         with httpx.Client(timeout=120, headers={'X-API-Key': os.getenv('PLATE_API_KEY', '')}) as client:
@@ -59,9 +68,10 @@ def main():
                 if not valid:
                     break
                 frame_time = capture.get(cv2.CAP_PROP_POS_MSEC) / 1000 if is_video else time.monotonic()
-                if frame_time < next_frame:
+                if frame_time + 1e-6 < next_frame:
                     continue
-                frame, score, sampled, selected_time = best_frame(capture, frame, args.burst)
+                started = time.monotonic()
+                frame, score, sampled, selected_time = best_frame(capture, frame, burst)
                 if frame.shape[1] > 1280:
                     frame = cv2.resize(frame, (1280, round(frame.shape[0] * 1280 / frame.shape[1])))
                 success, data = cv2.imencode('.jpg', frame)
@@ -74,8 +84,9 @@ def main():
                 result = response.json()
                 print(json.dumps({'latency_ms': result['latency_ms'], 'detections': result['detections'],
                                   'frames_compared': sampled, 'sharpness': round(score, 2),
-                                  'video_time': selected_time if is_video else None}, ensure_ascii=False))
-                next_frame = frame_time + args.interval if is_video else time.monotonic() + args.interval
+                                  'processing_ms': round((time.monotonic()-started)*1000, 1),
+                                  'video_time': selected_time if is_video else None}, ensure_ascii=False), flush=True)
+                next_frame = frame_time + args.interval if is_video else started + args.interval
     except KeyboardInterrupt:
         pass
     finally:

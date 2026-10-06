@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#101820"><title>Biển Số Việt · Nhận diện phương tiện</title>
-  <link rel="stylesheet" href="/style.css?v=2">
+  <link rel="stylesheet" href="/style.css?v=3">
   <link rel="stylesheet" href="/parking.css">
 </head>
 <body>
@@ -22,12 +22,23 @@
       <button id="recognize-btn" class="primary" disabled>Nhận diện ảnh <span>→</span></button>
       <div class="divider"><span>HOẶC CAMERA</span></div>
       <div class="camera-controls"><button id="camera-start">Bật camera</button><button id="camera-stop" disabled>Dừng</button></div>
-      <p class="hint">Camera chọn khung rõ hơn trong 3 khung liên tiếp rồi xử lý, lặp lại sau 3 giây. Độ rõ toàn ảnh không bảo đảm ký tự biển số rõ. Cần quyền camera tại localhost hoặc HTTPS.</p>
+      <label class="media-setting">Tần suất nhận diện camera<select id="camera-fps"><option value="1">1 lượt/giây</option><option value="2">2 lượt/giây</option><option value="5" selected>5 lượt/giây</option><option value="10">10 lượt/giây</option></select></label>
+      <p id="camera-rate" class="hint">Xem trực tiếp yêu cầu 30 FPS; nhận diện mặc định 5 lượt/giây, tùy tốc độ máy. Không xếp hàng khung cũ.</p>
+      <p class="hint">Chọn khung rõ hơn trong 3 khung cách nhau khoảng 33 ms. Độ rõ toàn ảnh không bảo đảm ký tự biển số rõ. Cần quyền camera tại localhost hoặc HTTPS.</p>
+      <div class="divider"><span>HOẶC VIDEO</span></div>
+      <label class="media-setting">Chọn file video<input id="video-file" type="file" accept="video/mp4,video/webm,video/ogg,.mp4,.webm,.ogv"></label>
+      <label class="media-setting">Số khung phân tích mỗi giây video<select id="video-fps"><option value="1">1 khung/giây</option><option value="2">2 khung/giây</option><option value="5" selected>5 khung/giây</option><option value="10">10 khung/giây</option></select></label>
+      <label class="check"><input id="video-save" type="checkbox"> Lưu khung có biển số vào lịch sử</label>
+      <div class="camera-controls"><button id="video-start" disabled>Phân tích video</button><button id="video-stop" disabled>Tạm dừng</button></div>
+      <progress id="video-progress" value="0" max="1" aria-label="Tiến độ phân tích video"></progress>
+      <p id="video-status" class="hint">MP4/WebM/OGV trình duyệt đọc được · tối đa 500 MB, 10 phút. Video được giải mã tại trình duyệt; chỉ khung ảnh gửi đến API.</p>
       <p id="filename" class="file-name">Chưa chọn ảnh</p>
     </div>
     <div class="preview-panel card"><div class="section-title"><h2>Khung hình & kết quả</h2><span id="latency" class="tag">SẴN SÀNG</span></div>
-      <div class="preview"><div id="preview-empty"><span aria-hidden="true">⌖</span><b>Chờ khung hình đầu tiên</b><p>Ảnh và vùng biển số sẽ xuất hiện tại đây.</p></div><canvas id="preview-canvas" hidden></canvas><video id="camera-video" playsinline muted hidden></video></div>
+      <div class="preview"><div id="preview-empty"><span aria-hidden="true">⌖</span><b>Chờ khung hình đầu tiên</b><p>Ảnh và vùng biển số sẽ xuất hiện tại đây.</p></div><video id="camera-video" playsinline muted hidden></video><video id="file-video" playsinline muted controls hidden></video><canvas id="preview-canvas" hidden></canvas></div>
+      <p id="frame-caption" class="hint" hidden>Khung đã phân tích · hình xem trực tiếp phía trên chạy độc lập.</p>
       <div id="results" class="results"><p class="hint">Kết quả có độ tin cậy thấp sẽ được đánh dấu cần kiểm tra.</p></div>
+      <div id="video-results" hidden><div class="section-title"><h2>Biển số theo thời điểm video</h2><button id="video-export" disabled>Xuất CSV</button></div><p class="hint">Hiển thị 100 kết quả gần nhất; CSV chứa toàn bộ kết quả đã phân tích. Có thể lặp cùng biển ở nhiều khung; đây không phải số xe duy nhất.</p><div class="table-wrap"><table><thead><tr><th>Biển số</th><th>Giây video</th><th>OCR</th><th>Trạng thái</th><th>Khung</th></tr></thead><tbody id="video-body"></tbody></table></div></div>
     </div></div>
     <p class="privacy">Ảnh được xử lý trên máy chủ bạn đang chạy. Khi bỏ chọn lưu lịch sử, ảnh và kết quả của lượt đó không được ghi vào kho tra cứu.</p>
   </section>
@@ -52,6 +63,7 @@
 <footer><span>BIỂN SỐ VIỆT / LOCAL VISION LAB</span><span>Nhận diện có thể sai. Kiểm tra ảnh gốc trước khi sử dụng kết quả.</span></footer>
 <dialog id="image-dialog"><button id="dialog-close" aria-label="Đóng ảnh">Đóng ×</button><img id="dialog-image" alt="Ảnh nguồn của lượt nhận diện"></dialog>
 <dialog id="parking-dialog"><form id="parking-confirm-form"><div class="section-title"><h2 id="parking-confirm-title">Xác nhận xe vào</h2><button id="parking-cancel" type="button">Đóng ×</button></div><p class="hint">Đối chiếu ảnh và sửa ký tự nếu OCR đọc sai. Đây là biển số được dùng cho lượt gửi.</p><div class="confirm-images"><div><span>Khung hình vừa nhận diện</span><img id="parking-current-image" alt="Ảnh phương tiện tại cổng"><img id="parking-current-crop" alt="Biển số tại cổng"></div><div id="parking-entry-proof" hidden><span>Ảnh lúc vào bãi</span><img id="parking-entry-image" alt="Ảnh phương tiện đã lưu lúc vào"><p id="parking-entry-text" class="hint"></p></div></div><label>Biển số sau khi đối chiếu<input id="parking-plate" required maxlength="20" autocomplete="off"></label><p id="parking-confirm-info" class="hint"></p><label class="check"><input id="parking-ack" type="checkbox" required> Tôi đã đối chiếu ảnh và xác nhận biển số chính xác.</label><button id="parking-submit" class="primary" disabled type="submit">Ghi nhận xe vào</button></form></dialog>
-<script src="/camera.js" defer></script>
-<script src="/app.js" defer></script>
+<script src="/camera.js?v=2" defer></script>
+<script src="/app.js?v=3" defer></script>
+<script src="/video.js?v=3" defer></script>
 </body></html>

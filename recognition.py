@@ -100,7 +100,7 @@ class PlateEngine:
             onnx_model_path=ROOT / 'models/plate_ocr.onnx',
             plate_config_path=ROOT / 'models/plate_ocr_config.yaml',
             providers=['CPUExecutionProvider'], sess_options=options)
-        self.device = device
+        self.device = ('0' if torch.cuda.is_available() else 'cpu') if device == 'auto' else device
         self.min_detail = float(os.getenv('PLATE_MIN_DETAIL', '25'))
         self.min_brightness = float(os.getenv('PLATE_MIN_BRIGHTNESS', '40'))
         if not math.isfinite(self.min_detail) or self.min_detail < 0 or not 0 <= self.min_brightness <= 255:

@@ -55,7 +55,7 @@ Dùng cùng 37 biển nguồn có thể đọc trong 40 ảnh chọn trước d�
 
 ## Camera và kiểm tra phần mềm
 
-- Browser so sánh 3 khung trong khoảng 200 ms; CLI mặc định so sánh 3 khung liên tiếp. Điểm Laplacian toàn ảnh là heuristic, có thể ưu tiên nền; không đảm bảo biển rõ. `--burst 1` tắt hoặc tăng số khung bằng `--burst`. Nếu mọi khung đều mờ cần chụp lại.
+- Browser so sánh 3 khung cách khoảng 33 ms; camera mục tiêu 5 lượt/giây, chỉnh 1–10. CLI giảm burst theo FPS file nguồn để giữ đủ mốc. Điểm Laplacian toàn ảnh là heuristic, có thể ưu tiên nền; không đảm bảo biển rõ. `--burst 1` tắt hoặc tăng số khung bằng `--burst`. Nếu mọi khung đều mờ cần chụp lại. Kiểm tra video và phép đo runtime mới trong [VIDEO_VALIDATION.md](VIDEO_VALIDATION.md).
 - Crop nhỏ/thiếu sáng/ít chi tiết và bất đồng giữa các biến thể OCR bật `needs_review` dù điểm OCR cao. Các ngưỡng chỉ là heuristic cần hiệu chỉnh theo camera, không phải bộ phân loại mờ được hiệu chuẩn.
 - Unittest cho corruption giữ hình học/tái lập, chọn khung rõ, quality/điểm OCR cao, bất đồng OCR, tiêu chí model và hợp đồng API/bãi xe: đạt. JavaScript kiểm tra chọn khung và hủy camera: đạt.
 - API thật đã khởi động lại, hash model đang nạp khớp training/robustness/OCR; dữ liệu bãi xe trước đó được giữ.
