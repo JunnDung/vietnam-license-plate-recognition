@@ -1,6 +1,6 @@
 # Biển Số Việt
 
-Hệ thống nhận diện biển số ô tô và xe máy Việt Nam cho bản thử nghiệm bãi giữ xe: mô hình **YOLO11n được fine-tune tại máy**, OCR **CCT S v2 có sẵn**, API FastAPI và giao diện tiếng Việt. Có xác nhận xe vào/ra, xem xe đang trong bãi và đối chiếu ảnh. Dữ liệu được lưu bằng SQLite, ảnh lưu tại máy chạy server.
+Hệ thống nhận diện biển số ô tô và xe máy Việt Nam từ ảnh, camera và video: mô hình **YOLO11n được fine-tune tại máy**, OCR **CCT S v2 có sẵn**, API FastAPI và giao diện tiếng Việt. Có tra cứu lịch sử, xem ảnh nguồn và xuất CSV. Dữ liệu được lưu bằng SQLite, ảnh lưu tại máy chạy server.
 
 ## Chạy trên Windows
 
@@ -32,14 +32,13 @@ uvicorn app:app --host 127.0.0.1 --port 8000
 
 - **Nhận diện:** chọn/kéo thả ảnh JPG, PNG hoặc WebP; điều chỉnh ngưỡng phát hiện; xem vùng biển số, ký tự và độ tin cậy.
 - **Camera trình duyệt:** cho phép camera tại localhost/HTTPS. Yêu cầu hình xem trực tiếp 30 FPS; nhận diện mặc định 5 lượt/giây, chọn 1/2/5/10 và xem tốc độ thực đạt. Lấy khung rõ hơn trong 3 khung cách khoảng 33 ms, xử lý tuần tự rồi lấy khung mới, không dồn yêu cầu. Dừng khi đổi tab hoặc rời trang. Nếu bật lưu, mỗi khung có biển tạo bản ghi mới; bỏ chọn lưu khi quan sát để tránh ghi nhiều ảnh lặp.
-- **Video:** chọn MP4/WebM/OGV mà trình duyệt giải mã được, tối đa 500 MB và 10 phút. Chọn 1/2/5/10 khung mỗi giây video, bấm **Phân tích video**, tạm dừng/tiếp tục hoặc quét lại. Kết quả có mốc giây, nút xem lại khung và CSV; chỉ hiển thị 100 kết quả gần nhất, CSV chứa tất cả kết quả. Mặc định không lưu lịch sử; tích lưu nếu cần đối chiếu xe vào/ra. Video được giải mã tại trình duyệt, chỉ các JPEG gửi đến API ảnh hiện có; không tải toàn bộ video lên server. Các khung mẫu đều được xử lý theo thứ tự, nên video có thể quét chậm hơn thời gian thực. Nhiều kết quả cùng biển không tương đương nhiều xe. AVI hoặc video dài dùng CLI.
+- **Video:** chọn MP4/WebM/OGV mà trình duyệt giải mã được, tối đa 500 MB và 10 phút. Chọn 1/2/5/10 khung mỗi giây video, bấm **Phân tích video**, tạm dừng/tiếp tục hoặc quét lại. Kết quả có mốc giây, nút xem lại khung và CSV; chỉ hiển thị 100 kết quả gần nhất, CSV chứa tất cả kết quả. Mặc định không lưu lịch sử; tích lưu để tra cứu khung về sau. Video được giải mã tại trình duyệt, chỉ các JPEG gửi đến API ảnh hiện có; không tải toàn bộ video lên server. Các khung mẫu đều được xử lý theo thứ tự, nên video có thể quét chậm hơn thời gian thực. Nhiều kết quả cùng biển không tương đương nhiều xe. AVI hoặc video dài dùng CLI.
 - **Tra cứu:** tìm một phần hoặc toàn bộ biển số, lọc thời điểm, xem ảnh nguồn, xuất CSV, xóa lượt nhận diện. Thời gian giao diện theo Việt Nam (UTC+7); API/CSV dùng UTC.
-- **Bãi giữ xe:** sau khi nhận diện ảnh đã lưu, chọn **Xe vào** hoặc **Xe ra**. Đối chiếu ảnh, sửa biển số khi cần, tích xác nhận rồi ghi nhận. Khi xe ra, giao diện tìm lượt vào còn mở và hiển thị ảnh lúc vào để đối chiếu. Xem xe đang trong bãi, lượt đã ra, thời gian gửi và lượt vào/ra hôm nay.
 - **Kết quả mô hình:** hiển thị các phép đo từ `reports/`. mAP là kết quả phát hiện vùng biển số, không phải tỷ lệ đọc đúng ký tự.
 
 Tra cứu chỉ tìm những lượt hệ thống đã ghi nhận. Hệ thống không kết nối cơ sở dữ liệu chủ xe hoặc đăng ký phương tiện.
 
-Luồng bãi xe luôn yêu cầu người vận hành xác nhận. Mỗi biển số có tối đa một lượt gửi đang mở; xe ra phải khớp lượt vào. Một ảnh nhận diện chỉ xác nhận được một sự kiện. Khi sửa OCR, biển số được xác nhận và cờ sửa được lưu ở lượt gửi; kết quả OCR gốc vẫn giữ nguyên. Ảnh đã dùng cho lượt gửi không thể bị xóa riêng từ lịch sử ảnh. Không có tính phí, RFID, điều khiển barrier hoặc nhận diện chủ xe trong phạm vi này.
+Giao diện hiện tập trung vào nhận diện, lịch sử và kiểm chứng mô hình; tab bãi giữ xe cùng thao tác xác nhận vào/ra đã tạm bỏ theo phạm vi hiện tại. Dữ liệu và API bãi xe cũ được giữ để tương thích, chưa có thao tác ghi nhận lượt gửi trên giao diện. Các ảnh đã được tham chiếu trong lượt gửi cũ vẫn được bảo vệ khỏi xóa riêng trong lịch sử.
 
 Camera USB, file video hoặc RTSP cũng có thể chạy bằng CLI:
 
@@ -94,7 +93,7 @@ print(response.json())
 
 `valid_format` chỉ kiểm tra một số mẫu biển dân dụng phổ biến. `needs_review` bật khi OCR dưới 0.8 hoặc định dạng không phù hợp. Điểm tự tin cao vẫn có thể sai; luôn đối chiếu ảnh khi kết quả dẫn đến quyết định thực tế. Không tự đổi O/0 hoặc I/1 để ép thành biển số hợp lệ.
 
-Ví dụ xác nhận lượt gửi sau khi API nhận diện trả một `detections[].id` đã được lưu:
+API bãi xe dưới đây được giữ cho tương thích với bản cũ; giao diện hiện tại không sử dụng. Ví dụ xác nhận lượt gửi từ một `detections[].id` đã lưu:
 
 ```json
 {

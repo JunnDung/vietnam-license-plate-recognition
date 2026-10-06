@@ -2,8 +2,6 @@
 const $ = id => document.getElementById(id);
 let selectedFile, stream, cameraTimer, cameraGeneration = 0, busy = false, historyOffset = 0, imageUrls = [];
 let noticeTimer;
-let parkingOffset = 0, parkingCandidate = null, parkingDirection = 'in';
-let parkingCurrentReady = false, parkingEntryReady = false;
 const key = () => sessionStorage.getItem('plate-api-key') || '';
 $('api-key').value = key();
 function notice(message, error = false) {
@@ -27,7 +25,7 @@ async function imageUrl(url) { const blob = await (await api(url)).blob(); const
 function busyState(value) {
   busy = value; $('recognize-btn').disabled = value || !selectedFile || !!stream || videoRunning;
   $('camera-start').disabled = value || !!stream || videoRunning; $('video-start').disabled = value || videoRunning || !videoURL || !!stream;
-  $('latency').textContent = value ? 'ĐANG XỬ LÝ…' : 'SẴN SÀNG'; document.querySelectorAll('.gate-actions button').forEach(button=>button.disabled=value);
+  $('latency').textContent = value ? 'ĐANG XỬ LÝ…' : 'SẴN SÀNG';
 }
 function draw(image, detections = []) {
   const canvas = $('preview-canvas'); canvas.width = image.videoWidth || image.naturalWidth || image.width; canvas.height = image.videoHeight || image.naturalHeight || image.height;
@@ -64,10 +62,7 @@ function renderResults(data) {
     if(item.quality?.issues?.length) info.append(element('p','hint',item.quality.issues.map(issue=>qualityLabels[issue] || issue).join(' · ')+'. Lấy ảnh rõ hơn và đối chiếu ký tự.'));
     if(item.ocr_disagreement) info.append(element('p','hint','Các biến thể ảnh trả ký tự khác nhau. Đối chiếu biển số dù điểm OCR cao.'));
     row.append(info,element('span',`badge${item.needs_review ? ' review' : ''}`,item.needs_review ? 'Cần kiểm tra' : 'Đã đọc'));
-    const actions=element('div','gate-actions');
-    if(item.image_url) for(const [direction,label] of [['in','Xe vào →'],['out','Xe ra →']]) { const button=element('button','',label);button.addEventListener('click',()=>openParkingConfirm(item,direction));actions.append(button); }
-    else actions.append(element('span','hint','Bật lưu lịch sử và nhận diện lại để xác nhận xe vào/ra.'));
-    row.append(actions); $('results').append(row);
+    $('results').append(row);
   }
   if (!data.detections.length) $('results').append(element('p','hint','Không phát hiện biển số. Thử ảnh rõ hơn hoặc giảm ngưỡng phát hiện.'));
   $('latency').textContent = `${data.latency_ms.toFixed(0)} MS · ${data.detections.length} BIỂN SỐ`;
@@ -179,72 +174,11 @@ async function showModel() {
     if(data.ocr_weather) $('metrics').append(element('p','hint','OCR điều kiện khó: dùng cùng mẫu đọc được ở ảnh gốc, không loại thêm mẫu sau khi làm mờ/thiếu sáng. Chưa kiểm chứng camera thực.'));
   } catch(error) { notice(error.message,true); }
 }
-function vnTime(value) {return value ? new Date(value).toLocaleString('vi-VN',{timeZone:'Asia/Ho_Chi_Minh'}) : '—';}
-function durationText(seconds) {const minutes=Math.floor(seconds/60);return `${Math.floor(minutes/60)} giờ ${minutes%60} phút`;}
-async function showParking() {
-  try {
-    const params=new URLSearchParams({plate:$('parking-search-plate').value,status:$('parking-status').value,limit:30,offset:parkingOffset});
-    const data=await (await api('/api/parking?'+params)).json();
-    if(parkingOffset>0 && !data.items.length && data.total>0) {parkingOffset=0;return showParking();}
-    releaseImages();$('parking-body').replaceChildren();$('inside-count').textContent=data.inside;$('entered-count').textContent=data.entered_today;$('exited-count').textContent=data.exited_today;
-    $('parking-empty').hidden=!!data.items.length;$('parking-count').textContent=`${data.total} lượt gửi`;$('parking-prev').disabled=parkingOffset===0;$('parking-next').disabled=parkingOffset+30>=data.total;
-    for(const item of data.items) {
-      const row=element('tr');row.append(element('td','',item.display_plate));const images=element('td');
-      for(const [url,title] of [[item.entry_crop_url,'Biển số lúc vào'],[item.exit_crop_url,'Biển số lúc ra']]) if(url) {const picture=element('img');picture.alt=title;images.append(picture);imageUrl(url).then(value=>picture.src=value).catch(()=>picture.alt='Ảnh không khả dụng');}
-      row.append(images,element('td','',vnTime(item.entered_at)),element('td','',vnTime(item.exited_at)),element('td','',durationText(item.duration_seconds)));
-      const state=element('td');state.append(element('span','badge',item.status==='active' ? 'Đang trong bãi' : 'Đã ra'));row.append(state);
-      const action=element('td');for(const [url,label] of [[item.entry_image_url,'Ảnh vào'],[item.exit_image_url,'Ảnh ra']]) if(url) {const button=element('button','',label);button.addEventListener('click',async()=>{try{$('dialog-image').src=await imageUrl(url);$('image-dialog').showModal();}catch(error){notice(error.message,true);}});action.append(button,document.createTextNode(' '));}
-      if(item.entry_corrected || item.exit_corrected) action.append(element('p','hint','Có sửa OCR sau đối chiếu'));
-      row.append(action);$('parking-body').append(row);
-    }
-  } catch(error) {notice(error.message,true);}
-}
-function updateParkingSubmit() {$('parking-submit').disabled=!$('parking-ack').checked || !parkingCurrentReady || (parkingDirection==='out' && !parkingEntryReady);}
-async function lookupParkingEntry() {
-  $('parking-ack').checked=false;$('parking-submit').disabled=true;$('parking-entry-proof').hidden=true;
-  parkingEntryReady=false;
-  if(parkingDirection==='in') {$('parking-confirm-info').textContent='Sẽ tạo lượt gửi mới khi bạn xác nhận.';return;}
-  const plate=$('parking-plate').value;
-  $('parking-confirm-info').textContent='Đang tìm lượt vào để đối chiếu…';
-  try {
-    const data=await (await api('/api/parking?'+new URLSearchParams({plate,status:'active',limit:100}))).json();
-    if(plate!==$('parking-plate').value || !$('parking-dialog').open) return;
-    const normalized=plate.toUpperCase().replace(/[^A-Z0-9]/g,''), session=data.items.find(item=>item.plate===normalized);
-    if(!session) {$('parking-confirm-info').textContent='Chưa tìm thấy lượt vào khớp. Kiểm tra hoặc sửa biển số trước khi xác nhận.';return;}
-    const entryUrl=await imageUrl(session.entry_image_url);
-    if(plate!==$('parking-plate').value || !$('parking-dialog').open) return;
-    $('parking-entry-image').src=entryUrl;$('parking-entry-text').textContent=`${session.display_plate} · Vào ${vnTime(session.entered_at)} · ${durationText(session.duration_seconds)}`;
-    $('parking-entry-proof').hidden=false;$('parking-confirm-info').textContent='Đối chiếu phương tiện và biển số giữa ảnh vào và ảnh hiện tại.';
-    parkingEntryReady=true;updateParkingSubmit();
-  }catch(error){$('parking-confirm-info').textContent=error.message;}
-}
-async function openParkingConfirm(item,direction) {
-  stopCamera();stopVideo();parkingCandidate=item;parkingDirection=direction;$('parking-confirm-title').textContent=direction==='in' ? 'Xác nhận xe vào' : 'Đối chiếu xe ra';
-  parkingCurrentReady=false;parkingEntryReady=false;
-  $('parking-submit').textContent=direction==='in' ? 'Ghi nhận xe vào' : 'Ghi nhận xe ra';$('parking-plate').value=item.display_plate || item.plate;
-  $('parking-current-image').removeAttribute('src');$('parking-current-crop').removeAttribute('src');$('parking-dialog').showModal();await lookupParkingEntry();
-  try {const current=await imageUrl(item.image_url),crop=await imageUrl(item.crop_url);if(parkingCandidate?.id!==item.id || !$('parking-dialog').open) return;$('parking-current-image').src=current;$('parking-current-crop').src=crop;parkingCurrentReady=true;updateParkingSubmit();}catch(error){notice(error.message,true);}
-}
-$('parking-search-form').addEventListener('submit',event=>{event.preventDefault();parkingOffset=0;showParking();});
-$('parking-refresh').addEventListener('click',showParking);
-$('parking-prev').addEventListener('click',()=>{parkingOffset=Math.max(0,parkingOffset-30);showParking();});
-$('parking-next').addEventListener('click',()=>{parkingOffset+=30;showParking();});
-$('parking-cancel').addEventListener('click',()=> $('parking-dialog').close());
-$('parking-plate').addEventListener('input',()=>{$('parking-ack').checked=false;parkingEntryReady=false;updateParkingSubmit();$('parking-entry-proof').hidden=true;});
-$('parking-plate').addEventListener('change',lookupParkingEntry);
-$('parking-ack').addEventListener('change',updateParkingSubmit);
-$('parking-confirm-form').addEventListener('submit',async event=>{
-  event.preventDefault();if(!parkingCandidate || !$('parking-ack').checked) return;$('parking-submit').disabled=true;
-  try {const data=await (await api('/api/parking/events',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({record_id:parkingCandidate.id,plate:$('parking-plate').value,direction:parkingDirection,confirmed:true})})).json();
-    $('parking-dialog').close();notice(`${data.direction==='in' ? 'Đã ghi nhận xe vào' : 'Đã ghi nhận xe ra'}: ${data.session.display_plate}`);
-    document.querySelector('[data-tab="parking"]').click();
-  }catch(error){notice(error.message,true);$('parking-submit').disabled=false;}
-});
 document.querySelectorAll('[data-tab]').forEach(button=>button.addEventListener('click',()=> {
   if(button.dataset.tab!=='recognize') {stopCamera();stopVideo();}
   document.querySelectorAll('[data-tab]').forEach(tab=> {const active=tab===button;tab.classList.toggle('active',active);tab.setAttribute('aria-selected',active);});
   document.querySelectorAll('.panel').forEach(panel=>panel.hidden=panel.id!==button.dataset.tab);
-  if(button.dataset.tab==='history') showHistory(); if(button.dataset.tab==='model') showModel();if(button.dataset.tab==='parking') showParking();
+  if(button.dataset.tab==='history') showHistory(); if(button.dataset.tab==='model') showModel();
 }));
 $('key-save').addEventListener('click',()=> { sessionStorage.setItem('plate-api-key',$('api-key').value); notice('Đã áp dụng API key cho phiên trình duyệt này.'); });
 async function checkHealth() { try { const data=await (await api('/api/health')).json(); $('status').textContent=data.status==='ready' ? 'Mô hình sẵn sàng' : 'Chưa tải được mô hình'; $('status').classList.toggle('ready',data.status==='ready'); } catch { $('status').textContent='Mất kết nối API'; $('status').classList.remove('ready'); } }

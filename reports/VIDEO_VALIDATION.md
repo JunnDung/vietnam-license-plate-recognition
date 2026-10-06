@@ -1,5 +1,7 @@
 # Nhận diện video và tăng tần suất camera — 2026-10-06
 
+Ghi chú phạm vi giao diện: phần bãi giữ xe và xác nhận vào/ra đã tạm bỏ ở bản cập nhật tiếp theo cùng ngày; nhận diện ảnh/video/camera và tra cứu vẫn hoạt động. Dữ liệu/API bãi xe cũ được giữ, các mô tả luồng xác nhận bên dưới là phạm vi của phiên bản khi đo video.
+
 ## Cách sử dụng
 
 Ở tab **Nhận diện**, chọn file video MP4/WebM/OGV mà trình duyệt đọc được (tối đa 500 MB, 10 phút), chọn số khung phân tích mỗi giây video rồi bấm **Phân tích video**. Mặc định 5 khung/giây: video 4 giây tạo 20 mốc lấy mẫu 0.00, 0.20, …, 3.80. Mỗi khung được xử lý tuần tự qua `/api/recognize`; file gốc không được upload. Khung gửi đi có cạnh dài tối đa 1280 px, detector vẫn dùng input 640 FP32 và OCR không đổi.

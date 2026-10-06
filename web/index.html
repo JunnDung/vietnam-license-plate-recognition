@@ -3,8 +3,7 @@
 <head>
   <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#101820"><title>Biển Số Việt · Nhận diện phương tiện</title>
-  <link rel="stylesheet" href="/style.css?v=3">
-  <link rel="stylesheet" href="/parking.css">
+  <link rel="stylesheet" href="/style.css?v=4">
 </head>
 <body>
 <header>
@@ -12,8 +11,8 @@
   <div class="header-tools"><span id="status" class="status">Đang kết nối…</span><details><summary>Cấu hình API</summary><label>API key <input id="api-key" type="password" autocomplete="off" placeholder="Chỉ cần khi server bật bảo vệ"></label><button id="key-save">Áp dụng</button></details><a href="/docs" target="_blank" rel="noopener">API docs ↗</a></div>
 </header>
 <main>
-  <div class="intro"><div><div class="eyebrow">VIETNAMESE LICENSE PLATE RECOGNITION</div><h1>Mỗi khung hình.<br><span>Một biển số được đọc.</span></h1><p>Phát hiện biển số ô tô, xe máy và đọc ký tự từ ảnh hoặc camera.<br>Lưu kết quả để tìm lại khi cần.</p></div><div class="plate-art" aria-hidden="true"><small>VIỆT NAM</small><b>51A</b><b>123.45</b><span>DETECT → READ → SEARCH</span></div></div>
-  <nav class="tabs" aria-label="Chức năng"><button class="active" data-tab="recognize" aria-selected="true">01 / Nhận diện</button><button data-tab="parking" aria-selected="false">02 / Bãi giữ xe</button><button data-tab="history" aria-selected="false">03 / Lịch sử ảnh</button><button data-tab="model" aria-selected="false">04 / Mô hình</button></nav>
+  <div class="intro"><div><div class="eyebrow">VIETNAMESE LICENSE PLATE RECOGNITION</div><h1>Mỗi khung hình.<br><span>Một biển số được đọc.</span></h1><p>Phát hiện biển số ô tô, xe máy và đọc ký tự từ ảnh, camera hoặc video.<br>Lưu kết quả để tìm lại khi cần.</p></div><div class="plate-art" aria-hidden="true"><small>VIỆT NAM</small><b>51A</b><b>123.45</b><span>DETECT → READ → SEARCH</span></div></div>
+  <nav class="tabs" aria-label="Chức năng"><button class="active" data-tab="recognize" aria-selected="true">01 / Nhận diện</button><button data-tab="history" aria-selected="false">02 / Lịch sử ảnh</button><button data-tab="model" aria-selected="false">03 / Mô hình</button></nav>
   <section id="recognize" class="panel">
     <div class="workspace"><div class="input-panel card">
       <div class="section-title"><h2>Ảnh đầu vào</h2><span class="tag">JPG · PNG · WEBP</span></div>
@@ -42,16 +41,6 @@
     </div></div>
     <p class="privacy">Ảnh được xử lý trên máy chủ bạn đang chạy. Khi bỏ chọn lưu lịch sử, ảnh và kết quả của lượt đó không được ghi vào kho tra cứu.</p>
   </section>
-  <section id="parking" class="panel" hidden>
-    <div class="card"><div class="section-title"><div><h2>Xe vào / Xe ra</h2><p class="hint">Nhận diện tại cổng → đối chiếu ảnh → xác nhận biển số → ghi nhận lượt gửi.</p></div><button id="parking-refresh">Làm mới</button></div>
-      <div class="metrics parking-stats"><div class="metric"><b id="inside-count">0</b><span>Xe đang trong bãi</span></div><div class="metric"><b id="entered-count">0</b><span>Lượt vào hôm nay · giờ Việt Nam</span></div><div class="metric"><b id="exited-count">0</b><span>Lượt ra hôm nay · giờ Việt Nam</span></div></div>
-      <form id="parking-search-form" class="parking-search"><label>Biển số<input id="parking-search-plate" placeholder="Tìm xe đang gửi hoặc lượt đã kết thúc" maxlength="30"></label><label>Trạng thái<select id="parking-status"><option value="active">Đang trong bãi</option><option value="closed">Đã ra</option><option value="all">Tất cả lượt gửi</option></select></label><button class="primary" type="submit">Tra cứu</button></form>
-      <div class="table-wrap"><table><thead><tr><th>Biển số xác nhận</th><th>Ảnh vào / ra</th><th>Giờ vào</th><th>Giờ ra</th><th>Thời gian gửi</th><th>Trạng thái</th><th>Đối chiếu</th></tr></thead><tbody id="parking-body"></tbody></table></div>
-      <div id="parking-empty" class="empty-state">Chưa có xe phù hợp. Nhận diện ảnh tại cổng rồi chọn Xe vào hoặc Xe ra.</div>
-      <div class="pagination"><span id="parking-count">0 lượt gửi</span><div><button id="parking-prev" disabled>← Trước</button><button id="parking-next" disabled>Sau →</button></div></div>
-      <p class="hint">Mỗi biển số có tối đa một lượt gửi đang mở. Xe ra phải khớp lượt vào. Ảnh đã dùng xác nhận được giữ làm bằng chứng; hệ thống không tự điều khiển barrier.</p>
-    </div>
-  </section>
   <section id="history" class="panel" hidden>
     <div class="card"><div class="section-title"><div><h2>Tra cứu lượt nhận diện</h2><p class="hint">Tìm biển số trong lịch sử đã lưu tại máy chủ này.</p></div><button id="export-btn">Xuất CSV ↗</button></div>
     <form id="search-form" class="search-form"><label>Biển số<input id="search-plate" placeholder="Ví dụ: 51A hoặc 51A-123.45" maxlength="30"></label><label>Từ thời điểm<input id="search-from" type="datetime-local"></label><label>Đến thời điểm<input id="search-to" type="datetime-local"></label><button class="primary" type="submit">Tìm kiếm</button></form>
@@ -62,8 +51,7 @@
 </main>
 <footer><span>BIỂN SỐ VIỆT / LOCAL VISION LAB</span><span>Nhận diện có thể sai. Kiểm tra ảnh gốc trước khi sử dụng kết quả.</span></footer>
 <dialog id="image-dialog"><button id="dialog-close" aria-label="Đóng ảnh">Đóng ×</button><img id="dialog-image" alt="Ảnh nguồn của lượt nhận diện"></dialog>
-<dialog id="parking-dialog"><form id="parking-confirm-form"><div class="section-title"><h2 id="parking-confirm-title">Xác nhận xe vào</h2><button id="parking-cancel" type="button">Đóng ×</button></div><p class="hint">Đối chiếu ảnh và sửa ký tự nếu OCR đọc sai. Đây là biển số được dùng cho lượt gửi.</p><div class="confirm-images"><div><span>Khung hình vừa nhận diện</span><img id="parking-current-image" alt="Ảnh phương tiện tại cổng"><img id="parking-current-crop" alt="Biển số tại cổng"></div><div id="parking-entry-proof" hidden><span>Ảnh lúc vào bãi</span><img id="parking-entry-image" alt="Ảnh phương tiện đã lưu lúc vào"><p id="parking-entry-text" class="hint"></p></div></div><label>Biển số sau khi đối chiếu<input id="parking-plate" required maxlength="20" autocomplete="off"></label><p id="parking-confirm-info" class="hint"></p><label class="check"><input id="parking-ack" type="checkbox" required> Tôi đã đối chiếu ảnh và xác nhận biển số chính xác.</label><button id="parking-submit" class="primary" disabled type="submit">Ghi nhận xe vào</button></form></dialog>
 <script src="/camera.js?v=2" defer></script>
-<script src="/app.js?v=3" defer></script>
+<script src="/app.js?v=4" defer></script>
 <script src="/video.js?v=3" defer></script>
 </body></html>
