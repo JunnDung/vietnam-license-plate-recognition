@@ -4,7 +4,9 @@ Hệ thống nhận diện biển số ô tô và xe máy Việt Nam từ ảnh,
 
 ## Chạy trên Windows
 
-Máy đang phát triển đã có môi trường `.venv` tại `D:\ComputerVision`. Chạy `run.cmd`, rồi mở **http://127.0.0.1:8000**. Nếu server đã chạy, chỉ cần mở địa chỉ này.
+Máy đang phát triển đã có môi trường `.venv` tại `D:\ComputerVision\NhanDienBienSo`. Chạy `run.cmd`, rồi mở **http://127.0.0.1:8000**. Nếu server đã chạy, chỉ cần mở địa chỉ này.
+
+`D:\ComputerVision` là thư mục chung cho nhiều dự án. Toàn bộ mã nguồn, mô hình, dữ liệu, báo cáo và lịch sử Git của dự án này nằm trong `NhanDienBienSo`; chạy các lệnh bên dưới từ thư mục đó.
 
 Trên máy mới, dùng Python 3.12 (hỗ trợ 3.11–3.13):
 
