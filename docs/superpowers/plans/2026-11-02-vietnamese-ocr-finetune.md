@@ -24,10 +24,10 @@ Transitive same-plate/source/crop links must not cross splits or reserved groups
 
 **Interfaces:** build_groups(rows) returns source/plate/crop connected components; assign_splits(rows,reserved_plates,reserved_sources,seed) returns eligible rows with train/val/test or reserved exclusion. Manifest rows carry member, plate, bbox, square, split, group, pixel/source/image hashes and local image paths; CSV train/val uses image_path,plate_text. Validation/test have one deterministic sample per ID, train keeps unique captures.
 
-- [ ] Test transitive source links, reserved group propagation, deterministic split independent of input order, duplicate/conflicting crop labels and disjoint nonempty sets; observe failure before implementation.
-- [ ] Implement preparation with pinned archive checks, per-image bounds/decode checks, exclusion audit and refusal to overwrite a frozen manifest; run tests and the full preparation before inference/training. Record actual counts and manifest hash.
-- [ ] Create .venv-train using Python3.12; pin necessary Keras/PyTorch/export dependencies without modifying .venv. Verify a CUDA tensor and imports; do not install unrelated train extras unsupported on Windows.
-- [ ] Commit preparation, tests and frozen input evidence.
+- [x] Test transitive source links, reserved group propagation, deterministic split independent of input order, duplicate/conflicting crop labels and disjoint nonempty sets; observe failure before implementation.
+- [x] Implement preparation with pinned archive checks, per-image bounds/decode checks, exclusion audit and refusal to overwrite a frozen manifest; run tests and the full preparation before inference/training. Record actual counts and manifest hash.
+- [x] Create .venv-train using Python3.12; pin necessary Keras/PyTorch/export dependencies without modifying .venv. Verify a CUDA tensor and imports; do not install unrelated train extras unsupported on Windows.
+- [x] Commit preparation, tests and frozen input evidence.
 
 ## Task 2 — Fine-tune with checkpoints and export
 
@@ -35,7 +35,7 @@ Transitive same-plate/source/crop links must not cross splits or reserved groups
 
 **Interfaces:** official train CLI consumes prepared train/val CSVs only. Wrapper records initial assets/config hashes, fixed arguments, process/live status, epoch CSV and best/last checkpoint paths. Training report exposes selected checkpoint/hash and actual epochs/elapsed. Selected ONNX path feeds Task3; no test CSV passed to training.
 
-- [ ] Pin/download official Keras/config assets with hashes. Inspect loaded model weights/heads and execute a small CUDA forward/backward sanity check before the full run; fail on unintended weight mismatch or nonfinite loss.
+- [x] Pin/download official Keras/config assets with hashes. Inspect loaded model weights/heads and execute a small CUDA forward/backward sanity check before the full run; fail on unintended weight mismatch or nonfinite loss.
 - [ ] Reuse official training CLI/callback behavior with declared seed/LR/batch/early stopping; save logs and recoverable best/last Keras checkpoints. Monitor real current logs and GPU, estimate timing from measured batches. Diagnose failures before making the one permitted validation-driven rerun.
 - [ ] Select best checkpoint by validation whole-plate accuracy, export to ONNX using supported backend, and assert decoded parity on validation examples. Record package versions and checksums; preserve logs rather than overwrite earlier experiments.
 - [ ] Commit training tooling, configuration and measured training evidence; keep source images/checkpoints out of Git until an adopted inference artifact is deliberately packaged.
