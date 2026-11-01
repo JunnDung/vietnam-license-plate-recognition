@@ -32,7 +32,7 @@ RGB channel order; confidence after normalization/padding; duplicated identity o
 
 ## Task 3 Measure and publish portfolio evidence
 
-- [ ] Evaluate the frozen candidate once on final partition, publish denominators, exact match, CER, Wilson interval, paired changes and per-sample outputs; state pretrained overlap unknown.
-- [ ] Benchmark warm crop OCR p50/p95 and latency scope; preserve detector metrics as historical detection-only results. Test CLI against invalid manifests and empty selections.
-- [ ] Update README and docs/CV.md with measured Vietnamese/English bullets, reproducible commands, limitations and data/model cards. Re-run Python/Node contracts and review whole branch with fresh reviewer.
+- [x] Evaluate the frozen candidate once on final partition, publish denominators, exact match, CER, Wilson interval, paired changes and per-sample outputs; state pretrained overlap unknown.
+- [x] Benchmark warm crop OCR p50/p95 and latency scope; preserve detector metrics as historical detection-only results. Test CLI against invalid manifests and empty selections.
+- [x] Update README and docs/CV.md with measured Vietnamese/English bullets, reproducible commands, limitations and data/model cards. Re-run Python/Node contracts and review whole branch with fresh reviewer.
 - [ ] Fix important reviewed issues with regression checks; commit/push and verify remote hash and CI. Merge only after checks pass, as authorized.

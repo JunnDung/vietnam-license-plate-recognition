@@ -35,6 +35,26 @@ Gate chốt trước phép đo: số đúng trên dev phải tăng, CER không t
 
 Hai thử nghiệm dev được giữ lại: [RGB](ocr_dev_rgb_20261102.json), [nắn phối cảnh](ocr_dev_rectified_20261102.json). Hồi quy/các điều kiện mô phỏng của hai bản: [ocr_legacy_paired_20261102.json](ocr_legacy_paired_20261102.json). Không dùng ảnh hoặc kết quả test để chọn phương án.
 
+## Kết quả test cuối
+
+Khóa mã tại commit `b3f046fe700d95e65838877545e5fdaee15fb466` trước khi chạy test. SHA-256 của `recognition.py`: `0a455c02789b627be008cd3cffc3b570fc7218dab325ee4140f181f8ee74795b`. Chạy test một lần trên toàn bộ 1.621 mẫu sau khi chốt; không sửa OCR theo kết quả này. [Báo cáo gốc với từng dự đoán, thời gian và hash](ocr_benchmark.json).
+
+| Phép đo trên cùng test | Baseline 1.3 | Candidate 1.4 |
+|---|---:|---:|
+| Đúng cả biển | 1.562/1.621 | **1.565/1.621** |
+| Exact match | 96,36% | **96,55%** |
+| Wilson 95% | 95,33–97,17% | 95,54–97,33% |
+| CER | 92/12.990 = 0,708% | **89/12.990 = 0,685%** |
+| Một dòng | 862/879 = 98,07% | 864/879 = 98,29% |
+| Hai dòng | 700/742 = 94,34% | 701/742 = 94,47% |
+| Mean crop OCR | 66,09 ms | 72,80 ms |
+| p50 / p95 | 60,42 / 83,07 ms | 60,08 / 110,16 ms |
+| Crop/giây tuần tự | 15,13 | 13,74 |
+
+Candidate sửa 6 mẫu vốn sai và làm sai thêm 3 mẫu vốn đúng, ròng tăng 3/1.621 (**0,185 điểm phần trăm**). Đây là mức tăng nhỏ; exact McNemar hai phía trên 9 cặp bất đồng cho p = 0,508, không đủ bằng chứng cải thiện có ý nghĩa thống kê ở mức 0,05. Không mô tả kết quả này là bước nhảy lớn về accuracy. Đổi lại, mean latency tăng khoảng 10%; p95 tăng khoảng 27 ms do thêm biến thể OCR cho một số crop. Giữ bản mới vì sửa đúng hợp đồng thư viện và đạt gate dev đã chốt, với chi phí/giới hạn được công bố.
+
+Hồi quy rõ/tối/mưa mô phỏng vẫn 37/37 trên crop và pipeline. **Mờ chuyển động nặng vẫn chỉ 3/37 crop**, pipeline 4/37 so với 3/37 baseline. Không suy diễn thành đã xử lý tốt mọi mờ hoặc mưa thật.
+
 ## Cách tính và thời gian
 
 Exact match = số chuỗi đúng hoàn toàn / tổng crop; CER = tổng khoảng cách Levenshtein / tổng ký tự nhãn, có tính insert/delete/substitute và dự đoán rỗng. Báo cáo kèm khoảng Wilson 95% cho exact match; khoảng này dựa trên giả định mẫu Bernoulli độc lập, không mô hình hóa mọi phụ thuộc giữa ảnh cùng camera. Có số liệu riêng một dòng/hai dòng và các trường hợp được sửa/làm sai thêm.
@@ -56,3 +76,11 @@ Invoke-WebRequest -Uri 'https://drive.usercontent.google.com/download?id=1sNmk3U
 ```
 
 Lệnh chuẩn bị kiểm tra SHA-256 archive trước khi tạo ảnh. Không ghi đè manifest/báo cáo đã có; dùng output mới khi tái lập. Accuracy phải khớp trên cùng môi trường/checkpoint; latency có thể khác theo tải máy. Khi phát triển phương án tiếp theo, test này đã được công bố: cần một tập đánh giá mới theo camera/phiên quay, không tiếp tục tối ưu trên nó rồi gọi là holdout độc lập.
+
+## Kiểm tra ứng dụng
+
+16 unittest đạt, gồm RGB từng biến thể, vị trí confidence, giới hạn nắn viền, split/dedup/metric, chặn manifest không hợp lệ, API summary không trả hàng nghìn dự đoán; các contract ảnh/lịch sử/temporal/backup trước đây vẫn đạt. Node syntax và kiểm tra camera/video đạt.
+
+API thật 1.4.0 khởi động, detector CUDA (`device=0`) và đúng hash checkpoint; đọc ảnh hồi quy `54N46324`, `save=false` giữ lịch sử ở 0 bản ghi trên clone mới. `/api/model` trả số liệu 1.621 crop, bỏ prediction arrays; trang chủ trả 200 và asset 1.4.0. Chi tiết: [API smoke](ocr_api_smoke_20261102.json). CLI video trống 7 giây chạy đủ 3 mốc 0/3/6 theo cách cũ và 35 khung theo 5 Hz mặc định, không sinh biển giả. Đây là smoke test chức năng, không phải đo accuracy video hay tải nhiều camera. Lịch sử/ảnh vận hành của máy cũ không có trong Git nên clone không khôi phục được chúng.
+
+Chưa thử camera USB/RTSP thật, mưa thật, đo tải dài hạn hoặc dựng lại DOCX. DOCX 1.3.0 và kết quả video trước đây là tài liệu lịch sử; lượt này cập nhật báo cáo OCR/README và câu mô tả CV theo thiết kế đã duyệt.

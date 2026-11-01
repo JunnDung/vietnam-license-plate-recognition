@@ -2,6 +2,21 @@
 
 Hệ thống nhận diện biển số ô tô và xe máy Việt Nam từ ảnh, camera và video: mô hình **YOLO11n được fine-tune tại máy**, OCR **CCT S v2 có sẵn**, API FastAPI và giao diện tiếng Việt. Có tra cứu lịch sử, xem ảnh nguồn và xuất CSV. Dữ liệu được lưu bằng SQLite, ảnh lưu tại máy chạy server.
 
+## Bản 1.4.0 — OCR và số liệu cho portfolio
+
+Sửa thứ tự màu RGB, căn confidence theo đúng ký tự và bổ sung nắn phối cảnh có điều kiện cho biển hai dòng. Giữ nguyên trọng số detector/OCR; không huấn luyện OCR mới trong lượt này.
+
+| Phép đo | Kết quả | Phạm vi |
+|---|---|---|
+| OCR đúng cả biển | 96,55% (1565/1621) | Crop VNLP test, một ảnh/một ID biển |
+| CER | 0,685% | Tổng lỗi ký tự / tổng ký tự nhãn |
+| OCR warmed CPU | p50 60,1 ms / p95 110,2 ms | Gồm tiền xử lý và OCR; chưa gồm detector/API |
+| Detector mAP@50 / mAP@50–95 | 99,11% / 87,50% | Kết quả huấn luyện trước đây, 665 ảnh test; không phải accuracy OCR |
+
+2.000 biển được chọn trước dự đoán: **379 dev / 1.621 test**, không trùng ID biển giữa hai phần. Tập test không dùng để chọn phương án trong lượt này; chưa biết mức trùng với pretrain upstream của OCR. Nhãn VNLP chưa được kiểm tra độc lập bằng người. Kết quả trên crop không chứng minh chất lượng toàn camera hoặc camera mới.
+
+[Phương pháp, baseline/candidate, khoảng tin cậy và lệnh tái lập](reports/OCR_BENCHMARK.md) · [Dự đoán từng mẫu](reports/ocr_benchmark.json) · [Mô tả CV tiếng Việt/Anh](docs/CV.md). Các báo cáo huấn luyện, thời tiết/video và DOCX 1.3 bên dưới được giữ làm lịch sử thí nghiệm; số liệu OCR hiện tại xem ở liên kết này.
+
 ## Chạy trên Windows
 
 Máy đang phát triển đã có môi trường `.venv` tại `D:\ComputerVision\NhanDienBienSo`. Chạy `run.cmd`, rồi mở **http://127.0.0.1:8000**. Nếu server đã chạy, chỉ cần mở địa chỉ này.
@@ -11,8 +26,8 @@ Máy đang phát triển đã có môi trường `.venv` tại `D:\ComputerVisio
 Trên máy mới, dùng Python 3.12 (hỗ trợ 3.11–3.13):
 
 ```powershell
-git clone https://github.com/JunnDung/vietnam-license-plate-recognition.git
-cd vietnam-license-plate-recognition
+git clone https://github.com/JunnDung/vietnam-license-plate-recognition.git NhanDienBienSo
+cd NhanDienBienSo
 powershell -ExecutionPolicy Bypass -File .\setup.ps1
 .\run.cmd
 ```
@@ -123,7 +138,7 @@ Dữ liệu được tìm bằng **Hugging Face MCP**: [Vietnam License Plate Se
 
 Model khởi tạo từ `yolo11n.pt`; augment độ sáng, quay nhẹ, scale và mosaic. Không lật ngang/dọc ký tự. Checkpoint tốt nhất được chọn bằng validation; **test được đánh giá sau khi kết thúc huấn luyện**, không dùng để chọn checkpoint. Muốn tiếp tục một lượt gián đoạn, chạy `train.py --resume` khi `runs/plate_detector/weights/last.pt` còn tồn tại. Để train một thí nghiệm mới, di chuyển thư mục run cũ trước khi chạy.
 
-OCR là mô hình pretrained [fast-plate-ocr](https://github.com/ankandrew/fast-plate-ocr), không được fine-tune ở dự án này vì dataset không có phiên âm đầy đủ. Pipeline thử crop gốc, ghép hai dòng cho biển vuông và CLAHE. Cần nhãn ký tự thực tế để fine-tune OCR riêng cho camera của bạn.
+OCR là mô hình pretrained [fast-plate-ocr](https://github.com/ankandrew/fast-plate-ocr), chưa được fine-tune ở dự án này. Pipeline dùng RGB, thử crop gốc, ghép hai dòng, CLAHE và thêm phương án ghép dòng sau nắn viền khi tìm được bốn góc phù hợp. Bộ dữ liệu detector ban đầu không có phiên âm đầy đủ; bộ VNLP mới được dùng để đánh giá OCR theo giao thức ở trên. Fine-tune cho camera riêng cần nhãn được kiểm tra và tập nghiệm thu riêng theo phiên quay.
 
 ### Fine-tune chống mờ và chọn model
 
