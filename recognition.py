@@ -48,6 +48,20 @@ def format_plate(text):
     return prefix + '-' + (digits[:3] + '.' + digits[3:] if len(digits) == 5 else digits)
 
 
+def decode_predictions(predictions):
+    candidates = []
+    for prediction in predictions:
+        text = normalize_plate(prediction.plate)
+        slots = [match.start() for match in re.finditer(r'[A-Z0-9]', prediction.plate.upper())]
+        probabilities = np.asarray(prediction.char_probs, dtype=float)[slots]
+        confidence = float(probabilities.mean()) if len(probabilities) else 0.
+        candidates.append({'plate': text, 'raw_text': prediction.plate,
+                           'ocr_confidence': round(confidence, 4), 'valid_format': is_vietnamese_plate(text)})
+    best = max(candidates, key=lambda item: (item['valid_format'], item['ocr_confidence']))
+    best['ocr_disagreement'] = len({item['plate'] for item in candidates if item['valid_format']}) > 1
+    return best
+
+
 def jpeg_bytes(image):
     success, data = cv2.imencode('.jpg', image, [cv2.IMWRITE_JPEG_QUALITY, 88])
     if not success:
@@ -151,17 +165,7 @@ class PlateEngine:
                 variants.append(flatten_two_lines(rectified))
         # FastPlateOCR's RGB model assumes in-memory arrays already use RGB.
         predictions = self.ocr.run([cv2.cvtColor(image, cv2.COLOR_BGR2RGB) for image in variants], return_confidence=True)
-        candidates = []
-        for prediction in predictions:
-            text = normalize_plate(prediction.plate)
-            slots = [match.start() for match in re.finditer(r'[A-Z0-9]', prediction.plate.upper())]
-            probabilities = np.asarray(prediction.char_probs, dtype=float)[slots]
-            confidence = float(probabilities.mean()) if len(probabilities) else 0.
-            candidates.append({'plate': text, 'raw_text': prediction.plate,
-                               'ocr_confidence': round(confidence, 4), 'valid_format': is_vietnamese_plate(text)})
-        best = max(candidates, key=lambda item: (item['valid_format'], item['ocr_confidence']))
-        best['ocr_disagreement'] = len({item['plate'] for item in candidates if item['valid_format']}) > 1
-        return best
+        return decode_predictions(predictions)
 
     def predict(self, image, confidence=.35):
         height, width = image.shape[:2]

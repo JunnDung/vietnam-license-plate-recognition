@@ -3,12 +3,53 @@ import unittest
 import csv
 from pathlib import Path
 import tempfile
+from copy import deepcopy
+from types import SimpleNamespace
+
+import numpy as np
 
 from scripts.prepare_ocr_training import build_groups, assign_splits, write_csvs
 from scripts.train_ocr import fetch_assets, training_progress
+from scripts.evaluate_ocr_finetune import adoption_checks, match_target, read_single
 
 
 class TrainingDataChecks(unittest.TestCase):
+    def test_adoption_rejects_accuracy_character_layout_latency_and_legacy_regressions(self):
+        base={'samples':1000,'correct':960,'cer':.01,'latency_p95_ms':100.,
+              'two_lines':{'samples':400,'correct':370},'pipeline_exact_match':.94}
+        candidate=deepcopy(base);candidate.update(correct=970,cer=.009,latency_p95_ms=105.,pipeline_exact_match=.95)
+        candidate['two_lines']['correct']=375
+        legacy={'crop':37,'pipeline':37}
+        self.assertTrue(all(adoption_checks(base,candidate,legacy,legacy).values()))
+        for change in ({'correct':964},{'cer':.011},{'latency_p95_ms':111.},{'pipeline_exact_match':.93}):
+            with self.subTest(change=change):
+                self.assertFalse(all(adoption_checks(base,dict(candidate,**change),legacy,legacy).values()))
+        changed=deepcopy(candidate);changed['two_lines']['correct']=369
+        self.assertFalse(all(adoption_checks(base,changed,legacy,legacy).values()))
+        self.assertFalse(all(adoption_checks(base,candidate,legacy,{'crop':36,'pipeline':37}).values()))
+
+    def test_target_matching_does_not_choose_a_box_by_ground_truth_text(self):
+        target=[0,0,100,100]
+        detections=[{'bbox':target,'plate':'WRONG'}, {'bbox':[1,1,99,99],'plate':'51A12345'},
+                    {'bbox':[200,200,300,300],'plate':'UNANNOTATED'}]
+        matched=match_target(detections,target)
+        self.assertEqual(matched['plate'],'WRONG')
+        self.assertIsNone(match_target(detections,[500,500,600,600]))
+
+    def test_single_pass_uses_one_rgb_image_and_shared_slot_decoding(self):
+        calls=[]
+        def run(images,**kwargs):
+            calls.extend(images)
+            return [SimpleNamespace(plate='51A_12345',char_probs=[.9,.9,.9,.01,.8,.8,.8,.8,.8,.01])]
+        ocr=SimpleNamespace(run=run)
+        result=read_single(ocr,np.full((40,80,3),(10,20,200),np.uint8))
+        self.assertEqual(len(calls),1)
+        np.testing.assert_array_equal(calls[0][0,0],[200,20,10])
+        self.assertEqual(result['plate'],'51A12345')
+        self.assertAlmostEqual(result['ocr_confidence'],.8375)
+        self.assertEqual(read_single(ocr,np.zeros((7,80,3),np.uint8))['plate'],'')
+        self.assertEqual(len(calls),1)
+
     def test_cached_weights_must_match_pinned_upstream_digest(self):
         with tempfile.TemporaryDirectory() as folder:
             (Path(folder)/'cct_s_v2_global.keras').write_bytes(b'wrong weights')

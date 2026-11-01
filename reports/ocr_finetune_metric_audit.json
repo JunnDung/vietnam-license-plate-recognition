@@ -1,0 +1,22 @@
+{
+  "upstream": "fast-plate-ocr1.1.0 plate_acc_metric",
+  "test": "tests/test_ocr_training_backend.py",
+  "unequal_batches": {
+    "batch_sizes": [
+      2,
+      1
+    ],
+    "correct_counts": [
+      2,
+      0
+    ],
+    "upstream_result": 0.5,
+    "expected_per_sample": 0.6666666666666666
+  },
+  "fix": "Return one binary exact-match value per example to Keras MeanMetricWrapper; explicitly persist Compose constructor seed.",
+  "discarded_initial_run": {
+    "completed_epochs": 1,
+    "checkpoint_sha256": "ee88aa3d53c778462a16dce83f601d1583bf6991fe3202a40e9dbac6306ba83e"
+  },
+  "final_test_used": false
+}

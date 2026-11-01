@@ -50,6 +50,29 @@ def training_progress(folder):
             'checkpoint_dir':str(logs[-1].parent.relative_to(ROOT)) if logs[-1].is_relative_to(ROOT) else str(logs[-1].parent)}
 
 
+def exact_plate_accuracy(max_plate_slots,vocabulary_size):
+    from keras import ops
+    def acc(y_true,y_pred):
+        truth=ops.argmax(ops.reshape(y_true,(-1,max_plate_slots,vocabulary_size)),axis=-1)
+        predicted=ops.argmax(ops.reshape(y_pred,(-1,max_plate_slots,vocabulary_size)),axis=-1)
+        # Return one value per plate so Keras weights a short final batch correctly.
+        return ops.cast(ops.all(ops.equal(truth,predicted),axis=-1),'float32')
+    return acc
+
+
+def save_augmentation(path,seed):
+    import albumentations as A
+    import yaml
+    from fast_plate_ocr.train.data.augmentation import default_train_augmentation
+    augmentation=default_train_augmentation('rgb')
+    augmentation.transforms.extend([A.MotionBlur(blur_limit=(3,7),p=.15),
+        A.RandomGamma(gamma_limit=(70,140),p=.15),A.GaussNoise(std_range=(.01,.04),p=.1)])
+    config=A.to_dict(augmentation)
+    # Compose omits its seed when serialized; persist the supported constructor argument.
+    config['transform']['seed']=seed
+    path.write_text(yaml.safe_dump(config,sort_keys=False),encoding='utf-8',newline='\n')
+
+
 def main():
     parser=argparse.ArgumentParser()
     parser.add_argument('--name',default='ocr_finetune')
@@ -78,14 +101,14 @@ def main():
     import keras
     import numpy as np
     import torch
-    import albumentations as A
     from fast_plate_ocr.train.model.model_builders import build_model
     from fast_plate_ocr.train.model.model_schema import load_model_config_from_yaml
     from fast_plate_ocr.train.model.config import load_plate_config_from_yaml
     from fast_plate_ocr.train.model.loss import cce_loss
     from fast_plate_ocr.train.utilities.utils import target_transform
-    from fast_plate_ocr.train.data.augmentation import default_train_augmentation
     from fast_plate_ocr.cli.train import train
+    import importlib
+    importlib.import_module('fast_plate_ocr.cli.train').plate_acc_metric=exact_plate_accuracy
     if not torch.cuda.is_available():raise RuntimeError('CUDA is required for this declared run')
     torch.set_num_threads(4);keras.utils.set_random_seed(20261102)
     keras.utils.disable_interactive_logging()
@@ -105,15 +128,14 @@ def main():
     print('Strict pretrained weight load and CUDA forward/backward passed:',sanity,flush=True)
     del model;keras.backend.clear_session();torch.cuda.empty_cache()
     run.mkdir(parents=True)
-    augmentation=default_train_augmentation('rgb')
-    augmentation.transforms.extend([A.MotionBlur(blur_limit=(3,7),p=.15),
-        A.RandomGamma(gamma_limit=(70,140),p=.15),A.GaussNoise(std_range=(.01,.04),p=.1)])
-    augmentation.set_random_seed(20261102)
-    A.save(augmentation,run/'augmentation.yaml',data_format='yaml')
+    save_augmentation(run/'augmentation.yaml',20261102)
     started=time.monotonic();stopped=threading.Event()
     status={'state':'training','started_at':datetime.now(timezone.utc).isoformat(),'pid':os.getpid(),
         'manifest_sha256':sha(manifest_path),'assets':{name:{'url':BASE+name,'sha256':expected} for name,expected in ASSETS.items()},
         'dependency_lock_sha256':sha(ROOT/'requirements-ocr-train-lock.txt'),
+        'training_source_sha256':sha(Path(__file__)),
+        'primary_metric':'Per-sample whole-plate slot exact accuracy; fixes upstream batch-mean weighting. Auxiliary metrics remain upstream batch means; region head has zero loss weight.',
+        'augmentation_seed_persisted':20261102,
         'data_csv_sha256':{s:sha(data/(s+'.csv')) for s in ('train','val')},'seed':20261102,
         'settings':{'epochs_max':args.epochs,'batch':args.batch,'learning_rate':args.lr,'early_stopping_patience':6,
                     'region_loss_weight':0.,'plate_loss_weight':1.,'mixed_precision':'mixed_float16'},

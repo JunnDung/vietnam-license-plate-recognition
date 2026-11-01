@@ -9,10 +9,16 @@ from unittest.mock import patch
 import numpy as np
 import cv2
 
-from recognition import PlateEngine, rectify_plate
+from recognition import PlateEngine, rectify_plate, decode_predictions
 
 
 class OCRContracts(unittest.TestCase):
+    def test_shared_prediction_decoding_preserves_normalized_slots(self):
+        result=decode_predictions([SimpleNamespace(plate='51A_12345',char_probs=[.9,.9,.9,.01,.8,.8,.8,.8,.8,.01])])
+        self.assertEqual(result['plate'],'51A12345')
+        self.assertAlmostEqual(result['ocr_confidence'],.8375)
+        self.assertFalse(result['ocr_disagreement'])
+
     def test_model_endpoint_exposes_benchmark_summary_without_predictions(self):
         import app
         with tempfile.TemporaryDirectory() as folder:
