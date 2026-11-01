@@ -1,0 +1,2330 @@
+{
+  "kind": "Legacy 37 regression, synthetic stress only; not primary accuracy",
+  "candidate_code_sha256": "0a455c02789b627be008cd3cffc3b570fc7218dab325ee4140f181f8ee74795b",
+  "results": {
+    "baseline": {
+      "original": {
+        "condition": "original",
+        "samples": 37,
+        "selected_before_predictions": true,
+        "annotation_audit": "After the preliminary pass, enlarged images were visually rechecked: index 30 is X1, index 37 ends in 9. Index 21 is physically occluded and the previously guessed prefix was removed. Independent human audit still recommended.",
+        "exact_match": 1.0,
+        "pipeline_exact_match": 1.0,
+        "character_error_rate": 0.0,
+        "mean_ms_crop_plus_pipeline": 230.30375675669939,
+        "device": "cpu",
+        "limitations": "Small manually transcribed, readable subset of test data. Unreadable exclusions recorded. Not population accuracy or real-weather evaluation.",
+        "excluded": [
+          {
+            "index": 9,
+            "image": "images/test/8a65d81752a4f5d5.png",
+            "reason": "Too blurred for reliable manual transcription"
+          },
+          {
+            "index": 22,
+            "image": "images/test/21f18cab1b83f5a0.png",
+            "reason": "Too blurred for reliable manual transcription"
+          },
+          {
+            "index": 21,
+            "image": "images/test/9b5419108c306299.png",
+            "reason": "Barrier occludes the first characters; full plate cannot be independently transcribed"
+          }
+        ],
+        "results": [
+          {
+            "index": 0,
+            "expected": "54N46324",
+            "crop_ocr": "54N46324",
+            "pipeline": "54N46324",
+            "ocr_confidence": 0.9996
+          },
+          {
+            "index": 1,
+            "expected": "30A96805",
+            "crop_ocr": "30A96805",
+            "pipeline": "30A96805",
+            "ocr_confidence": 1.0
+          },
+          {
+            "index": 2,
+            "expected": "51F44614",
+            "crop_ocr": "51F44614",
+            "pipeline": "51F44614",
+            "ocr_confidence": 0.9999
+          },
+          {
+            "index": 3,
+            "expected": "67AL09797",
+            "crop_ocr": "67AL09797",
+            "pipeline": "67AL09797",
+            "ocr_confidence": 0.9999
+          },
+          {
+            "index": 4,
+            "expected": "54L36961",
+            "crop_ocr": "54L36961",
+            "pipeline": "54L36961",
+            "ocr_confidence": 0.9999
+          },
+          {
+            "index": 5,
+            "expected": "59H160591",
+            "crop_ocr": "59H160591",
+            "pipeline": "59H160591",
+            "ocr_confidence": 0.9997
+          },
+          {
+            "index": 6,
+            "expected": "71B197914",
+            "crop_ocr": "71B197914",
+            "pipeline": "71B197914",
+            "ocr_confidence": 1.0
+          },
+          {
+            "index": 7,
+            "expected": "59S109841",
+            "crop_ocr": "59S109841",
+            "pipeline": "59S109841",
+            "ocr_confidence": 0.9999
+          },
+          {
+            "index": 8,
+            "expected": "66P15739",
+            "crop_ocr": "66P15739",
+            "pipeline": "66P15739",
+            "ocr_confidence": 0.9997
+          },
+          {
+            "index": 10,
+            "expected": "60F128808",
+            "crop_ocr": "60F128808",
+            "pipeline": "60F128808",
+            "ocr_confidence": 0.9986
+          },
+          {
+            "index": 11,
+            "expected": "82H108866",
+            "crop_ocr": "82H108866",
+            "pipeline": "82H108866",
+            "ocr_confidence": 0.9998
+          },
+          {
+            "index": 12,
+            "expected": "54V79675",
+            "crop_ocr": "54V79675",
+            "pipeline": "54V79675",
+            "ocr_confidence": 0.9997
+          },
+          {
+            "index": 13,
+            "expected": "30A04180",
+            "crop_ocr": "30A04180",
+            "pipeline": "30A04180",
+            "ocr_confidence": 0.9998
+          },
+          {
+            "index": 14,
+            "expected": "94H41831",
+            "crop_ocr": "94H41831",
+            "pipeline": "94H41831",
+            "ocr_confidence": 0.9998
+          },
+          {
+            "index": 15,
+            "expected": "98A29814",
+            "crop_ocr": "98A29814",
+            "pipeline": "98A29814",
+            "ocr_confidence": 0.9999
+          },
+          {
+            "index": 16,
+            "expected": "88A23016",
+            "crop_ocr": "88A23016",
+            "pipeline": "88A23016",
+            "ocr_confidence": 0.9999
+          },
+          {
+            "index": 17,
+            "expected": "59L197457",
+            "crop_ocr": "59L197457",
+            "pipeline": "59L197457",
+            "ocr_confidence": 1.0
+          },
+          {
+            "index": 18,
+            "expected": "59F224643",
+            "crop_ocr": "59F224643",
+            "pipeline": "59F224643",
+            "ocr_confidence": 0.9999
+          },
+          {
+            "index": 19,
+            "expected": "50X109634",
+            "crop_ocr": "50X109634",
+            "pipeline": "50X109634",
+            "ocr_confidence": 0.9999
+          },
+          {
+            "index": 20,
+            "expected": "72C136087",
+            "crop_ocr": "72C136087",
+            "pipeline": "72C136087",
+            "ocr_confidence": 1.0
+          },
+          {
+            "index": 23,
+            "expected": "90A07718",
+            "crop_ocr": "90A07718",
+            "pipeline": "90A07718",
+            "ocr_confidence": 0.9999
+          },
+          {
+            "index": 24,
+            "expected": "54H33457",
+            "crop_ocr": "54H33457",
+            "pipeline": "54H33457",
+            "ocr_confidence": 0.9998
+          },
+          {
+            "index": 25,
+            "expected": "30E50207",
+            "crop_ocr": "30E50207",
+            "pipeline": "30E50207",
+            "ocr_confidence": 1.0
+          },
+          {
+            "index": 26,
+            "expected": "51G84904",
+            "crop_ocr": "51G84904",
+            "pipeline": "51G84904",
+            "ocr_confidence": 0.9999
+          },
+          {
+            "index": 27,
+            "expected": "47B142872",
+            "crop_ocr": "47B142872",
+            "pipeline": "47B142872",
+            "ocr_confidence": 0.9999
+          },
+          {
+            "index": 28,
+            "expected": "30A62043",
+            "crop_ocr": "30A62043",
+            "pipeline": "30A62043",
+            "ocr_confidence": 1.0
+          },
+          {
+            "index": 29,
+            "expected": "51H25905",
+            "crop_ocr": "51H25905",
+            "pipeline": "51H25905",
+            "ocr_confidence": 0.9999
+          },
+          {
+            "index": 30,
+            "expected": "59X143044",
+            "crop_ocr": "59X143044",
+            "pipeline": "59X143044",
+            "ocr_confidence": 0.9999
+          },
+          {
+            "index": 31,
+            "expected": "30G31697",
+            "crop_ocr": "30G31697",
+            "pipeline": "30G31697",
+            "ocr_confidence": 0.9999
+          },
+          {
+            "index": 32,
+            "expected": "61A22959",
+            "crop_ocr": "61A22959",
+            "pipeline": "61A22959",
+            "ocr_confidence": 0.9999
+          },
+          {
+            "index": 33,
+            "expected": "59T159973",
+            "crop_ocr": "59T159973",
+            "pipeline": "59T159973",
+            "ocr_confidence": 1.0
+          },
+          {
+            "index": 34,
+            "expected": "55X86970",
+            "crop_ocr": "55X86970",
+            "pipeline": "55X86970",
+            "ocr_confidence": 0.9998
+          },
+          {
+            "index": 35,
+            "expected": "75F129830",
+            "crop_ocr": "75F129830",
+            "pipeline": "75F129830",
+            "ocr_confidence": 0.9999
+          },
+          {
+            "index": 36,
+            "expected": "29D05685",
+            "crop_ocr": "29D05685",
+            "pipeline": "29D05685",
+            "ocr_confidence": 0.9996
+          },
+          {
+            "index": 37,
+            "expected": "81K45959",
+            "crop_ocr": "81K45959",
+            "pipeline": "81K45959",
+            "ocr_confidence": 0.9994
+          },
+          {
+            "index": 38,
+            "expected": "54S88080",
+            "crop_ocr": "54S88080",
+            "pipeline": "54S88080",
+            "ocr_confidence": 0.9998
+          },
+          {
+            "index": 39,
+            "expected": "78N25203",
+            "crop_ocr": "78N25203",
+            "pipeline": "78N25203",
+            "ocr_confidence": 0.9998
+          }
+        ]
+      },
+      "synthetic_dark": {
+        "condition": "synthetic_dark",
+        "samples": 37,
+        "selected_before_predictions": true,
+        "annotation_audit": "After the preliminary pass, enlarged images were visually rechecked: index 30 is X1, index 37 ends in 9. Index 21 is physically occluded and the previously guessed prefix was removed. Independent human audit still recommended.",
+        "exact_match": 1.0,
+        "pipeline_exact_match": 1.0,
+        "character_error_rate": 0.0,
+        "mean_ms_crop_plus_pipeline": 220.19023243248395,
+        "device": "cpu",
+        "limitations": "Small manually transcribed, readable subset of test data. Unreadable exclusions recorded. Not population accuracy or real-weather evaluation.",
+        "excluded": [
+          {
+            "index": 9,
+            "image": "images/test/8a65d81752a4f5d5.png",
+            "reason": "Too blurred for reliable manual transcription"
+          },
+          {
+            "index": 22,
+            "image": "images/test/21f18cab1b83f5a0.png",
+            "reason": "Too blurred for reliable manual transcription"
+          },
+          {
+            "index": 21,
+            "image": "images/test/9b5419108c306299.png",
+            "reason": "Barrier occludes the first characters; full plate cannot be independently transcribed"
+          }
+        ],
+        "results": [
+          {
+            "index": 0,
+            "expected": "54N46324",
+            "crop_ocr": "54N46324",
+            "pipeline": "54N46324",
+            "ocr_confidence": 0.9839
+          },
+          {
+            "index": 1,
+            "expected": "30A96805",
+            "crop_ocr": "30A96805",
+            "pipeline": "30A96805",
+            "ocr_confidence": 0.9999
+          },
+          {
+            "index": 2,
+            "expected": "51F44614",
+            "crop_ocr": "51F44614",
+            "pipeline": "51F44614",
+            "ocr_confidence": 0.9999
+          },
+          {
+            "index": 3,
+            "expected": "67AL09797",
+            "crop_ocr": "67AL09797",
+            "pipeline": "67AL09797",
+            "ocr_confidence": 0.9999
+          },
+          {
+            "index": 4,
+            "expected": "54L36961",
+            "crop_ocr": "54L36961",
+            "pipeline": "54L36961",
+            "ocr_confidence": 0.9998
+          },
+          {
+            "index": 5,
+            "expected": "59H160591",
+            "crop_ocr": "59H160591",
+            "pipeline": "59H160591",
+            "ocr_confidence": 0.9996
+          },
+          {
+            "index": 6,
+            "expected": "71B197914",
+            "crop_ocr": "71B197914",
+            "pipeline": "71B197914",
+            "ocr_confidence": 0.9999
+          },
+          {
+            "index": 7,
+            "expected": "59S109841",
+            "crop_ocr": "59S109841",
+            "pipeline": "59S109841",
+            "ocr_confidence": 0.9999
+          },
+          {
+            "index": 8,
+            "expected": "66P15739",
+            "crop_ocr": "66P15739",
+            "pipeline": "66P15739",
+            "ocr_confidence": 0.9993
+          },
+          {
+            "index": 10,
+            "expected": "60F128808",
+            "crop_ocr": "60F128808",
+            "pipeline": "60F128808",
+            "ocr_confidence": 0.9992
+          },
+          {
+            "index": 11,
+            "expected": "82H108866",
+            "crop_ocr": "82H108866",
+            "pipeline": "82H108866",
+            "ocr_confidence": 0.9997
+          },
+          {
+            "index": 12,
+            "expected": "54V79675",
+            "crop_ocr": "54V79675",
+            "pipeline": "54V79675",
+            "ocr_confidence": 0.9995
+          },
+          {
+            "index": 13,
+            "expected": "30A04180",
+            "crop_ocr": "30A04180",
+            "pipeline": "30A04180",
+            "ocr_confidence": 0.9999
+          },
+          {
+            "index": 14,
+            "expected": "94H41831",
+            "crop_ocr": "94H41831",
+            "pipeline": "94H41831",
+            "ocr_confidence": 0.9998
+          },
+          {
+            "index": 15,
+            "expected": "98A29814",
+            "crop_ocr": "98A29814",
+            "pipeline": "98A29814",
+            "ocr_confidence": 0.9999
+          },
+          {
+            "index": 16,
+            "expected": "88A23016",
+            "crop_ocr": "88A23016",
+            "pipeline": "88A23016",
+            "ocr_confidence": 0.9999
+          },
+          {
+            "index": 17,
+            "expected": "59L197457",
+            "crop_ocr": "59L197457",
+            "pipeline": "59L197457",
+            "ocr_confidence": 0.9999
+          },
+          {
+            "index": 18,
+            "expected": "59F224643",
+            "crop_ocr": "59F224643",
+            "pipeline": "59F224643",
+            "ocr_confidence": 0.9998
+          },
+          {
+            "index": 19,
+            "expected": "50X109634",
+            "crop_ocr": "50X109634",
+            "pipeline": "50X109634",
+            "ocr_confidence": 0.9999
+          },
+          {
+            "index": 20,
+            "expected": "72C136087",
+            "crop_ocr": "72C136087",
+            "pipeline": "72C136087",
+            "ocr_confidence": 1.0
+          },
+          {
+            "index": 23,
+            "expected": "90A07718",
+            "crop_ocr": "90A07718",
+            "pipeline": "90A07718",
+            "ocr_confidence": 0.9999
+          },
+          {
+            "index": 24,
+            "expected": "54H33457",
+            "crop_ocr": "54H33457",
+            "pipeline": "54H33457",
+            "ocr_confidence": 0.9997
+          },
+          {
+            "index": 25,
+            "expected": "30E50207",
+            "crop_ocr": "30E50207",
+            "pipeline": "30E50207",
+            "ocr_confidence": 0.9999
+          },
+          {
+            "index": 26,
+            "expected": "51G84904",
+            "crop_ocr": "51G84904",
+            "pipeline": "51G84904",
+            "ocr_confidence": 0.9999
+          },
+          {
+            "index": 27,
+            "expected": "47B142872",
+            "crop_ocr": "47B142872",
+            "pipeline": "47B142872",
+            "ocr_confidence": 0.9999
+          },
+          {
+            "index": 28,
+            "expected": "30A62043",
+            "crop_ocr": "30A62043",
+            "pipeline": "30A62043",
+            "ocr_confidence": 1.0
+          },
+          {
+            "index": 29,
+            "expected": "51H25905",
+            "crop_ocr": "51H25905",
+            "pipeline": "51H25905",
+            "ocr_confidence": 0.9998
+          },
+          {
+            "index": 30,
+            "expected": "59X143044",
+            "crop_ocr": "59X143044",
+            "pipeline": "59X143044",
+            "ocr_confidence": 0.9999
+          },
+          {
+            "index": 31,
+            "expected": "30G31697",
+            "crop_ocr": "30G31697",
+            "pipeline": "30G31697",
+            "ocr_confidence": 0.9999
+          },
+          {
+            "index": 32,
+            "expected": "61A22959",
+            "crop_ocr": "61A22959",
+            "pipeline": "61A22959",
+            "ocr_confidence": 1.0
+          },
+          {
+            "index": 33,
+            "expected": "59T159973",
+            "crop_ocr": "59T159973",
+            "pipeline": "59T159973",
+            "ocr_confidence": 0.9999
+          },
+          {
+            "index": 34,
+            "expected": "55X86970",
+            "crop_ocr": "55X86970",
+            "pipeline": "55X86970",
+            "ocr_confidence": 0.9998
+          },
+          {
+            "index": 35,
+            "expected": "75F129830",
+            "crop_ocr": "75F129830",
+            "pipeline": "75F129830",
+            "ocr_confidence": 0.9999
+          },
+          {
+            "index": 36,
+            "expected": "29D05685",
+            "crop_ocr": "29D05685",
+            "pipeline": "29D05685",
+            "ocr_confidence": 0.9997
+          },
+          {
+            "index": 37,
+            "expected": "81K45959",
+            "crop_ocr": "81K45959",
+            "pipeline": "81K45959",
+            "ocr_confidence": 0.9992
+          },
+          {
+            "index": 38,
+            "expected": "54S88080",
+            "crop_ocr": "54S88080",
+            "pipeline": "54S88080",
+            "ocr_confidence": 0.9998
+          },
+          {
+            "index": 39,
+            "expected": "78N25203",
+            "crop_ocr": "78N25203",
+            "pipeline": "78N25203",
+            "ocr_confidence": 0.9998
+          }
+        ]
+      },
+      "synthetic_rain_fog": {
+        "condition": "synthetic_rain_fog",
+        "samples": 37,
+        "selected_before_predictions": true,
+        "annotation_audit": "After the preliminary pass, enlarged images were visually rechecked: index 30 is X1, index 37 ends in 9. Index 21 is physically occluded and the previously guessed prefix was removed. Independent human audit still recommended.",
+        "exact_match": 1.0,
+        "pipeline_exact_match": 1.0,
+        "character_error_rate": 0.0,
+        "mean_ms_crop_plus_pipeline": 212.4943810810716,
+        "device": "cpu",
+        "limitations": "Small manually transcribed, readable subset of test data. Unreadable exclusions recorded. Not population accuracy or real-weather evaluation.",
+        "excluded": [
+          {
+            "index": 9,
+            "image": "images/test/8a65d81752a4f5d5.png",
+            "reason": "Too blurred for reliable manual transcription"
+          },
+          {
+            "index": 22,
+            "image": "images/test/21f18cab1b83f5a0.png",
+            "reason": "Too blurred for reliable manual transcription"
+          },
+          {
+            "index": 21,
+            "image": "images/test/9b5419108c306299.png",
+            "reason": "Barrier occludes the first characters; full plate cannot be independently transcribed"
+          }
+        ],
+        "results": [
+          {
+            "index": 0,
+            "expected": "54N46324",
+            "crop_ocr": "54N46324",
+            "pipeline": "54N46324",
+            "ocr_confidence": 0.9997
+          },
+          {
+            "index": 1,
+            "expected": "30A96805",
+            "crop_ocr": "30A96805",
+            "pipeline": "30A96805",
+            "ocr_confidence": 0.9999
+          },
+          {
+            "index": 2,
+            "expected": "51F44614",
+            "crop_ocr": "51F44614",
+            "pipeline": "51F44614",
+            "ocr_confidence": 0.9998
+          },
+          {
+            "index": 3,
+            "expected": "67AL09797",
+            "crop_ocr": "67AL09797",
+            "pipeline": "67AL09797",
+            "ocr_confidence": 0.9999
+          },
+          {
+            "index": 4,
+            "expected": "54L36961",
+            "crop_ocr": "54L36961",
+            "pipeline": "54L36961",
+            "ocr_confidence": 0.9998
+          },
+          {
+            "index": 5,
+            "expected": "59H160591",
+            "crop_ocr": "59H160591",
+            "pipeline": "59H160591",
+            "ocr_confidence": 0.9988
+          },
+          {
+            "index": 6,
+            "expected": "71B197914",
+            "crop_ocr": "71B197914",
+            "pipeline": "71B197914",
+            "ocr_confidence": 1.0
+          },
+          {
+            "index": 7,
+            "expected": "59S109841",
+            "crop_ocr": "59S109841",
+            "pipeline": "59S109841",
+            "ocr_confidence": 0.9999
+          },
+          {
+            "index": 8,
+            "expected": "66P15739",
+            "crop_ocr": "66P15739",
+            "pipeline": "66P15739",
+            "ocr_confidence": 0.9995
+          },
+          {
+            "index": 10,
+            "expected": "60F128808",
+            "crop_ocr": "60F128808",
+            "pipeline": "60F128808",
+            "ocr_confidence": 0.9989
+          },
+          {
+            "index": 11,
+            "expected": "82H108866",
+            "crop_ocr": "82H108866",
+            "pipeline": "82H108866",
+            "ocr_confidence": 0.9998
+          },
+          {
+            "index": 12,
+            "expected": "54V79675",
+            "crop_ocr": "54V79675",
+            "pipeline": "54V79675",
+            "ocr_confidence": 0.9998
+          },
+          {
+            "index": 13,
+            "expected": "30A04180",
+            "crop_ocr": "30A04180",
+            "pipeline": "30A04180",
+            "ocr_confidence": 0.9999
+          },
+          {
+            "index": 14,
+            "expected": "94H41831",
+            "crop_ocr": "94H41831",
+            "pipeline": "94H41831",
+            "ocr_confidence": 0.9998
+          },
+          {
+            "index": 15,
+            "expected": "98A29814",
+            "crop_ocr": "98A29814",
+            "pipeline": "98A29814",
+            "ocr_confidence": 0.9999
+          },
+          {
+            "index": 16,
+            "expected": "88A23016",
+            "crop_ocr": "88A23016",
+            "pipeline": "88A23016",
+            "ocr_confidence": 0.9999
+          },
+          {
+            "index": 17,
+            "expected": "59L197457",
+            "crop_ocr": "59L197457",
+            "pipeline": "59L197457",
+            "ocr_confidence": 1.0
+          },
+          {
+            "index": 18,
+            "expected": "59F224643",
+            "crop_ocr": "59F224643",
+            "pipeline": "59F224643",
+            "ocr_confidence": 0.9998
+          },
+          {
+            "index": 19,
+            "expected": "50X109634",
+            "crop_ocr": "50X109634",
+            "pipeline": "50X109634",
+            "ocr_confidence": 0.9999
+          },
+          {
+            "index": 20,
+            "expected": "72C136087",
+            "crop_ocr": "72C136087",
+            "pipeline": "72C136087",
+            "ocr_confidence": 1.0
+          },
+          {
+            "index": 23,
+            "expected": "90A07718",
+            "crop_ocr": "90A07718",
+            "pipeline": "90A07718",
+            "ocr_confidence": 0.9999
+          },
+          {
+            "index": 24,
+            "expected": "54H33457",
+            "crop_ocr": "54H33457",
+            "pipeline": "54H33457",
+            "ocr_confidence": 0.9998
+          },
+          {
+            "index": 25,
+            "expected": "30E50207",
+            "crop_ocr": "30E50207",
+            "pipeline": "30E50207",
+            "ocr_confidence": 1.0
+          },
+          {
+            "index": 26,
+            "expected": "51G84904",
+            "crop_ocr": "51G84904",
+            "pipeline": "51G84904",
+            "ocr_confidence": 0.9999
+          },
+          {
+            "index": 27,
+            "expected": "47B142872",
+            "crop_ocr": "47B142872",
+            "pipeline": "47B142872",
+            "ocr_confidence": 0.9999
+          },
+          {
+            "index": 28,
+            "expected": "30A62043",
+            "crop_ocr": "30A62043",
+            "pipeline": "30A62043",
+            "ocr_confidence": 1.0
+          },
+          {
+            "index": 29,
+            "expected": "51H25905",
+            "crop_ocr": "51H25905",
+            "pipeline": "51H25905",
+            "ocr_confidence": 0.9998
+          },
+          {
+            "index": 30,
+            "expected": "59X143044",
+            "crop_ocr": "59X143044",
+            "pipeline": "59X143044",
+            "ocr_confidence": 0.9999
+          },
+          {
+            "index": 31,
+            "expected": "30G31697",
+            "crop_ocr": "30G31697",
+            "pipeline": "30G31697",
+            "ocr_confidence": 0.9999
+          },
+          {
+            "index": 32,
+            "expected": "61A22959",
+            "crop_ocr": "61A22959",
+            "pipeline": "61A22959",
+            "ocr_confidence": 0.9999
+          },
+          {
+            "index": 33,
+            "expected": "59T159973",
+            "crop_ocr": "59T159973",
+            "pipeline": "59T159973",
+            "ocr_confidence": 1.0
+          },
+          {
+            "index": 34,
+            "expected": "55X86970",
+            "crop_ocr": "55X86970",
+            "pipeline": "55X86970",
+            "ocr_confidence": 0.9998
+          },
+          {
+            "index": 35,
+            "expected": "75F129830",
+            "crop_ocr": "75F129830",
+            "pipeline": "75F129830",
+            "ocr_confidence": 0.9999
+          },
+          {
+            "index": 36,
+            "expected": "29D05685",
+            "crop_ocr": "29D05685",
+            "pipeline": "29D05685",
+            "ocr_confidence": 0.9991
+          },
+          {
+            "index": 37,
+            "expected": "81K45959",
+            "crop_ocr": "81K45959",
+            "pipeline": "81K45959",
+            "ocr_confidence": 0.9995
+          },
+          {
+            "index": 38,
+            "expected": "54S88080",
+            "crop_ocr": "54S88080",
+            "pipeline": "54S88080",
+            "ocr_confidence": 0.9998
+          },
+          {
+            "index": 39,
+            "expected": "78N25203",
+            "crop_ocr": "78N25203",
+            "pipeline": "78N25203",
+            "ocr_confidence": 0.9999
+          }
+        ]
+      },
+      "synthetic_motion_blur": {
+        "condition": "synthetic_motion_blur",
+        "samples": 37,
+        "selected_before_predictions": true,
+        "annotation_audit": "After the preliminary pass, enlarged images were visually rechecked: index 30 is X1, index 37 ends in 9. Index 21 is physically occluded and the previously guessed prefix was removed. Independent human audit still recommended.",
+        "exact_match": 0.08108108108108109,
+        "pipeline_exact_match": 0.08108108108108109,
+        "character_error_rate": 0.7516129032258064,
+        "mean_ms_crop_plus_pipeline": 218.5727567568294,
+        "device": "cpu",
+        "limitations": "Small manually transcribed, readable subset of test data. Unreadable exclusions recorded. Not population accuracy or real-weather evaluation.",
+        "excluded": [
+          {
+            "index": 9,
+            "image": "images/test/8a65d81752a4f5d5.png",
+            "reason": "Too blurred for reliable manual transcription"
+          },
+          {
+            "index": 22,
+            "image": "images/test/21f18cab1b83f5a0.png",
+            "reason": "Too blurred for reliable manual transcription"
+          },
+          {
+            "index": 21,
+            "image": "images/test/9b5419108c306299.png",
+            "reason": "Barrier occludes the first characters; full plate cannot be independently transcribed"
+          }
+        ],
+        "results": [
+          {
+            "index": 0,
+            "expected": "54N46324",
+            "crop_ocr": "21V16",
+            "pipeline": "54V16222",
+            "ocr_confidence": 0.4406
+          },
+          {
+            "index": 1,
+            "expected": "30A96805",
+            "crop_ocr": "30A96805",
+            "pipeline": "30A96805",
+            "ocr_confidence": 0.9999
+          },
+          {
+            "index": 2,
+            "expected": "51F44614",
+            "crop_ocr": "SIF4474",
+            "pipeline": "ST44674",
+            "ocr_confidence": 0.5121
+          },
+          {
+            "index": 3,
+            "expected": "67AL09797",
+            "crop_ocr": "L0",
+            "pipeline": "G1L144",
+            "ocr_confidence": 0.4841
+          },
+          {
+            "index": 4,
+            "expected": "54L36961",
+            "crop_ocr": "L9",
+            "pipeline": "SL96901",
+            "ocr_confidence": 0.4212
+          },
+          {
+            "index": 5,
+            "expected": "59H160591",
+            "crop_ocr": "",
+            "pipeline": "",
+            "ocr_confidence": 0.0
+          },
+          {
+            "index": 6,
+            "expected": "71B197914",
+            "crop_ocr": "",
+            "pipeline": "TMB4",
+            "ocr_confidence": 0.0
+          },
+          {
+            "index": 7,
+            "expected": "59S109841",
+            "crop_ocr": "1",
+            "pipeline": "50D1934",
+            "ocr_confidence": 0.6628
+          },
+          {
+            "index": 8,
+            "expected": "66P15739",
+            "crop_ocr": "TT15",
+            "pipeline": "CHD533",
+            "ocr_confidence": 0.336
+          },
+          {
+            "index": 10,
+            "expected": "60F128808",
+            "crop_ocr": "",
+            "pipeline": "",
+            "ocr_confidence": 0.0
+          },
+          {
+            "index": 11,
+            "expected": "82H108866",
+            "crop_ocr": "",
+            "pipeline": "",
+            "ocr_confidence": 0.0
+          },
+          {
+            "index": 12,
+            "expected": "54V79675",
+            "crop_ocr": "1900",
+            "pipeline": "SL19005",
+            "ocr_confidence": 0.3911
+          },
+          {
+            "index": 13,
+            "expected": "30A04180",
+            "crop_ocr": "3TA041",
+            "pipeline": "BT041A",
+            "ocr_confidence": 0.5456
+          },
+          {
+            "index": 14,
+            "expected": "94H41831",
+            "crop_ocr": "D",
+            "pipeline": "D",
+            "ocr_confidence": 0.3882
+          },
+          {
+            "index": 15,
+            "expected": "98A29814",
+            "crop_ocr": "",
+            "pipeline": "CA9142",
+            "ocr_confidence": 0.0
+          },
+          {
+            "index": 16,
+            "expected": "88A23016",
+            "crop_ocr": "88A23078",
+            "pipeline": "88A23077",
+            "ocr_confidence": 0.8268
+          },
+          {
+            "index": 17,
+            "expected": "59L197457",
+            "crop_ocr": "15",
+            "pipeline": "SHD145",
+            "ocr_confidence": 0.478
+          },
+          {
+            "index": 18,
+            "expected": "59F224643",
+            "crop_ocr": "L",
+            "pipeline": "FL775",
+            "ocr_confidence": 0.2717
+          },
+          {
+            "index": 19,
+            "expected": "50X109634",
+            "crop_ocr": "",
+            "pipeline": "166",
+            "ocr_confidence": 0.0
+          },
+          {
+            "index": 20,
+            "expected": "72C136087",
+            "crop_ocr": "",
+            "pipeline": "D101",
+            "ocr_confidence": 0.0
+          },
+          {
+            "index": 23,
+            "expected": "90A07718",
+            "crop_ocr": "90A07718",
+            "pipeline": "90M07718",
+            "ocr_confidence": 0.916
+          },
+          {
+            "index": 24,
+            "expected": "54H33457",
+            "crop_ocr": "94",
+            "pipeline": "SL99447",
+            "ocr_confidence": 0.5595
+          },
+          {
+            "index": 25,
+            "expected": "30E50207",
+            "crop_ocr": "30E50200",
+            "pipeline": "30E50200",
+            "ocr_confidence": 0.943
+          },
+          {
+            "index": 26,
+            "expected": "51G84904",
+            "crop_ocr": "00",
+            "pipeline": "31B000",
+            "ocr_confidence": 0.2073
+          },
+          {
+            "index": 27,
+            "expected": "47B142872",
+            "crop_ocr": "WPS7197",
+            "pipeline": "BE1",
+            "ocr_confidence": 0.4351
+          },
+          {
+            "index": 28,
+            "expected": "30A62043",
+            "crop_ocr": "30A62043",
+            "pipeline": "30A62043",
+            "ocr_confidence": 0.9999
+          },
+          {
+            "index": 29,
+            "expected": "51H25905",
+            "crop_ocr": "",
+            "pipeline": "72",
+            "ocr_confidence": 0.0
+          },
+          {
+            "index": 30,
+            "expected": "59X143044",
+            "crop_ocr": "",
+            "pipeline": "",
+            "ocr_confidence": 0.0
+          },
+          {
+            "index": 31,
+            "expected": "30G31697",
+            "crop_ocr": "1",
+            "pipeline": "302",
+            "ocr_confidence": 0.6755
+          },
+          {
+            "index": 32,
+            "expected": "61A22959",
+            "crop_ocr": "GAW220",
+            "pipeline": "GA3795",
+            "ocr_confidence": 0.3963
+          },
+          {
+            "index": 33,
+            "expected": "59T159973",
+            "crop_ocr": "",
+            "pipeline": "",
+            "ocr_confidence": 0.0
+          },
+          {
+            "index": 34,
+            "expected": "55X86970",
+            "crop_ocr": "10677",
+            "pipeline": "",
+            "ocr_confidence": 0.3652
+          },
+          {
+            "index": 35,
+            "expected": "75F129830",
+            "crop_ocr": "",
+            "pipeline": "",
+            "ocr_confidence": 0.0
+          },
+          {
+            "index": 36,
+            "expected": "29D05685",
+            "crop_ocr": "29DC5685",
+            "pipeline": "29D05685",
+            "ocr_confidence": 0.9551
+          },
+          {
+            "index": 37,
+            "expected": "81K45959",
+            "crop_ocr": "01A5999",
+            "pipeline": "1141159",
+            "ocr_confidence": 0.2996
+          },
+          {
+            "index": 38,
+            "expected": "54S88080",
+            "crop_ocr": "",
+            "pipeline": "",
+            "ocr_confidence": 0.0
+          },
+          {
+            "index": 39,
+            "expected": "78N25203",
+            "crop_ocr": "61L511",
+            "pipeline": "11L571",
+            "ocr_confidence": 0.3994
+          }
+        ]
+      }
+    },
+    "candidate": {
+      "original": {
+        "condition": "original",
+        "samples": 37,
+        "selected_before_predictions": true,
+        "annotation_audit": "After the preliminary pass, enlarged images were visually rechecked: index 30 is X1, index 37 ends in 9. Index 21 is physically occluded and the previously guessed prefix was removed. Independent human audit still recommended.",
+        "exact_match": 1.0,
+        "pipeline_exact_match": 1.0,
+        "character_error_rate": 0.0,
+        "mean_ms_crop_plus_pipeline": 242.36619189183773,
+        "device": "cpu",
+        "limitations": "Small manually transcribed, readable subset of test data. Unreadable exclusions recorded. Not population accuracy or real-weather evaluation.",
+        "excluded": [
+          {
+            "index": 9,
+            "image": "images/test/8a65d81752a4f5d5.png",
+            "reason": "Too blurred for reliable manual transcription"
+          },
+          {
+            "index": 22,
+            "image": "images/test/21f18cab1b83f5a0.png",
+            "reason": "Too blurred for reliable manual transcription"
+          },
+          {
+            "index": 21,
+            "image": "images/test/9b5419108c306299.png",
+            "reason": "Barrier occludes the first characters; full plate cannot be independently transcribed"
+          }
+        ],
+        "results": [
+          {
+            "index": 0,
+            "expected": "54N46324",
+            "crop_ocr": "54N46324",
+            "pipeline": "54N46324",
+            "ocr_confidence": 0.9995
+          },
+          {
+            "index": 1,
+            "expected": "30A96805",
+            "crop_ocr": "30A96805",
+            "pipeline": "30A96805",
+            "ocr_confidence": 1.0
+          },
+          {
+            "index": 2,
+            "expected": "51F44614",
+            "crop_ocr": "51F44614",
+            "pipeline": "51F44614",
+            "ocr_confidence": 0.9999
+          },
+          {
+            "index": 3,
+            "expected": "67AL09797",
+            "crop_ocr": "67AL09797",
+            "pipeline": "67AL09797",
+            "ocr_confidence": 0.9999
+          },
+          {
+            "index": 4,
+            "expected": "54L36961",
+            "crop_ocr": "54L36961",
+            "pipeline": "54L36961",
+            "ocr_confidence": 0.9999
+          },
+          {
+            "index": 5,
+            "expected": "59H160591",
+            "crop_ocr": "59H160591",
+            "pipeline": "59H160591",
+            "ocr_confidence": 0.9998
+          },
+          {
+            "index": 6,
+            "expected": "71B197914",
+            "crop_ocr": "71B197914",
+            "pipeline": "71B197914",
+            "ocr_confidence": 1.0
+          },
+          {
+            "index": 7,
+            "expected": "59S109841",
+            "crop_ocr": "59S109841",
+            "pipeline": "59S109841",
+            "ocr_confidence": 0.9999
+          },
+          {
+            "index": 8,
+            "expected": "66P15739",
+            "crop_ocr": "66P15739",
+            "pipeline": "66P15739",
+            "ocr_confidence": 0.9997
+          },
+          {
+            "index": 10,
+            "expected": "60F128808",
+            "crop_ocr": "60F128808",
+            "pipeline": "60F128808",
+            "ocr_confidence": 0.999
+          },
+          {
+            "index": 11,
+            "expected": "82H108866",
+            "crop_ocr": "82H108866",
+            "pipeline": "82H108866",
+            "ocr_confidence": 0.9998
+          },
+          {
+            "index": 12,
+            "expected": "54V79675",
+            "crop_ocr": "54V79675",
+            "pipeline": "54V79675",
+            "ocr_confidence": 0.9997
+          },
+          {
+            "index": 13,
+            "expected": "30A04180",
+            "crop_ocr": "30A04180",
+            "pipeline": "30A04180",
+            "ocr_confidence": 0.9998
+          },
+          {
+            "index": 14,
+            "expected": "94H41831",
+            "crop_ocr": "94H41831",
+            "pipeline": "94H41831",
+            "ocr_confidence": 0.9998
+          },
+          {
+            "index": 15,
+            "expected": "98A29814",
+            "crop_ocr": "98A29814",
+            "pipeline": "98A29814",
+            "ocr_confidence": 0.9999
+          },
+          {
+            "index": 16,
+            "expected": "88A23016",
+            "crop_ocr": "88A23016",
+            "pipeline": "88A23016",
+            "ocr_confidence": 0.9999
+          },
+          {
+            "index": 17,
+            "expected": "59L197457",
+            "crop_ocr": "59L197457",
+            "pipeline": "59L197457",
+            "ocr_confidence": 1.0
+          },
+          {
+            "index": 18,
+            "expected": "59F224643",
+            "crop_ocr": "59F224643",
+            "pipeline": "59F224643",
+            "ocr_confidence": 0.9999
+          },
+          {
+            "index": 19,
+            "expected": "50X109634",
+            "crop_ocr": "50X109634",
+            "pipeline": "50X109634",
+            "ocr_confidence": 0.9999
+          },
+          {
+            "index": 20,
+            "expected": "72C136087",
+            "crop_ocr": "72C136087",
+            "pipeline": "72C136087",
+            "ocr_confidence": 0.9999
+          },
+          {
+            "index": 23,
+            "expected": "90A07718",
+            "crop_ocr": "90A07718",
+            "pipeline": "90A07718",
+            "ocr_confidence": 0.9999
+          },
+          {
+            "index": 24,
+            "expected": "54H33457",
+            "crop_ocr": "54H33457",
+            "pipeline": "54H33457",
+            "ocr_confidence": 0.9998
+          },
+          {
+            "index": 25,
+            "expected": "30E50207",
+            "crop_ocr": "30E50207",
+            "pipeline": "30E50207",
+            "ocr_confidence": 1.0
+          },
+          {
+            "index": 26,
+            "expected": "51G84904",
+            "crop_ocr": "51G84904",
+            "pipeline": "51G84904",
+            "ocr_confidence": 0.9999
+          },
+          {
+            "index": 27,
+            "expected": "47B142872",
+            "crop_ocr": "47B142872",
+            "pipeline": "47B142872",
+            "ocr_confidence": 0.9999
+          },
+          {
+            "index": 28,
+            "expected": "30A62043",
+            "crop_ocr": "30A62043",
+            "pipeline": "30A62043",
+            "ocr_confidence": 1.0
+          },
+          {
+            "index": 29,
+            "expected": "51H25905",
+            "crop_ocr": "51H25905",
+            "pipeline": "51H25905",
+            "ocr_confidence": 0.9999
+          },
+          {
+            "index": 30,
+            "expected": "59X143044",
+            "crop_ocr": "59X143044",
+            "pipeline": "59X143044",
+            "ocr_confidence": 0.9999
+          },
+          {
+            "index": 31,
+            "expected": "30G31697",
+            "crop_ocr": "30G31697",
+            "pipeline": "30G31697",
+            "ocr_confidence": 0.9999
+          },
+          {
+            "index": 32,
+            "expected": "61A22959",
+            "crop_ocr": "61A22959",
+            "pipeline": "61A22959",
+            "ocr_confidence": 0.9999
+          },
+          {
+            "index": 33,
+            "expected": "59T159973",
+            "crop_ocr": "59T159973",
+            "pipeline": "59T159973",
+            "ocr_confidence": 1.0
+          },
+          {
+            "index": 34,
+            "expected": "55X86970",
+            "crop_ocr": "55X86970",
+            "pipeline": "55X86970",
+            "ocr_confidence": 0.9999
+          },
+          {
+            "index": 35,
+            "expected": "75F129830",
+            "crop_ocr": "75F129830",
+            "pipeline": "75F129830",
+            "ocr_confidence": 0.9999
+          },
+          {
+            "index": 36,
+            "expected": "29D05685",
+            "crop_ocr": "29D05685",
+            "pipeline": "29D05685",
+            "ocr_confidence": 0.9996
+          },
+          {
+            "index": 37,
+            "expected": "81K45959",
+            "crop_ocr": "81K45959",
+            "pipeline": "81K45959",
+            "ocr_confidence": 0.9995
+          },
+          {
+            "index": 38,
+            "expected": "54S88080",
+            "crop_ocr": "54S88080",
+            "pipeline": "54S88080",
+            "ocr_confidence": 0.9999
+          },
+          {
+            "index": 39,
+            "expected": "78N25203",
+            "crop_ocr": "78N25203",
+            "pipeline": "78N25203",
+            "ocr_confidence": 0.9998
+          }
+        ]
+      },
+      "synthetic_dark": {
+        "condition": "synthetic_dark",
+        "samples": 37,
+        "selected_before_predictions": true,
+        "annotation_audit": "After the preliminary pass, enlarged images were visually rechecked: index 30 is X1, index 37 ends in 9. Index 21 is physically occluded and the previously guessed prefix was removed. Independent human audit still recommended.",
+        "exact_match": 1.0,
+        "pipeline_exact_match": 1.0,
+        "character_error_rate": 0.0,
+        "mean_ms_crop_plus_pipeline": 241.7150000000146,
+        "device": "cpu",
+        "limitations": "Small manually transcribed, readable subset of test data. Unreadable exclusions recorded. Not population accuracy or real-weather evaluation.",
+        "excluded": [
+          {
+            "index": 9,
+            "image": "images/test/8a65d81752a4f5d5.png",
+            "reason": "Too blurred for reliable manual transcription"
+          },
+          {
+            "index": 22,
+            "image": "images/test/21f18cab1b83f5a0.png",
+            "reason": "Too blurred for reliable manual transcription"
+          },
+          {
+            "index": 21,
+            "image": "images/test/9b5419108c306299.png",
+            "reason": "Barrier occludes the first characters; full plate cannot be independently transcribed"
+          }
+        ],
+        "results": [
+          {
+            "index": 0,
+            "expected": "54N46324",
+            "crop_ocr": "54N46324",
+            "pipeline": "54N46324",
+            "ocr_confidence": 0.9948
+          },
+          {
+            "index": 1,
+            "expected": "30A96805",
+            "crop_ocr": "30A96805",
+            "pipeline": "30A96805",
+            "ocr_confidence": 0.9999
+          },
+          {
+            "index": 2,
+            "expected": "51F44614",
+            "crop_ocr": "51F44614",
+            "pipeline": "51F44614",
+            "ocr_confidence": 0.9999
+          },
+          {
+            "index": 3,
+            "expected": "67AL09797",
+            "crop_ocr": "67AL09797",
+            "pipeline": "67AL09797",
+            "ocr_confidence": 0.9999
+          },
+          {
+            "index": 4,
+            "expected": "54L36961",
+            "crop_ocr": "54L36961",
+            "pipeline": "54L36961",
+            "ocr_confidence": 0.9998
+          },
+          {
+            "index": 5,
+            "expected": "59H160591",
+            "crop_ocr": "59H160591",
+            "pipeline": "59H160591",
+            "ocr_confidence": 0.9998
+          },
+          {
+            "index": 6,
+            "expected": "71B197914",
+            "crop_ocr": "71B197914",
+            "pipeline": "71B197914",
+            "ocr_confidence": 0.9999
+          },
+          {
+            "index": 7,
+            "expected": "59S109841",
+            "crop_ocr": "59S109841",
+            "pipeline": "59S109841",
+            "ocr_confidence": 0.9999
+          },
+          {
+            "index": 8,
+            "expected": "66P15739",
+            "crop_ocr": "66P15739",
+            "pipeline": "66P15739",
+            "ocr_confidence": 0.9992
+          },
+          {
+            "index": 10,
+            "expected": "60F128808",
+            "crop_ocr": "60F128808",
+            "pipeline": "60F128808",
+            "ocr_confidence": 0.9992
+          },
+          {
+            "index": 11,
+            "expected": "82H108866",
+            "crop_ocr": "82H108866",
+            "pipeline": "82H108866",
+            "ocr_confidence": 0.9997
+          },
+          {
+            "index": 12,
+            "expected": "54V79675",
+            "crop_ocr": "54V79675",
+            "pipeline": "54V79675",
+            "ocr_confidence": 0.9995
+          },
+          {
+            "index": 13,
+            "expected": "30A04180",
+            "crop_ocr": "30A04180",
+            "pipeline": "30A04180",
+            "ocr_confidence": 0.9999
+          },
+          {
+            "index": 14,
+            "expected": "94H41831",
+            "crop_ocr": "94H41831",
+            "pipeline": "94H41831",
+            "ocr_confidence": 0.9998
+          },
+          {
+            "index": 15,
+            "expected": "98A29814",
+            "crop_ocr": "98A29814",
+            "pipeline": "98A29814",
+            "ocr_confidence": 0.9999
+          },
+          {
+            "index": 16,
+            "expected": "88A23016",
+            "crop_ocr": "88A23016",
+            "pipeline": "88A23016",
+            "ocr_confidence": 0.9999
+          },
+          {
+            "index": 17,
+            "expected": "59L197457",
+            "crop_ocr": "59L197457",
+            "pipeline": "59L197457",
+            "ocr_confidence": 0.9999
+          },
+          {
+            "index": 18,
+            "expected": "59F224643",
+            "crop_ocr": "59F224643",
+            "pipeline": "59F224643",
+            "ocr_confidence": 0.9998
+          },
+          {
+            "index": 19,
+            "expected": "50X109634",
+            "crop_ocr": "50X109634",
+            "pipeline": "50X109634",
+            "ocr_confidence": 0.9999
+          },
+          {
+            "index": 20,
+            "expected": "72C136087",
+            "crop_ocr": "72C136087",
+            "pipeline": "72C136087",
+            "ocr_confidence": 1.0
+          },
+          {
+            "index": 23,
+            "expected": "90A07718",
+            "crop_ocr": "90A07718",
+            "pipeline": "90A07718",
+            "ocr_confidence": 0.9999
+          },
+          {
+            "index": 24,
+            "expected": "54H33457",
+            "crop_ocr": "54H33457",
+            "pipeline": "54H33457",
+            "ocr_confidence": 0.9998
+          },
+          {
+            "index": 25,
+            "expected": "30E50207",
+            "crop_ocr": "30E50207",
+            "pipeline": "30E50207",
+            "ocr_confidence": 0.9999
+          },
+          {
+            "index": 26,
+            "expected": "51G84904",
+            "crop_ocr": "51G84904",
+            "pipeline": "51G84904",
+            "ocr_confidence": 0.9999
+          },
+          {
+            "index": 27,
+            "expected": "47B142872",
+            "crop_ocr": "47B142872",
+            "pipeline": "47B142872",
+            "ocr_confidence": 0.9999
+          },
+          {
+            "index": 28,
+            "expected": "30A62043",
+            "crop_ocr": "30A62043",
+            "pipeline": "30A62043",
+            "ocr_confidence": 1.0
+          },
+          {
+            "index": 29,
+            "expected": "51H25905",
+            "crop_ocr": "51H25905",
+            "pipeline": "51H25905",
+            "ocr_confidence": 0.9998
+          },
+          {
+            "index": 30,
+            "expected": "59X143044",
+            "crop_ocr": "59X143044",
+            "pipeline": "59X143044",
+            "ocr_confidence": 0.9999
+          },
+          {
+            "index": 31,
+            "expected": "30G31697",
+            "crop_ocr": "30G31697",
+            "pipeline": "30G31697",
+            "ocr_confidence": 0.9999
+          },
+          {
+            "index": 32,
+            "expected": "61A22959",
+            "crop_ocr": "61A22959",
+            "pipeline": "61A22959",
+            "ocr_confidence": 1.0
+          },
+          {
+            "index": 33,
+            "expected": "59T159973",
+            "crop_ocr": "59T159973",
+            "pipeline": "59T159973",
+            "ocr_confidence": 0.9999
+          },
+          {
+            "index": 34,
+            "expected": "55X86970",
+            "crop_ocr": "55X86970",
+            "pipeline": "55X86970",
+            "ocr_confidence": 0.9999
+          },
+          {
+            "index": 35,
+            "expected": "75F129830",
+            "crop_ocr": "75F129830",
+            "pipeline": "75F129830",
+            "ocr_confidence": 0.9999
+          },
+          {
+            "index": 36,
+            "expected": "29D05685",
+            "crop_ocr": "29D05685",
+            "pipeline": "29D05685",
+            "ocr_confidence": 0.9997
+          },
+          {
+            "index": 37,
+            "expected": "81K45959",
+            "crop_ocr": "81K45959",
+            "pipeline": "81K45959",
+            "ocr_confidence": 0.9993
+          },
+          {
+            "index": 38,
+            "expected": "54S88080",
+            "crop_ocr": "54S88080",
+            "pipeline": "54S88080",
+            "ocr_confidence": 0.9999
+          },
+          {
+            "index": 39,
+            "expected": "78N25203",
+            "crop_ocr": "78N25203",
+            "pipeline": "78N25203",
+            "ocr_confidence": 0.9997
+          }
+        ]
+      },
+      "synthetic_rain_fog": {
+        "condition": "synthetic_rain_fog",
+        "samples": 37,
+        "selected_before_predictions": true,
+        "annotation_audit": "After the preliminary pass, enlarged images were visually rechecked: index 30 is X1, index 37 ends in 9. Index 21 is physically occluded and the previously guessed prefix was removed. Independent human audit still recommended.",
+        "exact_match": 1.0,
+        "pipeline_exact_match": 1.0,
+        "character_error_rate": 0.0,
+        "mean_ms_crop_plus_pipeline": 240.775637837868,
+        "device": "cpu",
+        "limitations": "Small manually transcribed, readable subset of test data. Unreadable exclusions recorded. Not population accuracy or real-weather evaluation.",
+        "excluded": [
+          {
+            "index": 9,
+            "image": "images/test/8a65d81752a4f5d5.png",
+            "reason": "Too blurred for reliable manual transcription"
+          },
+          {
+            "index": 22,
+            "image": "images/test/21f18cab1b83f5a0.png",
+            "reason": "Too blurred for reliable manual transcription"
+          },
+          {
+            "index": 21,
+            "image": "images/test/9b5419108c306299.png",
+            "reason": "Barrier occludes the first characters; full plate cannot be independently transcribed"
+          }
+        ],
+        "results": [
+          {
+            "index": 0,
+            "expected": "54N46324",
+            "crop_ocr": "54N46324",
+            "pipeline": "54N46324",
+            "ocr_confidence": 0.9997
+          },
+          {
+            "index": 1,
+            "expected": "30A96805",
+            "crop_ocr": "30A96805",
+            "pipeline": "30A96805",
+            "ocr_confidence": 0.9999
+          },
+          {
+            "index": 2,
+            "expected": "51F44614",
+            "crop_ocr": "51F44614",
+            "pipeline": "51F44614",
+            "ocr_confidence": 0.9998
+          },
+          {
+            "index": 3,
+            "expected": "67AL09797",
+            "crop_ocr": "67AL09797",
+            "pipeline": "67AL09797",
+            "ocr_confidence": 0.9999
+          },
+          {
+            "index": 4,
+            "expected": "54L36961",
+            "crop_ocr": "54L36961",
+            "pipeline": "54L36961",
+            "ocr_confidence": 0.9998
+          },
+          {
+            "index": 5,
+            "expected": "59H160591",
+            "crop_ocr": "59H160591",
+            "pipeline": "59H160591",
+            "ocr_confidence": 0.9993
+          },
+          {
+            "index": 6,
+            "expected": "71B197914",
+            "crop_ocr": "71B197914",
+            "pipeline": "71B197914",
+            "ocr_confidence": 1.0
+          },
+          {
+            "index": 7,
+            "expected": "59S109841",
+            "crop_ocr": "59S109841",
+            "pipeline": "59S109841",
+            "ocr_confidence": 0.9999
+          },
+          {
+            "index": 8,
+            "expected": "66P15739",
+            "crop_ocr": "66P15739",
+            "pipeline": "66P15739",
+            "ocr_confidence": 0.9995
+          },
+          {
+            "index": 10,
+            "expected": "60F128808",
+            "crop_ocr": "60F128808",
+            "pipeline": "60F128808",
+            "ocr_confidence": 0.9992
+          },
+          {
+            "index": 11,
+            "expected": "82H108866",
+            "crop_ocr": "82H108866",
+            "pipeline": "82H108866",
+            "ocr_confidence": 0.9998
+          },
+          {
+            "index": 12,
+            "expected": "54V79675",
+            "crop_ocr": "54V79675",
+            "pipeline": "54V79675",
+            "ocr_confidence": 0.9997
+          },
+          {
+            "index": 13,
+            "expected": "30A04180",
+            "crop_ocr": "30A04180",
+            "pipeline": "30A04180",
+            "ocr_confidence": 0.9999
+          },
+          {
+            "index": 14,
+            "expected": "94H41831",
+            "crop_ocr": "94H41831",
+            "pipeline": "94H41831",
+            "ocr_confidence": 0.9998
+          },
+          {
+            "index": 15,
+            "expected": "98A29814",
+            "crop_ocr": "98A29814",
+            "pipeline": "98A29814",
+            "ocr_confidence": 0.9999
+          },
+          {
+            "index": 16,
+            "expected": "88A23016",
+            "crop_ocr": "88A23016",
+            "pipeline": "88A23016",
+            "ocr_confidence": 0.9999
+          },
+          {
+            "index": 17,
+            "expected": "59L197457",
+            "crop_ocr": "59L197457",
+            "pipeline": "59L197457",
+            "ocr_confidence": 1.0
+          },
+          {
+            "index": 18,
+            "expected": "59F224643",
+            "crop_ocr": "59F224643",
+            "pipeline": "59F224643",
+            "ocr_confidence": 0.9998
+          },
+          {
+            "index": 19,
+            "expected": "50X109634",
+            "crop_ocr": "50X109634",
+            "pipeline": "50X109634",
+            "ocr_confidence": 0.9999
+          },
+          {
+            "index": 20,
+            "expected": "72C136087",
+            "crop_ocr": "72C136087",
+            "pipeline": "72C136087",
+            "ocr_confidence": 0.9999
+          },
+          {
+            "index": 23,
+            "expected": "90A07718",
+            "crop_ocr": "90A07718",
+            "pipeline": "90A07718",
+            "ocr_confidence": 0.9999
+          },
+          {
+            "index": 24,
+            "expected": "54H33457",
+            "crop_ocr": "54H33457",
+            "pipeline": "54H33457",
+            "ocr_confidence": 0.9998
+          },
+          {
+            "index": 25,
+            "expected": "30E50207",
+            "crop_ocr": "30E50207",
+            "pipeline": "30E50207",
+            "ocr_confidence": 1.0
+          },
+          {
+            "index": 26,
+            "expected": "51G84904",
+            "crop_ocr": "51G84904",
+            "pipeline": "51G84904",
+            "ocr_confidence": 0.9999
+          },
+          {
+            "index": 27,
+            "expected": "47B142872",
+            "crop_ocr": "47B142872",
+            "pipeline": "47B142872",
+            "ocr_confidence": 0.9999
+          },
+          {
+            "index": 28,
+            "expected": "30A62043",
+            "crop_ocr": "30A62043",
+            "pipeline": "30A62043",
+            "ocr_confidence": 1.0
+          },
+          {
+            "index": 29,
+            "expected": "51H25905",
+            "crop_ocr": "51H25905",
+            "pipeline": "51H25905",
+            "ocr_confidence": 0.9997
+          },
+          {
+            "index": 30,
+            "expected": "59X143044",
+            "crop_ocr": "59X143044",
+            "pipeline": "59X143044",
+            "ocr_confidence": 0.9999
+          },
+          {
+            "index": 31,
+            "expected": "30G31697",
+            "crop_ocr": "30G31697",
+            "pipeline": "30G31697",
+            "ocr_confidence": 0.9999
+          },
+          {
+            "index": 32,
+            "expected": "61A22959",
+            "crop_ocr": "61A22959",
+            "pipeline": "61A22959",
+            "ocr_confidence": 0.9999
+          },
+          {
+            "index": 33,
+            "expected": "59T159973",
+            "crop_ocr": "59T159973",
+            "pipeline": "59T159973",
+            "ocr_confidence": 1.0
+          },
+          {
+            "index": 34,
+            "expected": "55X86970",
+            "crop_ocr": "55X86970",
+            "pipeline": "55X86970",
+            "ocr_confidence": 0.9998
+          },
+          {
+            "index": 35,
+            "expected": "75F129830",
+            "crop_ocr": "75F129830",
+            "pipeline": "75F129830",
+            "ocr_confidence": 0.9999
+          },
+          {
+            "index": 36,
+            "expected": "29D05685",
+            "crop_ocr": "29D05685",
+            "pipeline": "29D05685",
+            "ocr_confidence": 0.999
+          },
+          {
+            "index": 37,
+            "expected": "81K45959",
+            "crop_ocr": "81K45959",
+            "pipeline": "81K45959",
+            "ocr_confidence": 0.9995
+          },
+          {
+            "index": 38,
+            "expected": "54S88080",
+            "crop_ocr": "54S88080",
+            "pipeline": "54S88080",
+            "ocr_confidence": 0.9998
+          },
+          {
+            "index": 39,
+            "expected": "78N25203",
+            "crop_ocr": "78N25203",
+            "pipeline": "78N25203",
+            "ocr_confidence": 0.9999
+          }
+        ]
+      },
+      "synthetic_motion_blur": {
+        "condition": "synthetic_motion_blur",
+        "samples": 37,
+        "selected_before_predictions": true,
+        "annotation_audit": "After the preliminary pass, enlarged images were visually rechecked: index 30 is X1, index 37 ends in 9. Index 21 is physically occluded and the previously guessed prefix was removed. Independent human audit still recommended.",
+        "exact_match": 0.08108108108108109,
+        "pipeline_exact_match": 0.10810810810810811,
+        "character_error_rate": 0.7193548387096774,
+        "mean_ms_crop_plus_pipeline": 244.92725945944855,
+        "device": "cpu",
+        "limitations": "Small manually transcribed, readable subset of test data. Unreadable exclusions recorded. Not population accuracy or real-weather evaluation.",
+        "excluded": [
+          {
+            "index": 9,
+            "image": "images/test/8a65d81752a4f5d5.png",
+            "reason": "Too blurred for reliable manual transcription"
+          },
+          {
+            "index": 22,
+            "image": "images/test/21f18cab1b83f5a0.png",
+            "reason": "Too blurred for reliable manual transcription"
+          },
+          {
+            "index": 21,
+            "image": "images/test/9b5419108c306299.png",
+            "reason": "Barrier occludes the first characters; full plate cannot be independently transcribed"
+          }
+        ],
+        "results": [
+          {
+            "index": 0,
+            "expected": "54N46324",
+            "crop_ocr": "51V1682",
+            "pipeline": "54V16224",
+            "ocr_confidence": 0.5356
+          },
+          {
+            "index": 1,
+            "expected": "30A96805",
+            "crop_ocr": "30A96805",
+            "pipeline": "30A96805",
+            "ocr_confidence": 0.9999
+          },
+          {
+            "index": 2,
+            "expected": "51F44614",
+            "crop_ocr": "SIF4474",
+            "pipeline": "SF44674",
+            "ocr_confidence": 0.4471
+          },
+          {
+            "index": 3,
+            "expected": "67AL09797",
+            "crop_ocr": "L0",
+            "pipeline": "G1L104",
+            "ocr_confidence": 0.4679
+          },
+          {
+            "index": 4,
+            "expected": "54L36961",
+            "crop_ocr": "241118",
+            "pipeline": "SLB6901",
+            "ocr_confidence": 0.4423
+          },
+          {
+            "index": 5,
+            "expected": "59H160591",
+            "crop_ocr": "HT",
+            "pipeline": "SH",
+            "ocr_confidence": 0.2813
+          },
+          {
+            "index": 6,
+            "expected": "71B197914",
+            "crop_ocr": "",
+            "pipeline": "F",
+            "ocr_confidence": 0.0
+          },
+          {
+            "index": 7,
+            "expected": "59S109841",
+            "crop_ocr": "1",
+            "pipeline": "50D1904",
+            "ocr_confidence": 0.5177
+          },
+          {
+            "index": 8,
+            "expected": "66P15739",
+            "crop_ocr": "11",
+            "pipeline": "1",
+            "ocr_confidence": 0.3216
+          },
+          {
+            "index": 10,
+            "expected": "60F128808",
+            "crop_ocr": "",
+            "pipeline": "",
+            "ocr_confidence": 0.0
+          },
+          {
+            "index": 11,
+            "expected": "82H108866",
+            "crop_ocr": "",
+            "pipeline": "",
+            "ocr_confidence": 0.0
+          },
+          {
+            "index": 12,
+            "expected": "54V79675",
+            "crop_ocr": "9",
+            "pipeline": "SL19005",
+            "ocr_confidence": 0.4805
+          },
+          {
+            "index": 13,
+            "expected": "30A04180",
+            "crop_ocr": "3TA041",
+            "pipeline": "BT041A",
+            "ocr_confidence": 0.5491
+          },
+          {
+            "index": 14,
+            "expected": "94H41831",
+            "crop_ocr": "D",
+            "pipeline": "D",
+            "ocr_confidence": 0.3422
+          },
+          {
+            "index": 15,
+            "expected": "98A29814",
+            "crop_ocr": "",
+            "pipeline": "CA9142",
+            "ocr_confidence": 0.0
+          },
+          {
+            "index": 16,
+            "expected": "88A23016",
+            "crop_ocr": "88A23078",
+            "pipeline": "68A23077",
+            "ocr_confidence": 0.8261
+          },
+          {
+            "index": 17,
+            "expected": "59L197457",
+            "crop_ocr": "ED7755",
+            "pipeline": "SHD145",
+            "ocr_confidence": 0.5448
+          },
+          {
+            "index": 18,
+            "expected": "59F224643",
+            "crop_ocr": "L",
+            "pipeline": "FL775",
+            "ocr_confidence": 0.5442
+          },
+          {
+            "index": 19,
+            "expected": "50X109634",
+            "crop_ocr": "",
+            "pipeline": "166",
+            "ocr_confidence": 0.0
+          },
+          {
+            "index": 20,
+            "expected": "72C136087",
+            "crop_ocr": "11",
+            "pipeline": "ZLD000",
+            "ocr_confidence": 0.2779
+          },
+          {
+            "index": 23,
+            "expected": "90A07718",
+            "crop_ocr": "90A07718",
+            "pipeline": "90A07718",
+            "ocr_confidence": 0.9384
+          },
+          {
+            "index": 24,
+            "expected": "54H33457",
+            "crop_ocr": "94",
+            "pipeline": "3IE154",
+            "ocr_confidence": 0.3835
+          },
+          {
+            "index": 25,
+            "expected": "30E50207",
+            "crop_ocr": "30E50200",
+            "pipeline": "30E50200",
+            "ocr_confidence": 0.9286
+          },
+          {
+            "index": 26,
+            "expected": "51G84904",
+            "crop_ocr": "00",
+            "pipeline": "51B000",
+            "ocr_confidence": 0.3263
+          },
+          {
+            "index": 27,
+            "expected": "47B142872",
+            "crop_ocr": "WPR7197",
+            "pipeline": "MBF177",
+            "ocr_confidence": 0.3322
+          },
+          {
+            "index": 28,
+            "expected": "30A62043",
+            "crop_ocr": "30A62043",
+            "pipeline": "30A62043",
+            "ocr_confidence": 0.9999
+          },
+          {
+            "index": 29,
+            "expected": "51H25905",
+            "crop_ocr": "",
+            "pipeline": "3727",
+            "ocr_confidence": 0.0
+          },
+          {
+            "index": 30,
+            "expected": "59X143044",
+            "crop_ocr": "110",
+            "pipeline": "00",
+            "ocr_confidence": 0.2158
+          },
+          {
+            "index": 31,
+            "expected": "30G31697",
+            "crop_ocr": "30061G",
+            "pipeline": "302",
+            "ocr_confidence": 0.5721
+          },
+          {
+            "index": 32,
+            "expected": "61A22959",
+            "crop_ocr": "GAW220",
+            "pipeline": "GA3795",
+            "ocr_confidence": 0.3863
+          },
+          {
+            "index": 33,
+            "expected": "59T159973",
+            "crop_ocr": "",
+            "pipeline": "",
+            "ocr_confidence": 0.0
+          },
+          {
+            "index": 34,
+            "expected": "55X86970",
+            "crop_ocr": "10I6477",
+            "pipeline": "101477",
+            "ocr_confidence": 0.3843
+          },
+          {
+            "index": 35,
+            "expected": "75F129830",
+            "crop_ocr": "",
+            "pipeline": "",
+            "ocr_confidence": 0.0
+          },
+          {
+            "index": 36,
+            "expected": "29D05685",
+            "crop_ocr": "29DC5685",
+            "pipeline": "29D05685",
+            "ocr_confidence": 0.9536
+          },
+          {
+            "index": 37,
+            "expected": "81K45959",
+            "crop_ocr": "01A5959",
+            "pipeline": "1141159",
+            "ocr_confidence": 0.3268
+          },
+          {
+            "index": 38,
+            "expected": "54S88080",
+            "crop_ocr": "88",
+            "pipeline": "888",
+            "ocr_confidence": 0.3192
+          },
+          {
+            "index": 39,
+            "expected": "78N25203",
+            "crop_ocr": "61L501",
+            "pipeline": "161L511",
+            "ocr_confidence": 0.4155
+          }
+        ]
+      }
+    }
+  }
+}

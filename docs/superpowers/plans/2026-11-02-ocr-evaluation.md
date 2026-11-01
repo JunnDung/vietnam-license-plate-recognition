@@ -25,10 +25,10 @@ RGB channel order; confidence after normalization/padding; duplicated identity o
 
 ## Task 2 Correct OCR input and scoring
 
-- [ ] Add tests/test_ocr_contract.py that sends a colored crop through PlateEngine.read_crop and verifies the OCR receives RGB for every variant; test padded/spaced prediction probabilities remain aligned with retained characters. Confirm failure on shipped code.
-- [ ] Make minimal recognition.py correction; preserve explicit disagreement and quality flags. Run existing contracts and new tests.
-- [ ] Measure baseline vs candidate on development samples; adopt by the design gate. Freeze chosen code/config before final evaluation; report failures as well as gains.
-- [ ] Commit OCR correction and evidence.
+- [x] Add tests/test_ocr_contract.py that sends a colored crop through PlateEngine.read_crop and verifies the OCR receives RGB for every variant; test padded/spaced prediction probabilities remain aligned with retained characters. Confirm failure on shipped code.
+- [x] Make minimal recognition.py correction; preserve explicit disagreement and quality flags. Run existing contracts and new tests.
+- [x] Measure baseline vs candidate on development samples; adopt by the design gate. Freeze chosen code/config before final evaluation; report failures as well as gains.
+- [x] Commit OCR correction and evidence.
 
 ## Task 3 Measure and publish portfolio evidence
 

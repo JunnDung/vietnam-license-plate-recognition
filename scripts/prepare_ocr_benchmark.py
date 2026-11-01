@@ -110,7 +110,7 @@ def main():
             'limitations':'Public OCR pretrained training overlap unknown. Test is unseen by this change, not proven unseen by upstream pretraining. Filename annotations were not independently human audited. Crop-only results do not measure detection.',
             'samples':selected}
     args.manifest.parent.mkdir(parents=True,exist_ok=True)
-    args.manifest.write_text(json.dumps(report,indent=2),encoding='utf-8')
+    args.manifest.write_text(json.dumps(report,indent=2),encoding='utf-8',newline='\n')
     print(json.dumps({key:value for key,value in report.items() if key not in ('samples','rejected')},indent=2),flush=True)
 
 

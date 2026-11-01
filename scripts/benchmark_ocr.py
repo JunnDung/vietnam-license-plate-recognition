@@ -1,5 +1,6 @@
 """Paired OCR accuracy with denominators, uncertainty and warm wall-clock latency."""
 import argparse
+from datetime import datetime, timezone
 import hashlib
 import importlib.util
 import json
@@ -91,10 +92,12 @@ def main():
                 'square':row['square'],'latency_ms':elapsed,'ocr_confidence':reading['ocr_confidence'],
                 'ocr_disagreement':reading.get('ocr_disagreement',False)})
         if (index+1)%100==0:print(f'Scored {index+1}/{len(samples)} paired crops',flush=True)
-    report={'split':args.split,'manifest_sha256':hashlib.sha256(args.manifest.read_bytes()).hexdigest(),
+    report={'split':args.split,'created_at':datetime.now(timezone.utc).isoformat(),
+            'manifest_sha256':hashlib.sha256(args.manifest.read_bytes()).hexdigest(),
             'baseline_code_sha256':hashlib.sha256(args.baseline_module.read_bytes()).hexdigest(),
             'candidate_code_sha256':hashlib.sha256((ROOT/'recognition.py').read_bytes()).hexdigest(),
             'ocr_sha256':hashlib.sha256((ROOT/'models/plate_ocr.onnx').read_bytes()).hexdigest(),
+            'ocr_config_sha256':hashlib.sha256((ROOT/'models/plate_ocr_config.yaml').read_bytes()).hexdigest(),
             'protocol':'Crop-only exact match and CER; all manifest-selected samples, batch variants per crop, CPU ONNX Runtime 2 threads, 5 warmups per layout per implementation, alternating order. Timing includes crop transforms/OCR/decoding, excludes file IO and detector/API.',
             'runtime':{'onnxruntime':onnxruntime.__version__,'numpy':np.__version__,'opencv':cv2.__version__,
                        'python':platform.python_version(),'system':platform.platform(),'processor':platform.processor()},
@@ -106,7 +109,7 @@ def main():
     report['paired']={'fixed':sum(a['predicted']!=a['expected'] and b['predicted']==b['expected'] for a,b in paired),
                       'regressed':sum(a['predicted']==a['expected'] and b['predicted']!=b['expected'] for a,b in paired)}
     args.output.parent.mkdir(parents=True,exist_ok=True)
-    args.output.write_text(json.dumps(report,indent=2),encoding='utf-8')
+    args.output.write_text(json.dumps(report,indent=2),encoding='utf-8',newline='\n')
     print(json.dumps({name:summarize(rows) for name,rows in predictions.items()},indent=2),flush=True)
 
 

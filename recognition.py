@@ -84,6 +84,34 @@ def flatten_two_lines(crop):
     return np.concatenate((pieces[0], gap, pieces[1]), axis=1)
 
 
+def rectify_plate(crop):
+    gray = cv2.cvtColor(crop, cv2.COLOR_BGR2GRAY)
+    binary = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)[1]
+    contours, _ = cv2.findContours(binary, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    if not contours:
+        return None
+    contour = max(contours, key=cv2.contourArea)
+    quad = cv2.approxPolyDP(contour, .03 * cv2.arcLength(contour, True), True)
+    # shortcut: only bright, visible four-corner borders; retain original crops for other plates.
+    if len(quad) != 4 or not cv2.isContourConvex(quad) or cv2.contourArea(quad) < .4 * gray.size:
+        return None
+    points = quad.reshape(4, 2).astype(np.float32)
+    sums, differences = points.sum(axis=1), np.diff(points, axis=1).ravel()
+    points = points[[sums.argmin(), differences.argmin(), sums.argmax(), differences.argmax()]]
+    if len(np.unique(points, axis=0)) != 4:
+        return None
+    top_left, top_right, bottom_right, bottom_left = points
+    if max(abs(top_right[1]-top_left[1]), abs(bottom_right[1]-bottom_left[1]),
+           abs(top_left[0]-bottom_left[0]), abs(top_right[0]-bottom_right[0])) <= 1:
+        return None
+    width = round(max(np.linalg.norm(top_right-top_left), np.linalg.norm(bottom_right-bottom_left)))
+    height = round(max(np.linalg.norm(bottom_left-top_left), np.linalg.norm(bottom_right-top_right)))
+    if min(width, height) < 8:
+        return None
+    target = np.array([[0, 0], [width-1, 0], [width-1, height-1], [0, height-1]], np.float32)
+    return cv2.warpPerspective(crop, cv2.getPerspectiveTransform(points, target), (width, height))
+
+
 class PlateEngine:
     def __init__(self, detector=None, ocr=None, device='cpu'):
         from ultralytics import YOLO
@@ -117,11 +145,17 @@ class PlateEngine:
         lab = cv2.cvtColor(variants[-1], cv2.COLOR_BGR2LAB)
         lab[:, :, 0] = cv2.createCLAHE(clipLimit=2., tileGridSize=(4, 4)).apply(lab[:, :, 0])
         variants.append(cv2.cvtColor(lab, cv2.COLOR_LAB2BGR))
-        predictions = self.ocr.run(variants, return_confidence=True)
+        if square or crop.shape[1] / crop.shape[0] < 2.2:
+            rectified = rectify_plate(crop)
+            if rectified is not None:
+                variants.append(flatten_two_lines(rectified))
+        # FastPlateOCR's RGB model assumes in-memory arrays already use RGB.
+        predictions = self.ocr.run([cv2.cvtColor(image, cv2.COLOR_BGR2RGB) for image in variants], return_confidence=True)
         candidates = []
         for prediction in predictions:
             text = normalize_plate(prediction.plate)
-            probabilities = np.asarray(prediction.char_probs, dtype=float)[:len(text)]
+            slots = [match.start() for match in re.finditer(r'[A-Z0-9]', prediction.plate.upper())]
+            probabilities = np.asarray(prediction.char_probs, dtype=float)[slots]
             confidence = float(probabilities.mean()) if len(probabilities) else 0.
             candidates.append({'plate': text, 'raw_text': prediction.plate,
                                'ocr_confidence': round(confidence, 4), 'valid_format': is_vietnamese_plate(text)})

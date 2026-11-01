@@ -76,7 +76,7 @@ def authorized(request: Request):
         raise HTTPException(401, 'API key không hợp lệ.')
 
 
-app = FastAPI(title='Biển Số Việt · Recognition API', version='1.3.0', lifespan=lifespan)
+app = FastAPI(title='Biển Số Việt · Recognition API', version='1.4.0', lifespan=lifespan)
 
 
 @app.middleware('http')
@@ -108,13 +108,16 @@ def health():
 @app.get('/api/model', dependencies=[Depends(authorized)])
 def model_report():
     reports = {}
-    for name in ('training', 'robustness', 'ocr_evaluation', 'hardening', 'ocr_weather', 'real_video'):
+    for name in ('training', 'robustness', 'ocr_evaluation', 'hardening', 'ocr_weather', 'real_video', 'ocr_benchmark'):
         path = ROOT / 'reports' / (name + '.json')
         if path.exists():
             reports[name] = json.loads(path.read_text(encoding='utf-8'))
             if name == 'real_video':
                 for clip in reports[name]['clips']:
                     clip.pop('frames',None)
+            if name == 'ocr_benchmark':
+                for result in reports[name]['results'].values():
+                    result.pop('predictions',None)
     return reports
 
 

@@ -1,0 +1,6 @@
+# Keep evaluation provenance hashes identical across Windows and Linux clones.
+recognition.py text eol=lf
+scripts/benchmark_ocr.py text eol=lf
+scripts/prepare_ocr_benchmark.py text eol=lf
+reports/ocr_benchmark*.json text eol=lf
+reports/ocr_*20261102*.json text eol=lf
