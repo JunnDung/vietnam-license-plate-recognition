@@ -17,11 +17,11 @@ RGB channel order; confidence after normalization/padding; duplicated identity o
 
 ## Task 1 Restore baseline and freeze evaluation inputs
 
-- [ ] Create feature branch in the fresh clone; recreate .venv and download verified OCR weights; save git-show baseline recognition module locally.
-- [ ] Run all existing Python/Node contracts and record failures before changes.
-- [ ] Inspect public transcribed datasets, record source revision/license and deterministic identity-disjoint dev/test rules before measuring predictions. If crop dataset is unavailable, use the explicitly labeled legacy regression set and publish the coverage limitation rather than fabricate a larger result.
-- [ ] Add tests in tests/test_ocr_evaluation.py for split isolation, duplicate/conflicting-label behavior and metrics; watch RED, then implement scripts/prepare_ocr_benchmark.py and scripts/benchmark_ocr.py only as required by inspected data.
-- [ ] Commit the reproducible evaluation workflow.
+- [x] Create feature branch in the fresh clone; recreate .venv and download verified OCR weights; save git-show baseline recognition module locally.
+- [x] Run all existing Python/Node contracts and record failures before changes.
+- [x] Inspect public transcribed datasets, record source revision/license and deterministic identity-disjoint dev/test rules before measuring predictions. If crop dataset is unavailable, use the explicitly labeled legacy regression set and publish the coverage limitation rather than fabricate a larger result.
+- [x] Add tests in tests/test_ocr_evaluation.py for split isolation, duplicate/conflicting-label behavior and metrics; watch RED, then implement scripts/prepare_ocr_benchmark.py and scripts/benchmark_ocr.py only as required by inspected data.
+- [x] Commit the reproducible evaluation workflow.
 
 ## Task 2 Correct OCR input and scoring
 
