@@ -1,5 +1,7 @@
 # Kiểm chứng OCR 1.4.0 — 02/11/2026
 
+Đây là báo cáo lịch sử của **1.4.0**. Phiên bản **1.5.0** fine-tune OCR, dùng split mới loại toàn bộ 2.000 ID cũ và thay model sau khi vượt gate validation; xem [OCR_FINETUNE.md](OCR_FINETUNE.md). Các điểm 1.621 test dưới đây không phải chỉ số của model 1.5 và không dùng để chọn model mới. DOCX cũng đã được cập nhật riêng cho lượt 1.5; ghi chú chưa cập nhật DOCX ở cuối trang này mô tả phạm vi lúc phát hành 1.4.
+
 ## Phạm vi và mô hình
 
 Đo khả năng đọc **đúng toàn bộ chuỗi trên crop biển số có nhãn**. Đây không phải accuracy toàn camera, mAP detector hay tỷ lệ xe được nhận diện ổn định trong video. Chuẩn hóa cả nhãn và dự đoán về chữ Latin viết hoa/chữ số; không tự thay O/0, I/1 hoặc dùng nhãn để sửa dự đoán.

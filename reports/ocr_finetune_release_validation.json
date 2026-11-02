@@ -1,0 +1,54 @@
+{
+  "created_at": "2026-11-02T07:32:36.972392+00:00",
+  "version": "1.5.0",
+  "freeze_commit": "bf26eb664396ed82d6ba23ddbd970324679e5ed6",
+  "final_inference_and_evaluator_unchanged": true,
+  "final_report_sha256": "61f8d2369c24759b14443f4b224555a4456ab5d4c98b370fc675b2da28e14092",
+  "runtime_unittest": {
+    "discovered": 33,
+    "passed": 31,
+    "skipped_optional_training": 2
+  },
+  "isolated_training_backend_tests_passed": 2,
+  "node_controller_suites_passed": 2,
+  "node_syntax_files": [
+    "web/app.js",
+    "web/camera.js",
+    "web/video.js"
+  ],
+  "live_api_smoke": "reports/ocr_finetune_api_smoke.json",
+  "clean_package_smoke": "reports/ocr_finetune_package_smoke.json",
+  "live_blank_video_cli_passed": true,
+  "real_video_regression": "reports/ocr_finetune_video_regression.json",
+  "browser_ui_smoke": "reports/ocr_finetune_ui_smoke.json",
+  "review": {
+    "fresh_whole_branch_reviewer": "finetune_release_review",
+    "unresolved_p1_p2": 0,
+    "independently_recomputed_final_predictions": true
+  },
+  "docx": {
+    "path": "reports/Bao_cao_do_an_nhan_dien_bien_so.docx",
+    "sha256": "f1394a5af318fd516408d810e7b10128eaff1e5c4cf80f3cd20bc3008719f219",
+    "word_pages": 30,
+    "rendered_pages": 30,
+    "visually_reviewed_pages": 30,
+    "fields_updated_with": "Microsoft Word",
+    "rendered_with": "documents render_docx.py / installed LibreOffice / Poppler",
+    "final_chart_pages_rechecked": [
+      24,
+      26
+    ]
+  },
+  "selection_ci": {
+    "commit": "bf26eb664396ed82d6ba23ddbd970324679e5ed6",
+    "run": "https://github.com/JunnDung/vietnam-license-plate-recognition/actions/runs/41403833111",
+    "conclusion": "success"
+  },
+  "not_checked": [
+    "Physical USB/RTSP camera",
+    "Real rain footage",
+    "Long-duration or multi-camera load",
+    "Independent human audit of all filename labels",
+    "Full source-overlap audit against upstream OCR/detector training"
+  ]
+}

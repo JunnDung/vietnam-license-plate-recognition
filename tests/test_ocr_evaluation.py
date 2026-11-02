@@ -11,6 +11,16 @@ from scripts.benchmark_ocr import summarize
 
 
 class EvaluationChecks(unittest.TestCase):
+    def test_video_cli_preserves_existing_evaluation_before_loading_models(self):
+        script=Path(__file__).resolve().parents[1]/'scripts/evaluate_video.py'
+        with tempfile.TemporaryDirectory() as folder:
+            output=Path(folder)/'result.json';output.write_text('original evidence',encoding='utf-8')
+            result=subprocess.run([sys.executable,str(script),'--manifest',str(Path(folder)/'absent.json'),
+                '--output',str(output)],capture_output=True,text=True)
+            self.assertNotEqual(result.returncode,0)
+            self.assertIn('Output exists',result.stderr)
+            self.assertEqual(output.read_text(encoding='utf-8'),'original evidence')
+
     def test_filename_boxes_split_and_conflicts(self):
         item = parse_name('detection/two_rows/4_710_0_29t116544_12_17_153_138.jpg')
         self.assertEqual(item['plate'],'29T116544')

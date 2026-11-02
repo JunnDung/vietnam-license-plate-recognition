@@ -110,11 +110,11 @@ def health():
 def model_report():
     reports = {}
     for name in ('training', 'robustness', 'ocr_evaluation', 'hardening', 'ocr_weather', 'real_video', 'ocr_benchmark',
-                 'ocr_finetune_release', 'ocr_finetune_training', 'ocr_finetune_test'):
+                 'ocr_finetune_release', 'ocr_finetune_training', 'ocr_finetune_test', 'ocr_finetune_video_regression'):
         path = ROOT / 'reports' / (name + '.json')
         if path.exists():
             reports[name] = json.loads(path.read_text(encoding='utf-8'))
-            if name == 'real_video':
+            if name in ('real_video', 'ocr_finetune_video_regression'):
                 for clip in reports[name]['clips']:
                     clip.pop('frames',None)
             if name in ('ocr_benchmark', 'ocr_finetune_test'):

@@ -1,5 +1,6 @@
 """Reproduce selected-target video measurements without changing weights or history."""
 import argparse
+from datetime import datetime, timezone
 import hashlib
 import json
 from pathlib import Path
@@ -72,15 +73,21 @@ def measure(engine, clip, fps, roi):
 def main():
     parser=argparse.ArgumentParser();parser.add_argument('--manifest',type=Path,default=ROOT/'reports/video_ground_truth.json')
     parser.add_argument('--output',type=Path,default=ROOT/'reports/real_video.json');parser.add_argument('--device',default='auto')
-    args=parser.parse_args();manifest=json.loads(args.manifest.read_text(encoding='utf-8'))
+    args=parser.parse_args()
+    if args.output.exists():parser.error('Output exists; choose a new path to preserve evaluation evidence.')
+    manifest=json.loads(args.manifest.read_text(encoding='utf-8'))
     engine=PlateEngine(device=args.device);engine.predict(np.full((480,640,3),127,dtype=np.uint8))
-    result={'date':'2026-10-06','weights_sha256':engine.detector_weights_sha256,'device':engine.device,
+    result={'date':datetime.now(timezone.utc).date().isoformat(),'weights_sha256':engine.detector_weights_sha256,
+            'ocr_weights_sha256':engine.ocr_weights_sha256,'device':engine.device,
+            'recognition_source_sha256':hashlib.sha256((ROOT/'recognition.py').read_bytes()).hexdigest(),
             'manifest_sha256':hashlib.sha256(args.manifest.read_bytes()).hexdigest(),'limitations':manifest['annotation'], 'clips':[]}
     for clip in manifest['clips']:
         for roi in ([None,clip['roi_percent']] if clip['roi_percent'] else [None]):
             measurement=measure(engine,clip,manifest['sampling_fps'],roi);measurement['file']=clip['file'];result['clips'].append(measurement)
             print(json.dumps({key:value for key,value in measurement.items() if key not in ('frames','stable_events')},ensure_ascii=False),flush=True)
-    args.output.write_text(json.dumps(result,indent=2,ensure_ascii=False),encoding='utf-8')
+    args.output.parent.mkdir(parents=True,exist_ok=True)
+    with args.output.open('x',encoding='utf-8') as file:
+        file.write(json.dumps(result,indent=2,ensure_ascii=False))
 
 
 if __name__ == '__main__':

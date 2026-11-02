@@ -1,21 +1,27 @@
 # Biển Số Việt
 
-Hệ thống nhận diện biển số ô tô và xe máy Việt Nam từ ảnh, camera và video: mô hình **YOLO11n được fine-tune tại máy**, OCR **CCT S v2 có sẵn**, API FastAPI và giao diện tiếng Việt. Có tra cứu lịch sử, xem ảnh nguồn và xuất CSV. Dữ liệu được lưu bằng SQLite, ảnh lưu tại máy chạy server.
+Hệ thống nhận diện biển số ô tô và xe máy Việt Nam từ ảnh, camera và video: **YOLO11n và OCR CCT S v2 được fine-tune tại máy**, API FastAPI và giao diện tiếng Việt. Có tra cứu lịch sử, xem ảnh nguồn và xuất CSV. Dữ liệu được lưu bằng SQLite, ảnh lưu tại máy chạy server.
 
-## Bản 1.4.0 — OCR và số liệu cho portfolio
+## Bản 1.5.0 — fine-tune OCR và đánh giá mới
 
-Sửa thứ tự màu RGB, căn confidence theo đúng ký tự và bổ sung nắn phối cảnh có điều kiện cho biển hai dòng. Giữ nguyên trọng số detector/OCR; không huấn luyện OCR mới trong lượt này.
+Fine-tune CCT S v2 trên **26.939 crop / 15.123 ID biển**, RTX 3060 Laptop 6 GB, 16 epoch và chọn checkpoint epoch 10. Phân vùng theo nhóm ID/pixel, **1.959 validation / 1.855 test mới**, loại mọi ID của benchmark cũ và legacy37. Hai cách phục vụ được so sánh trên validation; chọn một crop RGB, vượt đủ sáu tiêu chí và khóa tại commit `bf26eb6` trước khi chạy test một lần.
 
-| Phép đo | Kết quả | Phạm vi |
-|---|---|---|
-| OCR đúng cả biển | 96,55% (1565/1621) | Crop VNLP test, một ảnh/một ID biển |
-| CER | 0,685% | Tổng lỗi ký tự / tổng ký tự nhãn |
-| OCR warmed CPU | p50 60,1 ms / p95 110,2 ms | Gồm tiền xử lý và OCR; chưa gồm detector/API |
-| Detector mAP@50 / mAP@50–95 | 99,11% / 87,50% | Kết quả huấn luyện trước đây, 665 ảnh test; không phải accuracy OCR |
+| Cùng 1.855 mục tiêu test mới | Baseline 1.4 | OCR fine-tune 1.5 |
+|---|---:|---:|
+| OCR đúng cả biển | 1792/1855 = 96,60% | **1810/1855 = 97,57%** |
+| CER | 110/14845 = 0,741% | **64/14845 = 0,431%** |
+| Biển hai dòng đúng | 784/833 = 94,12% | **801/833 = 96,16%** |
+| OCR CPU p50 / p95 | 58,3 / 109,0 ms | **27,8 / 30,7 ms** |
+| Phát hiện + đọc đúng mục tiêu, IoU ≥0,5 | 1706/1855 = 91,97% | **1720/1855 = 92,72%** |
+| Pipeline p50 / p95 | 104,2 / 164,5 ms | **66,9 / 94,8 ms** |
 
-2.000 biển được chọn trước dự đoán: **379 dev / 1.621 test**, không trùng ID biển giữa hai phần. Tập test không dùng để chọn phương án trong lượt này; chưa biết mức trùng với pretrain upstream của OCR. Nhãn VNLP chưa được kiểm tra độc lập bằng người. Kết quả trên crop không chứng minh chất lượng toàn camera hoặc camera mới.
+Wilson 95% crop exact **96,77–98,18%**. Sửa đúng 23 lỗi và làm sai thêm 5 mẫu baseline vốn đúng, tăng ròng 18/1855; exact McNemar hai phía p = 0,000912 với giả định độc lập giữa mục tiêu. Validation 98,47% chỉ dùng chọn model, không thay thế điểm test 97,57%. Detector giữ nguyên; **99,11% mAP@50 / 87,50% mAP@50–95 trên 665 ảnh test** là kết quả detector cũ, khác tỷ lệ đọc đúng chuỗi.
 
-[Phương pháp, baseline/candidate, khoảng tin cậy và lệnh tái lập](reports/OCR_BENCHMARK.md) · [Dự đoán từng mẫu](reports/ocr_benchmark.json) · [Mô tả CV tiếng Việt/Anh](docs/CV.md). Các báo cáo huấn luyện, thời tiết/video và DOCX 1.3 bên dưới được giữ làm lịch sử thí nghiệm; số liệu OCR hiện tại xem ở liên kết này.
+OCR chạy ONNX CPU hai luồng; detector CUDA, input 640/confidence 0,35. Độ trễ không gồm IO/HTTP/lưu ảnh, không phải FPS camera. Ảnh nguồn chưa gán nhãn mọi biển nên pipeline chỉ đo mục tiêu chọn, không phải precision toàn cảnh. Nhãn filename chưa được người kiểm tra độc lập toàn bộ; chưa rõ mức trùng với pretrained OCR và bộ train detector cũ. Chưa nghiệm thu camera mới.
+
+Legacy37 giữ 37/37 crop/pipeline. Trên 200 validation mô phỏng, thiếu sáng 195/200, mưa/sương 191/200; **mờ chuyển động mạnh chỉ 104/200, thấp hơn baseline 106/200**. Không cam kết đã xử lý tốt mọi cảnh đêm/mưa/mờ.
+
+[Phương pháp, training, baseline/candidate và tái lập](reports/OCR_FINETUNE.md) · [Dự đoán test từng mẫu](reports/ocr_finetune_test.json) · [CV tiếng Việt/Anh](docs/CV.md) · [Báo cáo DOCX](reports/Bao_cao_do_an_nhan_dien_bien_so.docx). [Benchmark 1.4](reports/OCR_BENCHMARK.md) và các báo cáo thời tiết/video trước đây là lịch sử với trọng số lúc đo.
 
 ## Chạy trên Windows
 
@@ -32,7 +38,7 @@ powershell -ExecutionPolicy Bypass -File .\setup.ps1
 .\run.cmd
 ```
 
-Nếu cần GPU NVIDIA cho huấn luyện, dùng `setup.ps1 -Cuda`. Có thể chỉ định Python bằng `-Python C:\path\python.exe`. Bộ cài chỉ tạo môi trường riêng trong dự án. OCR được tải một lần từ nguồn upstream; lần chạy sau xử lý ảnh bằng các file model trên máy.
+Nếu cần GPU NVIDIA cho detector, dùng `setup.ps1 -Cuda`. Có thể chỉ định Python bằng `-Python C:\path\python.exe`. Bộ cài chỉ tạo môi trường riêng trong dự án. OCR fine-tune đã đóng gói trong Git; script tải thêm baseline upstream để đối chiếu. Suy luận dùng model trên máy. Fine-tune OCR dùng môi trường riêng theo [hướng dẫn](reports/OCR_FINETUNE.md).
 
 Trên Linux:
 
@@ -69,7 +75,7 @@ CLI mở nguồn camera ở phía máy chạy script rồi gửi ảnh đến AP
 
 CLI chọn khung có điểm chi tiết cao hơn trong tối đa 3 khung liên tiếp, giảm burst khi FPS nguồn thấp để giữ đủ mốc video; `--burst 1` tắt và `--burst 5` tăng số khung so sánh. Đây là điểm trên toàn ảnh, không bảo đảm biển số rõ. Hướng dẫn ban đêm, trời mưa, màn trập và nghiệm thu: [CAMERA_GUIDE.md](reports/CAMERA_GUIDE.md).
 
-API mặc định `PLATE_DEVICE=auto`: detector chạy CUDA khi có GPU phù hợp, nếu không dùng CPU; OCR vẫn dùng CPU. Đặt `PLATE_DEVICE=cpu` để ép CPU, rồi khởi động lại server. Không giảm input detector 640 hoặc đổi độ chính xác model để tăng FPS. Phép đo warmed inference trên 37 ảnh: CPU trung bình 141 ms, GPU 108 ms; chưa gồm trình duyệt, burst, HTTP và lưu ảnh. Kiểm chứng video/tốc độ: [VIDEO_VALIDATION.md](reports/VIDEO_VALIDATION.md).
+API mặc định `PLATE_DEVICE=auto`: detector chạy CUDA khi có GPU phù hợp, nếu không dùng CPU; OCR vẫn dùng CPU. Đặt `PLATE_DEVICE=cpu` để ép CPU, rồi khởi động lại server. Không giảm input detector 640 hoặc đổi độ chính xác model để tăng FPS. Phép đo 37 ảnh CPU/GPU trung bình 141/108 ms trong [VIDEO_VALIDATION.md](reports/VIDEO_VALIDATION.md) thuộc bản cũ, chưa gồm trình duyệt/burst/HTTP/lưu ảnh. Hiệu năng 1.5 xem bảng test mới và [video hồi quy mới](reports/ocr_finetune_video_regression.json).
 
 ## API xử lý ảnh
 
@@ -138,7 +144,7 @@ Dữ liệu được tìm bằng **Hugging Face MCP**: [Vietnam License Plate Se
 
 Model khởi tạo từ `yolo11n.pt`; augment độ sáng, quay nhẹ, scale và mosaic. Không lật ngang/dọc ký tự. Checkpoint tốt nhất được chọn bằng validation; **test được đánh giá sau khi kết thúc huấn luyện**, không dùng để chọn checkpoint. Muốn tiếp tục một lượt gián đoạn, chạy `train.py --resume` khi `runs/plate_detector/weights/last.pt` còn tồn tại. Để train một thí nghiệm mới, di chuyển thư mục run cũ trước khi chạy.
 
-OCR là mô hình pretrained [fast-plate-ocr](https://github.com/ankandrew/fast-plate-ocr), chưa được fine-tune ở dự án này. Pipeline dùng RGB, thử crop gốc, ghép hai dòng, CLAHE và thêm phương án ghép dòng sau nắn viền khi tìm được bốn góc phù hợp. Bộ dữ liệu detector ban đầu không có phiên âm đầy đủ; bộ VNLP mới được dùng để đánh giá OCR theo giao thức ở trên. Fine-tune cho camera riêng cần nhãn được kiểm tra và tập nghiệm thu riêng theo phiên quay.
+OCR khởi tạo từ [FastPlateOCR CCT S v2](https://github.com/ankandrew/fast-plate-ocr), fine-tune bằng Keras/PyTorch rồi export ONNX FP32. Pipeline 1.5 đọc **một crop RGB**, không cần ghép dòng/CLAHE nhiều biến thể. Giữ loss head quốc gia bằng 0 và nạp đủ trọng số khởi tạo; chỉ đánh giá chuỗi biển. Model/config/provenance mới trong `models/plate_ocr_vn*` và `models/ocr_vn_provenance.json`; baseline cũ được giữ riêng để rollback/đối chiếu. Hướng dẫn dữ liệu, train/export và phép đo: [OCR_FINETUNE.md](reports/OCR_FINETUNE.md). Camera riêng vẫn cần nhãn đã kiểm tra và tập nghiệm thu theo phiên quay.
 
 ### Fine-tune chống mờ và chọn model
 
@@ -154,7 +160,7 @@ Bản cập nhật đã hoàn thành **18 epoch bổ sung sau 40 epoch nền**. 
 .\.venv\Scripts\python.exe scripts\validate_robust.py --baseline .local/v1/plate_detector.pt --baseline-report-dir .local/v1 --baseline-ocr-weather .local/v1/ocr_weather.json --run plate_robust_replay --device 0
 ```
 
-Run đã tồn tại sẽ bị từ chối để giữ checkpoint; dùng tên mới khi lặp thí nghiệm. Sau khi thay model cần khởi động lại server. `evaluate_robustness.py --extended --output reports/robustness_extra.json` đo thêm thiếu sáng xám có nhiễu, mờ chéo và mưa kèm mờ. Không dùng kết quả test để chọn checkpoint/ngưỡng; test hiện tại đã được dùng chẩn đoán v1 nên là benchmark hồi quy, vẫn cần tập độc lập theo camera.
+Run đã tồn tại sẽ bị từ chối để giữ checkpoint; dùng tên mới khi lặp thí nghiệm. Sau khi thay model cần khởi động lại server. Các lệnh chạy lại ở trên dùng OCR đang hoạt động; muốn tái lập nguyên bản phép đo OCR 1.3 cần checkout `920784a` cùng asset của phiên bản đó. `evaluate_robustness.py --extended --output reports/robustness_extra.json` đo thêm thiếu sáng xám có nhiễu, mờ chéo và mưa kèm mờ. Không dùng kết quả test để chọn checkpoint/ngưỡng; test detector hiện tại đã được dùng chẩn đoán v1 nên là benchmark hồi quy, vẫn cần tập độc lập theo camera.
 
 ## Đánh giá và giới hạn
 
@@ -167,9 +173,9 @@ Run đã tồn tại sẽ bị từ chối để giữ checkpoint; dùng tên m�
 - `reports/hardening.json`: so sánh baseline/candidate, tiêu chí chọn bằng validation và kết quả test sau khi đã chốt model.
 - `reports/robustness_extended.json`: bảy điều kiện detector mô phỏng với before/after trên cùng ảnh.
 - `reports/VALIDATION.md`: kết quả cuối cùng và phạm vi các kiểm tra chạy thực tế.
-- [Báo cáo kỹ thuật DOCX](reports/Bao_cao_do_an_nhan_dien_bien_so.docx): báo cáo đồ án cập nhật phiên bản 1.3.0, bao gồm lý thuyết, huấn luyện, kiểm chứng video thật, vận hành và giới hạn.
+- [Báo cáo kỹ thuật DOCX](reports/Bao_cao_do_an_nhan_dien_bien_so.docx): báo cáo đồ án 1.5.0, gồm lý thuyết detector/OCR, dữ liệu, fine-tune, đường học, so sánh test, API/video, vận hành và giới hạn.
 
-Dataset không có camera/vehicle IDs, nhãn thời tiết hoặc nhãn ngày/đêm. Chia nhóm và loại trùng pixel giảm rò rỉ, nhưng **không chứng minh không còn cùng biển số ở các split**. Kiểm tra mô phỏng và mẫu OCR nhỏ không chứng minh chất lượng cho mọi camera ban đêm, trời mưa, biển bị lóa, che khuất hoặc rất nhỏ. Trước khi dùng camera thực tế, cần một tập test theo camera/phiên quay với ngày/đêm/mưa được gán nhãn riêng. Crop OCR dùng phép ghép hai dòng đơn giản; biển nghiêng mạnh có thể cần model keypoint để nắn phối cảnh.
+Dataset detector cũ không có camera/vehicle IDs, nhãn thời tiết hoặc nhãn ngày/đêm. Chia nhóm và loại trùng pixel của bộ detector **không chứng minh không còn cùng biển số ở các split**. Bộ OCR 1.5 mới đã tách ID/pixel như phần đầu, nhưng chưa chứng minh độc lập theo camera hoặc với mọi dữ liệu upstream. Kiểm tra mô phỏng và mẫu OCR nhỏ không chứng minh chất lượng mọi cảnh đêm, mưa, lóa, che khuất hoặc biển rất nhỏ. Trước khi dùng thực tế cần tập theo camera/phiên quay với nhãn riêng. OCR hiện đọc trực tiếp crop RGB; biển nghiêng mạnh vẫn có thể cần keypoint để nắn phối cảnh.
 
 ## Kiểm tra phần mềm
 
@@ -189,7 +195,7 @@ Mặc định server chỉ lắng nghe `127.0.0.1`. Biến môi trường: `PLAT
 
 Nếu mở trong LAN/Internet, đặt API key, reverse proxy HTTPS và giới hạn request; HTTPS cần cho camera trong browser ở máy khác. Giao diện cho nhập key và chỉ giữ trong sessionStorage, gửi bằng `X-API-Key`; không đưa key vào URL ảnh. Chưa có tài khoản nhiều người hoặc phân quyền từng bản ghi. Chạy **một worker**: bộ gán track, voting và chống lặp ở RAM theo phiên, tối đa 128 phiên, phiên nhàn rỗi hết hạn sau 10 phút. Khóa inference toàn cục phù hợp một máy và lưu lượng nhỏ; chưa đo tải nhiều camera.
 
-Thư mục `runtime/` chứa ảnh/lịch sử. `scripts/maintenance.py backup` tạo snapshot SQLite cùng ảnh có tham chiếu, kiểm tra hash trước khi hoàn thành; dọn lịch sử mặc định dry-run và giữ các ảnh đã dùng làm bằng chứng cũ. Có thể xóa từng lượt từ giao diện. Dữ liệu camera, dữ liệu train, môi trường, log, token và OCR download không đưa lên Git. Repo lưu code, model detector đã train và các báo cáo. Không có API key được hardcode.
+Thư mục `runtime/` chứa ảnh/lịch sử. `scripts/maintenance.py backup` tạo snapshot SQLite cùng ảnh có tham chiếu, kiểm tra hash trước khi hoàn thành; dọn lịch sử mặc định dry-run và giữ các ảnh đã dùng làm bằng chứng cũ. Có thể xóa từng lượt từ giao diện. Dữ liệu camera/train, môi trường, log vận hành, token và baseline OCR download không đưa lên Git. Repo lưu code, detector và OCR fine-tune, log epoch không chứa ảnh, provenance và báo cáo. Không có API key được hardcode.
 
 ## Nguồn và giấy phép
 
@@ -208,9 +214,9 @@ Code dự án theo AGPL-3.0, cùng chế độ mã nguồn mở của [Ultralyti
 .\.venv\Scripts\python.exe scripts\maintenance.py prune --days 30
 # Chỉ thực thi xóa sau khi đã sao lưu và xem kết quả dry-run:
 .\.venv\Scripts\python.exe scripts\maintenance.py prune --days 30 --apply
-.\.venv\Scripts\python.exe scripts\evaluate_video.py --device auto
+.\.venv\Scripts\python.exe scripts\evaluate_video.py --device auto --output .local/replayed-video.json
 ```
 
-[Hướng dẫn vận hành và khôi phục](reports/OPERATIONS.md), [kiểm chứng phiên bản hiện tại](reports/RELEASE_VALIDATION.md). Video nguồn chỉ dùng đánh giá cục bộ, không đưa lên repo; URL revision/hash và nhãn mục tiêu trong `reports/video_ground_truth.json`, kết quả từng khung trong `reports/real_video.json`. Các clip này là bộ hồi quy phát triển, không phải tập nghiệm thu độc lập.
+[Hướng dẫn vận hành và khôi phục](reports/OPERATIONS.md), [kiểm chứng bản 1.3 trước đây](reports/RELEASE_VALIDATION.md). Video nguồn chỉ dùng đánh giá cục bộ, không đưa lên repo; URL revision/hash và nhãn mục tiêu trong `reports/video_ground_truth.json`. Kết quả mới với OCR 1.5: [ocr_finetune_video_regression.json](reports/ocr_finetune_video_regression.json); kết quả cũ trong `reports/real_video.json`. Các clip này là bộ hồi quy phát triển, không phải tập nghiệm thu độc lập.
 
-Để dựng lại DOCX, cài dependency authoring trong môi trường riêng với `python -m pip install -r requirements-report.txt`, rồi chạy `python scripts/build_report.py`. Mở Word và cập nhật mục lục/fields bằng Ctrl+A, F9 trước khi xuất bản. File bàn giao đã được cập nhật mục lục và kiểm tra bố cục đủ 24 trang.
+Để dựng lại DOCX, cài dependency authoring trong môi trường riêng với `python -m pip install -r requirements-report.txt`, chạy `python scripts/plot_ocr_finetune.py` rồi `python scripts/build_report.py`. Mở Word và cập nhật mục lục/fields bằng Ctrl+A, F9 trước khi xuất bản. File bàn giao được render và kiểm tra từng trang; bằng chứng kiểm chứng mới trong [OCR_FINETUNE.md](reports/OCR_FINETUNE.md).

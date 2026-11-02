@@ -1,3 +1,4 @@
 # Optional DOCX authoring only; not needed by the recognition API.
 python-docx==1.2.0
 Pillow==12.3.0
+matplotlib==3.11.2

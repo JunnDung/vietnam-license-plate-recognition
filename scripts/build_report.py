@@ -22,6 +22,18 @@ OUT = REPORTS/'Bao_cao_do_an_nhan_dien_bien_so.docx'
 read = lambda name: json.loads((REPORTS/(name+'.json')).read_text(encoding='utf-8'))
 training, hardening, stress, weather = [read(name) for name in ('training','hardening','robustness_extended','ocr_weather')]
 video, operations, ground_truth = [read(name) for name in ('real_video','operation_validation','video_ground_truth')]
+release_path=REPORTS/'ocr_finetune_release.json'
+release=read('ocr_finetune_release') if release_path.exists() else None
+version=release['version'] if release else '1.3.0'
+if release:
+    ocr_data,ocr_train,ocr_val,ocr_test=[read(name) for name in
+        ('ocr_finetune_manifest','ocr_finetune_training','ocr_finetune_validation','ocr_finetune_test')]
+    candidate=ocr_test['results'][release['candidate_mode']]
+    baseline=ocr_test['results']['baseline']
+    active=candidate if release['adopted'] else baseline
+
+def pct(value,digits=2):
+    return f'{100*value:.{digits}f}%'.replace('.',',')
 document = Document()
 section = document.sections[0]
 section.page_width,section.page_height = Cm(21),Cm(29.7)
@@ -50,7 +62,7 @@ document.styles['Caption'].font.italic=True
 footer=section.footer.paragraphs[0];footer.alignment=WD_ALIGN_PARAGRAPH.CENTER
 field=OxmlElement('w:fldSimple');field.set(qn('w:instr'),'PAGE');footer._p.append(field)
 document.core_properties.title='Xây dựng hệ thống nhận diện biển số phương tiện Việt Nam'
-document.core_properties.subject='Báo cáo đồ án Computer Vision phiên bản 1.3.0'
+document.core_properties.subject=f'Báo cáo đồ án Computer Vision phiên bản {version}'
 document.core_properties.author='Dự án NhanDienBienSo'
 document.core_properties.keywords='YOLO11n CCT OCR camera video temporal consensus FastAPI SQLite'
 
@@ -140,15 +152,19 @@ title=document.add_paragraph('Xây dựng hệ thống nhận diện biển số
 title.paragraph_format.space_before=Pt(40);title.paragraph_format.space_after=Pt(30)
 subtitle=document.add_paragraph('Phát hiện vùng biển số và nhận dạng ký tự từ ảnh camera và video',style='Subtitle');subtitle.alignment=WD_ALIGN_PARAGRAPH.CENTER
 subtitle.runs[0].font.size=Pt(15)
-p('Phiên bản hệ thống 1.3.0',True).alignment=WD_ALIGN_PARAGRAPH.CENTER
-p('Ngày hoàn thiện báo cáo 6 tháng 10 năm 2026').alignment=WD_ALIGN_PARAGRAPH.CENTER
+p(f'Phiên bản hệ thống {version}',True).alignment=WD_ALIGN_PARAGRAPH.CENTER
+p('Ngày cập nhật '+release['report_date'] if release else 'Ngày hoàn thiện báo cáo 6 tháng 10 năm 2026').alignment=WD_ALIGN_PARAGRAPH.CENTER
 p('Dự án NhanDienBienSo').alignment=WD_ALIGN_PARAGRAPH.CENTER
-p('Sản phẩm gồm mô hình detector đã huấn luyện, OCR pretrained, API xử lý ảnh, giao diện tra cứu và công cụ vận hành. Phạm vi hiện tại tập trung nhận diện biển số; giao diện quản lý bãi xe đã được loại khỏi sản phẩm.').paragraph_format.space_before=Pt(45)
+p(('Sản phẩm gồm detector YOLO11n, thí nghiệm fine-tune OCR chuyên biển số Việt Nam, API xử lý ảnh, giao diện tra cứu và bộ đánh giá có thể tái lập. Kết quả thí nghiệm, model được chọn và giới hạn triển khai được phân biệt trong báo cáo.' if release else 'Sản phẩm gồm mô hình detector đã huấn luyện, OCR pretrained, API xử lý ảnh, giao diện tra cứu và công cụ vận hành. Phạm vi hiện tại tập trung nhận diện biển số; giao diện quản lý bãi xe đã được loại khỏi sản phẩm.')).paragraph_format.space_before=Pt(45)
 
 page('Tóm tắt đồ án',1)
 p('Đồ án xây dựng hệ thống nhận diện biển số ô tô và xe máy Việt Nam từ ảnh, camera trình duyệt và file video. Quy trình gồm phát hiện vùng biển bằng YOLO11n, cắt và xử lý biển một hoặc hai dòng, đọc ký tự bằng CCT S v2, đánh giá chất lượng rồi lưu và tra cứu kết quả. Phiên bản 1.3.0 bổ sung gán track theo chuyển động, kiểm chứng kết quả qua nhiều khung, chống bản ghi lặp, chọn vùng nhận diện và sao lưu dữ liệu. Hệ thống chạy cục bộ, có API FastAPI và giao diện tiếng Việt.')
-p('Detector được fine-tune trên GPU RTX 3060 Laptop qua 40 epoch nền và 18 epoch bổ sung với dữ liệu train tăng cường. Trên 665 ảnh test, mAP@50 đạt 99,11%, mAP@50–95 đạt 87,50%. Đây là chỉ số định vị vùng biển, không phải tỷ lệ đọc đúng chuỗi. OCR sử dụng trọng số có sẵn và không được huấn luyện trong đồ án. Mẫu 37 biển có thể đọc ở ảnh gốc đạt 37/37 cho cả quy trình; khi mô phỏng mờ ngang mạnh, chỉ 3/37 đọc đúng. Kết quả này chỉ ra chữ bị mất chi tiết vẫn là điểm yếu lớn.')
-p('Đánh giá bổ sung trên ba video thật công khai: năm mục tiêu chọn trong cảnh giao thông ban ngày và một biển xe máy trong nhà được đọc ổn định; cảnh giao thông đêm có hai trong ba biển ô tô đã chọn ổn định. Biển thứ ba đọc đúng ở một số khung nhưng không đủ quan sát rõ thống nhất. Các clip cũng được dùng kiểm tra và sửa gán track, nên là bộ hồi quy phát triển, chưa phải tập nghiệm thu độc lập. Không có video mưa thật hoặc camera triển khai của người dùng để công bố chất lượng hiện trường.')
+if release:
+    p(f'Detector giữ trọng số từ thí nghiệm trước: mAP@50 99,11% và mAP@50–95 87,50% trên 665 ảnh. Lượt mới fine-tune CCT S v2 trên {ocr_data["counts"]["train"]["images"]:,} crop thuộc {ocr_data["counts"]["train"]["plates"]:,} ID biển, dùng {ocr_data["counts"]["val"]["plates"]:,} ID validation và {ocr_data["counts"]["test"]["plates"]:,} ID test mới tách biệt. Có {ocr_train["completed_epochs"]} epoch hoàn thành; checkpoint được chọn ở epoch {ocr_train["best_epoch"]}. Kết quả model đang sử dụng trên crop test là {active["correct"]}/{active["samples"]} đúng cả biển ({pct(active["exact_match"])}), CER {pct(active["cer"],3)}. Tỷ lệ phát hiện và đọc đúng mục tiêu trong ảnh nguồn đạt {pct(active["pipeline_exact_match"])}. Đây là hai phép đo khác với mAP detector.')
+    p('Model fine-tune '+('được đưa vào ứng dụng sau khi vượt các tiêu chí validation và hồi quy đã chốt.' if release['adopted'] else 'được giữ dưới dạng thí nghiệm vì chưa vượt đầy đủ tiêu chí thay model; ứng dụng tiếp tục dùng baseline.'))
+else:
+    p('Detector được fine-tune trên GPU RTX 3060 Laptop qua 40 epoch nền và 18 epoch bổ sung với dữ liệu train tăng cường. Trên 665 ảnh test, mAP@50 đạt 99,11%, mAP@50–95 đạt 87,50%. Đây là chỉ số định vị vùng biển, không phải tỷ lệ đọc đúng chuỗi. OCR sử dụng trọng số có sẵn và không được huấn luyện trong đồ án. Mẫu 37 biển có thể đọc ở ảnh gốc đạt 37/37 cho cả quy trình; khi mô phỏng mờ ngang mạnh, chỉ 3/37 đọc đúng. Kết quả này chỉ ra chữ bị mất chi tiết vẫn là điểm yếu lớn.')
+p('Video hồi quy với OCR 1.5 đọc stable 5/5 mục tiêu ban ngày, 1/1 xe máy trong nhà và 3/3 mục tiêu đêm toàn khung. Với ROI đêm đã định, cũng đạt 3/3 nhưng có thêm ba chuỗi stable ngoài nhãn chưa xác minh. Không cộng ROI với toàn khung thành mẫu độc lập. Các clip từng dùng phát triển gán track nên chưa phải tập nghiệm thu video độc lập; chưa có mưa thật hoặc camera triển khai của người dùng.' if release else 'Đánh giá video lịch sử đạt 5/5 mục tiêu ban ngày, 1/1 xe máy trong nhà và 2/3 mục tiêu đêm stable. Các clip là bộ hồi quy phát triển, chưa phải tập nghiệm thu độc lập; chưa có mưa thật hoặc camera triển khai của người dùng.')
 p('Sản phẩm đã có quy trình chạy, kiểm thử, sao lưu và khôi phục; phù hợp triển khai thử nghiệm có người đối chiếu trong phạm vi một máy và lưu lượng nhỏ. Để nghiệm thu vận hành dài hạn, cần dữ liệu theo camera và ngày quay, nhãn mọi lượt xe, phép đo độ trễ và các thử lỗi mạng, mất điện, lóa, mưa cùng tải liên tục. Đồ án không tự động quyết định quyền nhận xe hoặc mở barrier.')
 p('Từ khóa YOLO11n OCR CCT S v2 nhận diện biển số kiểm chứng thời gian FastAPI SQLite',True)
 
@@ -163,7 +179,7 @@ p('Mục tiêu của đồ án là một sản phẩm có thể chạy, tra cứ
 heading('Yêu cầu và sản phẩm bàn giao')
 table(['Yêu cầu','Sản phẩm thực hiện'],[
  ('Phát hiện biển số','YOLO11n fine-tune với hai lớp biển dài và biển vuông'),
- ('Nhận dạng ký tự','CCT S v2 pretrained và xử lý biển hai dòng'),
+ ('Nhận dạng ký tự','CCT S v2 và thí nghiệm fine-tune có kiểm chứng' if release else 'CCT S v2 pretrained và xử lý biển hai dòng'),
  ('Ảnh camera video','Giao diện xử lý ảnh và khung lấy mẫu; CLI USB RTSP video'),
  ('Tra cứu kết quả','SQLite, ảnh nguồn/crop, bộ lọc thời điểm và CSV'),
  ('Vận hành','Voting, chống lặp, ROI, backup verify và retention dry-run'),
@@ -184,8 +200,9 @@ p('Huấn luyện tối ưu lỗi vị trí, phân lớp và biểu diễn phân
 
 page('Nhận dạng ký tự và xử lý crop')
 p('OCR nhận một ảnh biển đã cắt và trả chuỗi ký tự. Sai ở detector có thể làm mất ký tự ngoài crop; ngay cả crop đúng vị trí vẫn có thể không đọc được do mờ hoặc lóa. Vì vậy, tỷ lệ OCR trên crop nhãn và tỷ lệ đúng cả detector cộng OCR là hai phép đo khác nhau. Đồ án giữ phép đo cả hai để xác định nơi phát sinh lỗi.')
-p('CCT là kiến trúc Compact Convolutional Transformer: dùng đặc trưng từ convolution trước khi xử lý bằng transformer để biểu diễn quan hệ giữa các đặc trưng. Nghiên cứu Compact Transformers trình bày convolutional tokenization và sequence pooling [2]. Trong dự án, trọng số OCR cụ thể là cct_s_v2_global_model của FastPlateOCR [3]; cấu hình có ảnh RGB 128 × 64, tối đa 10 vị trí ký tự và bảng chữ số/chữ Latin cùng ký tự padding. Không suy diễn rằng checkpoint này được huấn luyện trên dữ liệu của đồ án.')
+p('CCT là kiến trúc Compact Convolutional Transformer: dùng đặc trưng từ convolution trước khi xử lý bằng transformer để biểu diễn quan hệ giữa các đặc trưng. Nghiên cứu Compact Transformers trình bày convolutional tokenization và sequence pooling [2]. Checkpoint khởi tạo là CCT S v2 global của FastPlateOCR [3], với ảnh RGB 128 × 64 và tối đa 10 vị trí ký tự. '+('Lượt fine-tune và bộ dữ liệu mới được trình bày ở chương 7; trọng số khởi tạo và trọng số đã fine-tune có hash riêng.' if release else 'Đây là trọng số có sẵn, chưa được train trong giai đoạn này.'))
 heading('Biển một dòng và hai dòng')
+if release:p('Các bước ghép dòng và CLAHE dưới đây mô tả baseline để đối chiếu. Cách suy luận được chọn cho phiên bản mới là '+('một crop RGB duy nhất.' if release['candidate_mode']=='single' and release['adopted'] else 'pipeline nhiều biến thể, với model được nêu ở chương 7.')+' Các quy tắc chất lượng và yêu cầu đối chiếu ảnh vẫn được giữ.')
 p('Mỗi hộp được nới khoảng 3,5% theo hai chiều và chặn tại biên ảnh. OCR thử crop gốc; với biển vuông hoặc tỷ lệ rộng/cao thấp hơn 2,2, hệ thống còn ghép hai dòng thành một dòng. Đường chia nằm trong 35–65% chiều cao và được chọn bằng vùng có ít nét đen nhất theo phép chiếu ngang. Hai phần được resize cùng chiều cao và nối bằng khoảng trắng. Cách này phù hợp biển gần thẳng; không thay thế nắn phối cảnh bằng keypoint khi nghiêng mạnh.')
 p('CLAHE trên kênh sáng của ảnh được thử thêm để cải thiện tương phản cục bộ. Những biến thể này cung cấp nhiều cách đọc của cùng crop, không phải nhiều bằng chứng độc lập. Chuỗi được viết hoa và bỏ ký tự không phải chữ số hoặc chữ Latin. Mẫu dân dụng phổ biến được kiểm tra bằng regex; đây là kiểm tra định dạng vận hành chứ không bao phủ mọi biển quân đội, ngoại giao hoặc biển đặc biệt.')
 heading('Điểm tin cậy và mâu thuẫn OCR')
@@ -202,6 +219,7 @@ p('Mỗi track giữ tối đa bảy quan sát; quan sát needs_review không g�
 p('Voting giảm dao động nhưng có thể cùng thống nhất một lỗi OCR; xe xuất hiện rất ngắn có thể không kịp đủ ba lần đọc. Track chỉ biểu diễn sự liên tục hình ảnh, không phải danh tính phương tiện. Chống lặp văn bản chỉ dùng khi ghi sự kiện, không dùng làm khóa ghép track.')
 
 page('Chương 3 Dữ liệu và huấn luyện',1)
+if release:p('Chương này trình bày thí nghiệm detector và dữ liệu ở giai đoạn trước. Bộ VNLP, quy trình fine-tune OCR, kiểm tra export và đánh giá mới được trình bày riêng trong chương 7. Các số liệu 37 ảnh và video cũ là hồi quy phát triển, không được dùng làm tập test mới.')
 heading('Nguồn dữ liệu và chuẩn bị nhãn')
 p('Dữ liệu lấy từ Vietnam License Plate Segment Datasets của hoanglvuit, ghim revision b8a1e809cadea0e53b1c519f637d494f0d87796f [5]. File archive có SHA-256 được kiểm tra trong prepare_data.py trước khi tạo split. Polygon chuẩn hóa được đổi thành hộp min/max và kiểm tra lớp, số tọa độ, giá trị hữu hạn trong [0,1], hộp có diện tích dương. Các nhãn không hợp lệ được ghi vào manifest thay vì âm thầm nhận vào train.')
 p('Ảnh được loại trùng theo hash pixel RGB; 44 ảnh trùng được bỏ, sáu mẫu nhãn bị từ chối. Các ảnh còn lại được chia theo nhóm gần đúng từ tiền tố tên và khối thứ tự 25 ảnh, dùng seed 42. Cách nhóm tốt hơn chia ngẫu nhiên từng ảnh liền kề, nhưng không có camera hoặc vehicle ID nên không thể chứng minh biển cùng một xe không xuất hiện ở nhiều split.')
@@ -248,6 +266,7 @@ p('records giữ id, created_at UTC, source, chuỗi/display, điểm detector/O
 p('Giao diện hiển thị giờ Việt Nam UTC+7, CSV/API dùng UTC. CSV escape các giá trị có thể bị phần mềm bảng tính hiểu là công thức. API ảnh tra cứu kiểm tra quyền bằng X-API-Key; giao diện lấy blob có header, không nhúng key vào URL. Ảnh và dữ liệu vận hành được loại khỏi Git.')
 
 page('Chương 5 Kết quả thực nghiệm',1)
+if release:p('Các bảng detector và video trong chương này giữ lại kết quả của giai đoạn 1.3 để đối chiếu. Kết quả test OCR và toàn pipeline của lượt mới nằm ở chương 7; không gộp các tập dữ liệu hoặc đổi tên validation thành test.')
 heading('Detector trên tập test gốc')
 base=hardening['baseline']['training']['test']
 keys=[('metrics/mAP50(B)','mAP@50'),('metrics/mAP50-95(B)','mAP@50–95'),('metrics/precision(B)','Precision tổng hợp'),('metrics/recall(B)','Recall tổng hợp')]
@@ -278,6 +297,7 @@ table(['Clip','Pipeline TB ms','Pipeline p95 ms','Toàn phép đo s'],[(row[0],c
 p('Pipeline TB/p95 chỉ tính engine.predict, không gồm toàn bộ seek, decode, JPEG, HTTP và ghi ảnh. Có một blank warmup detector; OCR lần đầu vẫn nằm trong phép đo. Full elapsed có phần giải mã và lấy mẫu, không tương đương stream camera thời gian thực. Tăng FPS mục tiêu không bảo đảm đạt FPS xử lý nếu có nhiều biển trong cùng khung.')
 
 page('Kiểm thử phần mềm và độ an toàn dữ liệu')
+if release:p('Các số đếm chín unittest, 60 bản ghi/86 ảnh và thử video trình duyệt trong phần này là bằng chứng của bản 1.3, không phải trạng thái dữ liệu trên clone mới. Kiểm chứng phần mềm mới được ghi trong báo cáo phát hành; các phép đo OCR mới ở chương 7.')
 p('Kiểm thử phần mềm tách khỏi độ chính xác model. Inference giả cho phép tái lập trạng thái lưu/xóa, xác thực và race mà không phụ thuộc cảnh ảnh; API thật với ảnh/video kiểm tra tích hợp model. Hiện chín unittest và hai bộ điều khiển Node đã chạy đạt. Workflow GitHub chạy trên CPU để kiểm tra hợp đồng phần mềm, không tự huấn luyện lại hoặc tự tạo benchmark camera.')
 table(['Nhóm kiểm thử','Kết quả được xác minh'],[
  ('Upload và biên dữ liệu','Ảnh sai định dạng, quá kích thước, confidence NaN bị chặn'),
@@ -292,6 +312,7 @@ p('API thật nhận tám khung cùng biển với save=false, trả pending r�
 p('Snapshot vận hành có 60 bản ghi và 86 ảnh. Backup verify đạt; khôi phục thử vào thư mục riêng, SQLite integrity_check trả ok và số bản ghi là 60. Dry-run retention 30 ngày có 0 lượt đủ điều kiện; không thực hiện xóa lịch sử người dùng. Backup nằm cục bộ, không đẩy ảnh dữ liệu vận hành lên GitHub. API sau migration vẫn giữ 60 bản ghi.')
 
 page('Chương 6 Giao diện và vận hành',1)
+if release:p('Các ảnh giao diện lịch sử minh họa luồng thao tác đã có. Trang số liệu của phiên bản mới sử dụng báo cáo tương ứng với model đang hoạt động; xem các kết quả và giới hạn trong chương 7. Clone Git không chứa lịch sử hoặc ảnh vận hành của máy cũ.')
 figure(ASSETS/'stream-result.png','Hình 4 Khung stable và bảng gộp một lượt biển từ MP4 thật',12.6)
 p('Giao diện hiện còn Nhận diện, Lịch sử ảnh và Mô hình. Ảnh/video/camera cùng dùng endpoint xử lý ảnh; video có tạm dừng, tiếp tục, quét lại và xem mốc đầu của lượt stable. Bảng giữ 100 lượt gần nhất; CSV chứa mọi lượt stable đã phân tích. Cảnh báo kết quả cuối khung và bảng lượt stable là hai thông tin khác nhau: khung hiện tại xấu hơn không xóa bằng chứng stable trước đó.')
 
@@ -320,15 +341,84 @@ p('Nghiệm thu phải dùng camera và dữ liệu ghi mới, tách theo ngày/
 table(['Hạng mục','Phép đo cần thực hiện'],[('Ngày đêm mưa riêng','Đúng cả biển, bỏ sót, sai stable theo từng điều kiện'),('Chuyển động và lóa','Khoảng cách tốc độ độ sáng và kích thước crop'),('Sự kiện','Tỷ lệ lặp, trộn track, mất lượt và thời gian đến stable'),('Hiệu năng','p50 p95 end to end, khung trễ và tải nhiều biển'),('Độ bền','Chạy liên tục nhiều giờ, lỗi mạng camera và restart'),('Phục hồi','Khôi phục snapshot trên máy/ổ khác, đối chiếu đủ ảnh')],[5.3,10.9])
 p('Ngưỡng nghiệm thu phải được chủ triển khai chốt trước, theo mức độ hậu quả khi đọc sai và lượng người đối chiếu. Đồ án chưa có dữ liệu hiện trường để cam kết một SLA hoặc độ chính xác 99%. Bản hiện tại cho phép thử vận hành trên một máy với người quan sát; chưa coi là nghiệm thu tự động không người kiểm tra.')
 heading('Các ưu tiên tiếp theo')
-p('Ưu tiên đầu tiên là tập độc lập cho camera dự định dùng, nhất là đêm, lóa và mưa. Tiếp theo là cải thiện OCR bằng dữ liệu chuỗi Việt Nam được gán nhãn đúng và tách train/validation/test theo xe/phiên, thay vì chỉ train thêm detector. Khi có nhiều trường hợp nghiêng, cần đánh giá nắn phối cảnh bằng keypoint; khi thực sự có nhiều camera, cần trạng thái chia sẻ và hàng đợi có backpressure cùng phép đo tải.')
+p('Ưu tiên đầu tiên là tập độc lập cho camera dự định dùng, nhất là đêm, lóa và mưa. Fine-tune OCR và tách theo ID trong nguồn công khai đã được thực hiện ở chương 7; bước tiếp theo cần nhãn đã được người kiểm tra và phân vùng theo camera/phiên quay. Khi có nhiều trường hợp nghiêng, cần đánh giá nắn phối cảnh bằng keypoint; khi thực sự có nhiều camera, cần trạng thái chia sẻ và hàng đợi có backpressure cùng phép đo tải.' if release else 'Ưu tiên đầu tiên là tập độc lập cho camera dự định dùng, nhất là đêm, lóa và mưa. Tiếp theo là cải thiện OCR bằng dữ liệu chuỗi Việt Nam được gán nhãn đúng và tách train/validation/test theo xe/phiên, thay vì chỉ train thêm detector.')
 p('Mỗi cải tiến cần baseline và tiêu chí hồi quy để không làm xấu ảnh gốc. Không thêm model khử mờ chỉ vì tên công nghệ: nếu tạo chi tiết không có trong ảnh, kết quả có thể trông nét nhưng đọc sai ký tự. Không bỏ quality/review để đổi lấy số sự kiện nhiều hơn. Phân quyền, ghi log truy cập và tự giám sát restart chỉ nên triển khai khi yêu cầu vận hành nhiều người/camera đã xác định rõ.')
 
-page('Chương 7 Kết luận',1)
-p('Đồ án đã hoàn thành chuỗi sản phẩm từ dữ liệu đến ứng dụng: chuẩn bị nhãn và split, huấn luyện detector, tích hợp OCR, API ảnh, giao diện ảnh/camera/video, tra cứu và CSV. Phiên bản 1.3.0 bổ sung gán track dự đoán chuyển động, voting bảo thủ, chống lưu lặp, ROI, lý do review và công cụ backup/verify/prune. Dữ liệu lịch sử được giữ sau khi chuyển thư mục, thay đổi giao diện và migration schema.')
-p('Kết quả detector trên test gốc đạt mAP@50 99,11% và mAP@50–95 87,50%. Fine-tune cải thiện detector dưới mờ mô phỏng, nhưng không làm tăng mọi chỉ số. OCR vẫn là giới hạn lớn khi chữ mất chi tiết: chỉ 3/37 mẫu mờ ngang mạnh đọc đúng cả biển. Việc giữ cảnh báo và chọn khung rõ có cơ sở từ chính kết quả thực nghiệm này.')
-p('Video thật bổ sung mức kiểm chứng thực dụng: năm mục tiêu ban ngày và một biển xe máy trong nhà được đọc stable; cảnh đêm đạt hai trong ba mục tiêu chọn stable. Một số chuỗi đúng một khung vẫn bị giữ review do thiếu chứng cứ thời gian. Điều này thể hiện lựa chọn giảm chấp nhận vội; không chứng minh không còn lỗi OCR hoặc lỗi ghép. Các video đã dùng phát triển cần được thay bằng bộ độc lập để nghiệm thu.')
-p('Chín kiểm thử Python, các bộ điều khiển camera/video và thử API/model thật đã đạt trong phạm vi đã mô tả. Snapshot 60 records/86 ảnh đã verify và khôi phục thử với integrity_check ok. Giao diện video gộp 18 khung thành một lượt stable khi không lưu; dữ liệu người dùng không bị thêm ngầm. Mã nguồn, detector và báo cáo được lưu trong GitHub; dữ liệu vận hành và video nguồn giữ cục bộ.')
-p('Sản phẩm có thể dùng để thử triển khai nhận diện và tra cứu với người đối chiếu trên một máy. Chưa tuyên bố hoàn thiện cho tất cả bối cảnh đêm/mưa/chuyển động hoặc chạy 24/7 không giám sát. Công việc còn lại trước nghiệm thu là dữ liệu camera mới, nhãn đầy đủ và đo định lượng chất lượng, độ trễ cùng phục hồi dài hạn. Phạm vi bãi giữ xe đã được tạm bỏ; báo cáo tập trung vào bài toán nhận diện biển số theo sản phẩm hiện tại.')
+if release:
+    page('Chương 7 Fine-tune OCR và đánh giá mới',1)
+    heading('Mục tiêu và giả thuyết thực nghiệm')
+    p('Thí nghiệm kiểm tra liệu thích nghi mô hình OCR đa quốc gia với biển số Việt Nam có tăng tỷ lệ đúng cả chuỗi mà không làm xấu CER, biển hai dòng, độ trễ và bộ hồi quy cũ. Detector, confidence 0,35, input 640 và logic chất lượng được giữ cố định. Kiến trúc CCT S v2 là công trình có sẵn; đóng góp của đồ án là chuẩn bị dữ liệu, fine-tune, kiểm soát phép đo và tích hợp sản phẩm [3, 11, 12].')
+    heading('CCT S v2 và cách học chuỗi biển số')
+    p('Ảnh crop BGR từ OpenCV được đổi sang RGB trước OCR; thư viện resize về 64 × 128 pixel, giữ kiểu uint8 ở đầu vào ONNX. Các khối convolution có số kênh 48, 80, 96, 112 và MaxBlurPool trích đặc trưng cục bộ. Patch kích thước 2 tạo 512 token. Năm khối Transformer đầu dùng hai attention head, chiều đặc trưng 112; TokenReducer dùng 10 query với bốn head, sau đó ba khối xử lý chuỗi rút gọn. Mô hình có 1.061.339 tham số, đủ nhỏ để fine-tune trên GPU laptop 6 GB.')
+    p('Self-attention tính mức liên hệ giữa query và key rồi dùng các trọng số đó tổng hợp value. Multi-head attention cho phép biểu diễn nhiều kiểu liên hệ giữa nét chữ và vị trí. Cấu hình thực tế dùng Dynamic Tanh thay chuẩn hóa: y = γ × tanh(α × x) + β, với α, γ và β được học, α khởi tạo bằng 0,5 [13]. Không nên mô tả model này như Transformer dùng LayerNorm thông thường.')
+    p('Head ký tự trả ma trận 10 × 37: tối đa 10 vị trí và 37 ký hiệu gồm chữ Latin, chữ số và dấu padding “_”. Nhãn được padding và biểu diễn one-hot. Loss là categorical cross-entropy theo vị trí, L = −Σ y × log(p); giải mã lấy argmax từng vị trí rồi bỏ padding. Đây là nhận dạng song song theo slot, không dùng CTC hay bộ giải mã tự hồi quy. Head quốc gia 66 lớp được giữ nguyên hình dạng để nạp đủ trọng số pretrained nhưng đặt hệ số loss bằng 0; không dùng độ chính xác quốc gia để đánh giá sản phẩm.')
+    page('Dữ liệu và kiểm soát rò rỉ')
+    p('Nguồn VNLP công khai được ghim revision và SHA-256 archive [11]. Nhãn chuỗi và hộp được đọc từ tên file, kiểm tra giới hạn và ảnh giải mã được. Hộp thực tế là hai góc xyxy; không dùng cách diễn giải xywh trong mô tả nguồn khi không khớp dữ liệu. Bộ ảnh chưa được nhóm đồ án kiểm chứng thủ công toàn bộ và chưa thấy giấy phép tái phân phối rõ ràng; ảnh nguồn không được phát hành lại trong Git.')
+    table(['Phân vùng','Ảnh crop','ID biển','Hai dòng'],[(name,ocr_data['counts'][key]['images'],ocr_data['counts'][key]['plates'],ocr_data['counts'][key]['two_lines']) for key,name in [('train','Train'),('val','Validation'),('test','Test cuối')]], [4.8,3.8,3.8,3.8])
+    p('Tạo thành phần liên thông từ cùng ID biển, cùng pixel ảnh nguồn hoặc cùng pixel crop trước khi chia. Hash thành phần với seed vnlp-finetune-20261102 rồi lấy modulo 10: 0–7 train, 8 validation, 9 test. Train giữ các lần chụp khác nhau; validation/test chỉ giữ một ảnh xác định theo hash cho mỗi ID. Toàn bộ 2.000 ID benchmark cũ và 37 ID hồi quy cùng các nhóm liên quan bị loại khỏi train/validation/test mới. Các giao ID, nhóm và pixel giữa ba phần bằng 0. Đây là tách theo danh tính trong dữ liệu nguồn, chưa chứng minh độc lập theo camera hoặc phiên quay.')
+    p('Manifest được khóa trước huấn luyện. CSV chỉ chứa train và validation; test cuối không được đưa cho trainer. 28.898 crop train/validation đã đối chiếu lại hash sau huấn luyện. Chưa biết dữ liệu pretrained của tác giả có trùng nguồn VNLP hay không; vì vậy chỉ tuyên bố không rò rỉ trong lần fine-tune của đồ án, không tuyên bố test hoàn toàn chưa từng xuất hiện ở mọi giai đoạn pretrained.')
+    page('Quy trình huấn luyện và kiểm chứng export')
+    table(['Thiết lập','Giá trị'],[('Khởi tạo','CCT S v2 global, nạp nghiêm ngặt mọi lớp'),('Optimizer','AdamW; learning rate 0,0001; weight decay 0,0005'),('Lịch learning rate','Cosine; warmup 5%; EMA trọng số'),('Batch và seed','32; seed 20261102'),('Dừng sớm',f'Tối đa 30 epoch, patience 6; thực chạy {ocr_train["completed_epochs"]}'),('Checkpoint chọn',f'Epoch {ocr_train["best_epoch"]}; validation slot exact {pct(ocr_train["best_validation_accuracy"])}'),('Tài nguyên',f'RTX 3060 Laptop 6 GB; {ocr_train["elapsed_seconds"]/3600:.2f} giờ'),('Độ chính xác số','Mixed FP16 khi train; FP32 khi export ONNX')],[5.3,10.9])
+    p('Augmentation gồm các phép hình học/ánh sáng mặc định mức vừa của cấu hình đã lưu, bổ sung mờ chuyển động kernel 3–7 với xác suất 0,15, gamma 70–140 với xác suất 0,15 và nhiễu Gaussian độ lệch chuẩn 0,01–0,04 với xác suất 0,10. Seed được ghi trực tiếp vào YAML vì serializer augmentation không giữ trường này. Không tạo dữ liệu từ tập test và không lựa chọn điều kiện nhiễu bằng kết quả test.')
+    p('Một lần chạy đầu bị dừng sau epoch đầu do phát hiện metric upstream lấy trung bình các batch có kích thước khác nhau: batch hai mẫu đúng và batch một mẫu sai cho 0,5 thay vì 2/3. Metric được sửa trả kết quả từng mẫu, kiểm thử hồi quy đạt rồi chạy lại cùng cấu hình. Các checkpoint và log lần đầu được giữ. Chỉ số phụ upstream còn phụ thuộc trung bình batch và head quốc gia có loss bằng 0; không dùng chúng làm thành tích.')
+    figure(REPORTS/'ocr_finetune_learning.png','Hình 5 Đường học thực tế; checkpoint chọn tại epoch 10',14)
+    p('Export TorchScript gặp lỗi kernel MaxBlurPool. Dùng TensorFlow CPU riêng, nạp cùng trọng số FP32 rồi export ONNX, không train lại. Trên 32 mẫu validation, chuỗi trùng 32/32 với TensorFlow và Torch gốc ở cả FP32/mixed FP16; sai khác xác suất cực đại TensorFlow/ONNX 1,52 × 10⁻⁶, Torch FP32/ONNX 2,38 × 10⁻⁷. Batch 1/2/8 đạt. Parity trên mẫu không thay thế benchmark toàn tập.')
+    heading('Lựa chọn trên validation và kết quả test cuối')
+    valrows=[]
+    for name,item in ocr_val['results'].items():
+        valrows.append((name,f'{item["correct"]}/{item["samples"]}',pct(item['exact_match']),pct(item['cer'],3),f'{item["latency_p95_ms"]:.2f}'))
+    table(['Cách chạy','Đúng cả biển','Exact match','CER','OCR p95 ms'],valrows,[3.6,3.5,3.2,2.8,3.1])
+    p('So sánh hai đường suy luận: single đọc trực tiếp một crop RGB và variants dùng cách xử lý nhiều biến thể của baseline 1.4. Mức chấp nhận được chốt trước: tăng ít nhất 0,5 điểm phần trăm exact match; CER, số biển hai dòng đúng và legacy37 không giảm; OCR p95 không quá 110% baseline. Bổ sung yêu cầu thành công toàn pipeline không giảm. Nếu nhiều cách đạt, chọn exact match cao hơn, sau đó CER thấp hơn và độ trễ thấp hơn. Chọn xong mới chạy test cuối một lần.')
+    gates={'exact_gain_at_least_half_percentage_point':'Exact tăng ít nhất 0,5 điểm %',
+           'cer_no_regression':'CER không tăng','two_line_no_regression':'Hai dòng không giảm',
+           'p95_within_ten_percent':'p95 không quá 110% baseline',
+           'pipeline_no_regression':'Pipeline không giảm','legacy_clean_no_regression':'Legacy37 không giảm'}
+    table(['Tiêu chí','single','variants'],[(label,*(('Đạt' if ocr_val['adoption_checks'][mode][key] else 'Chưa đạt') for mode in ('single','variants'))) for key,label in gates.items()],[9,3.6,3.6])
+    p(f'Đường candidate được khóa để đánh giá cuối: {release["candidate_mode"]}. '+('Đạt tiêu chí thay model và được tích hợp vào ứng dụng.' if release['adopted'] else 'Không đạt đủ tiêu chí thay model; ứng dụng giữ baseline, candidate được công bố như kết quả thí nghiệm.'))
+    rows=[]
+    for name,item in [('Baseline 1.4',baseline),('Fine-tune '+release['candidate_mode'],candidate)]:
+        rows.append((name,f'{item["correct"]}/{item["samples"]}',pct(item['exact_match']),pct(item['cer'],3),pct(item['pipeline_exact_match'])))
+    table(['Mô hình','Đúng crop','Exact match','CER','Pipeline đúng'],rows,[4.1,3.2,3,2.7,3.2])
+    figure(REPORTS/'ocr_finetune_comparison.png','Hình 6 So sánh paired trên test cuối; khoảng tin cậy Wilson 95% cho crop exact match')
+    for name,item in [('Baseline',baseline),('Fine-tune',candidate)]:
+        p(f'{name}: Wilson 95% crop exact match [{pct(item["wilson95"][0])}; {pct(item["wilson95"][1])}]; OCR p50/p95 {item["latency_p50_ms"]:.2f}/{item["latency_p95_ms"]:.2f} ms; pipeline p50/p95 {item["pipeline_p50_ms"]:.2f}/{item["pipeline_p95_ms"]:.2f} ms. Biển một dòng đúng {item["one_line"]["correct"]}/{item["one_line"]["samples"]}; hai dòng đúng {item["two_lines"]["correct"]}/{item["two_lines"]["samples"]}.')
+    paired=ocr_test['paired'][release['candidate_mode']]
+    p(f'Đối chiếu từng mẫu: candidate sửa đúng {paired["fixed"]} lỗi baseline và làm sai thêm {paired["regressed"]} mẫu baseline đúng. Exact McNemar hai phía p = {paired["exact_mcnemar_two_sided_p"]:.3g}. Kiểm định và Wilson giả định kết quả các mục tiêu độc lập; các phụ thuộc cảnh chụp còn có thể làm khoảng bất định thực lớn hơn. Không dùng p-value để chọn lại model sau khi đã xem test.')
+    heading('Định nghĩa phép đo và giới hạn')
+    p('Exact match = số chuỗi đúng hoàn toàn / toàn bộ số mục tiêu. CER = tổng khoảng cách Levenshtein / tổng ký tự nhãn; kết quả rỗng vẫn tính lỗi. Pipeline chọn hộp có IoU cao nhất với hộp mục tiêu, yêu cầu IoU ≥ 0,5 rồi so toàn chuỗi, không dùng nội dung OCR để chọn hộp. Bỏ sót hoặc sai chuỗi đều là thất bại. Ảnh nguồn chỉ có nhãn mục tiêu chọn; các biển khác chưa được gán nhãn đầy đủ nên không công bố precision toàn cảnh hay mAP từ phép đo này. Mức trùng nguồn với bộ train detector cũ chưa được đối chiếu đầy đủ; tách train/test mới chỉ bảo đảm cho lần fine-tune OCR của đồ án.')
+    p('Độ trễ dùng ONNX CPU hai luồng cho OCR và detector CUDA trên cùng máy; năm warmup cho mỗi layout/model, một warmup detector, luân phiên thứ tự model. Phép đo crop loại thời gian đọc file; pipeline gồm detector, OCR, quality nhưng không gồm HTTP, giải mã file và ghi lịch sử. Nghịch đảo độ trễ crop không phải FPS camera. Điểm confidence trung bình ký tự chưa được calibration thành xác suất đúng cả biển.')
+    page('Điều kiện khó và kiểm chứng ứng dụng')
+    stressrows=[]
+    for condition,items in ocr_val['synthetic_stress'].items():
+        stressrows.append((labels[condition],f'{items["baseline"]["correct"]}/{items["baseline"]["samples"]}',f'{items[release["candidate_mode"]]["correct"]}/{items[release["candidate_mode"]]["samples"]}'))
+    table(['Điều kiện mô phỏng','Baseline đúng','Candidate đúng'],stressrows,[7.4,4.4,4.4])
+    p('200 mục tiêu validation được chọn theo hash trước khi làm nhiễu; giữ toàn bộ mẫu sau biến đổi. Đây là stress trên ảnh mô phỏng, không thay thế dữ liệu đêm/mưa thật và không phải điểm test cuối. Không thể phục hồi chữ không còn chi tiết chỉ bằng confidence cao; ứng dụng tiếp tục giữ cảnh báo chất lượng và cần người đối chiếu.')
+    if (REPORTS/'ocr_finetune_video_regression.json').exists():
+        heading('Video hồi quy với OCR mới')
+        fresh_video=read('ocr_finetune_video_regression')
+        rows=[]
+        for clip in fresh_video['clips']:
+            label='Ban ngày' if clip['file']=='moving-car.MOV' else 'Xe máy trong nhà' if clip['file']=='video1.mp4' else 'Đêm ROI' if clip['roi_percent'] else 'Đêm toàn khung'
+            rows.append((label,clip['sampled_frames'],f'{len(clip["targets_read_stably"])}/{len(clip["selected_targets"])}',len(clip['unverified_stable_plates']),f'{clip["pipeline_p95_ms"]:.1f}'))
+        table(['Video hồi quy','Khung','Mục tiêu stable','Chuỗi khác chưa xác minh','p95 ms'],rows,[4,2.1,3.2,4,2.9])
+        p('Các clip và ROI được giữ như bộ hồi quy đã công bố, không chọn lại mục tiêu theo model mới. Mục tiêu stable chỉ tính các biển đã gán nhãn chọn; các chuỗi stable ngoài danh sách chưa xác minh có thể là biển chưa được gán nhãn hoặc đọc sai, không được coi mặc nhiên là đúng hay false positive. Không cộng kết quả toàn khung và ROI thành số xe khác nhau. Đây không phải tập test video độc lập và chưa có mưa thật/camera USB hoặc RTSP của người dùng.')
+    if (REPORTS/'ocr_finetune_api_smoke.json').exists():
+        api=read('ocr_finetune_api_smoke')
+        p(f'API thật phiên bản {api["health"]["version"]} khởi động ready với đúng hash OCR. Ảnh hồi quy {api["real_image"]["expected"]} đọc đúng; phát lại tám khung cùng ảnh chuyển pending sang stable. save=false giữ lịch sử ở {api["history_before"]} bản ghi trước và {api["history_after"]} sau thử. Ảnh hỏng trả HTTP {api["invalid_image_status"]}; endpoint model bỏ mảng dự đoán thô. Đây là kiểm tra tích hợp trên ảnh đã biết, không phải phép đo accuracy độc lập hay tải dài hạn.')
+
+page('Chương 8 Kết luận' if release else 'Chương 7 Kết luận',1)
+if release:
+    p(f'Đồ án hoàn thành từ dữ liệu đến sản phẩm và phép đo: detector YOLO11n, OCR CCT S v2, API FastAPI, ảnh/camera/video, temporal consensus, tra cứu và các công cụ giữ an toàn dữ liệu. Lượt này bổ sung fine-tune OCR trên 26.939 crop, phân vùng theo ID và pixel, kiểm chứng checkpoint/export, chọn đường chạy bằng validation và công bố dự đoán từng mẫu test. Phiên bản báo cáo là {version}.')
+    p(f'Model đang hoạt động đạt crop exact match {active["correct"]}/{active["samples"]} ({pct(active["exact_match"])}), CER {pct(active["cer"],3)} và phát hiện rồi đọc đúng mục tiêu {active["pipeline_correct"]}/{active["samples"]} ({pct(active["pipeline_exact_match"])}). Chỉ số detector mAP@50 99,11% thuộc bộ test detector cũ 665 ảnh; không đồng nhất với tỷ lệ nhận dạng chuỗi. Toàn bộ kết quả đi cùng mẫu số, protocol và hash để người khác kiểm tra.')
+    p('Sản phẩm phù hợp thử nghiệm nhận diện với người đối chiếu. Nguồn nhãn chưa được kiểm tra thủ công toàn bộ, khả năng trùng dữ liệu pretrained chưa biết, scene chưa gán nhãn hết và chưa có nghiệm thu camera thật của người dùng. Cần thu tập độc lập theo camera/ngày quay, gồm ngày đêm mưa và biển khó, đo sai sự kiện stable và độ bền tải dài trước khi vận hành tự động. Phạm vi hiện tại tập trung nhận diện biển số, không mở rộng quản lý bãi xe.')
+else:
+    p('Bản báo cáo lịch sử chưa có bộ kết quả fine-tune OCR. Các kết luận sau thuộc phiên bản 1.3.0.')
+    p('Đồ án đã hoàn thành chuỗi sản phẩm từ dữ liệu đến ứng dụng: chuẩn bị nhãn và split, huấn luyện detector, tích hợp OCR, API ảnh, giao diện ảnh/camera/video, tra cứu và CSV. Phiên bản 1.3.0 bổ sung gán track dự đoán chuyển động, voting bảo thủ, chống lưu lặp, ROI, lý do review và công cụ backup/verify/prune. Dữ liệu lịch sử được giữ sau khi chuyển thư mục, thay đổi giao diện và migration schema.')
+    p('Kết quả detector trên test gốc đạt mAP@50 99,11% và mAP@50–95 87,50%. Fine-tune cải thiện detector dưới mờ mô phỏng, nhưng không làm tăng mọi chỉ số. OCR vẫn là giới hạn lớn khi chữ mất chi tiết: chỉ 3/37 mẫu mờ ngang mạnh đọc đúng cả biển. Việc giữ cảnh báo và chọn khung rõ có cơ sở từ chính kết quả thực nghiệm này.')
+    p('Video thật bổ sung mức kiểm chứng thực dụng: năm mục tiêu ban ngày và một biển xe máy trong nhà được đọc stable; cảnh đêm đạt hai trong ba mục tiêu chọn stable. Một số chuỗi đúng một khung vẫn bị giữ review do thiếu chứng cứ thời gian. Điều này thể hiện lựa chọn giảm chấp nhận vội; không chứng minh không còn lỗi OCR hoặc lỗi ghép. Các video đã dùng phát triển cần được thay bằng bộ độc lập để nghiệm thu.')
+    p('Chín kiểm thử Python, các bộ điều khiển camera/video và thử API/model thật đã đạt trong phạm vi đã mô tả. Snapshot 60 records/86 ảnh đã verify và khôi phục thử với integrity_check ok. Giao diện video gộp 18 khung thành một lượt stable khi không lưu; dữ liệu người dùng không bị thêm ngầm. Mã nguồn, detector và báo cáo được lưu trong GitHub; dữ liệu vận hành và video nguồn giữ cục bộ.')
+    p('Sản phẩm có thể dùng để thử triển khai nhận diện và tra cứu với người đối chiếu trên một máy. Chưa tuyên bố hoàn thiện cho tất cả bối cảnh đêm/mưa/chuyển động hoặc chạy 24/7 không giám sát. Công việc còn lại trước nghiệm thu là dữ liệu camera mới, nhãn đầy đủ và đo định lượng chất lượng, độ trễ cùng phục hồi dài hạn. Phạm vi bãi giữ xe đã được tạm bỏ; báo cáo tập trung vào bài toán nhận diện biển số theo sản phẩm hiện tại.')
+
 
 page('Tài liệu tham khảo',1)
 references=[
@@ -341,23 +431,31 @@ references=[
  '[7] ddkhoa2605. LicensePlateDetection. Video_Test/video1.mp4 và cam_20250922_181322.mp4, revision f1c732e2270becc44df1de6529372f63ef251076. https://github.com/ddkhoa2605/LicensePlateDetection. Chưa thấy khai báo giấy phép; giữ video cục bộ để đánh giá, không đóng gói trong repo sản phẩm.',
  '[8] FastAPI. Request Forms and Files, TestClient và deployment. https://fastapi.tiangolo.com/tutorial/request-forms-and-files/ và https://fastapi.tiangolo.com/deployment/. Tài liệu API thư viện được dùng hiện thực.',
  '[9] Python Software Foundation. sqlite3 Online backup và transaction control. https://docs.python.org/3.12/library/sqlite3.html. Cơ sở triển khai snapshot database.',
- '[10] Dự án NhanDienBienSo. Báo cáo thực nghiệm JSON và mã nguồn phiên bản 1.3.0, ngày 6 tháng 10 năm 2026. training.json, hardening.json, ocr_weather.json, real_video.json, operation_validation.json và RELEASE_VALIDATION.md.'
+ '[10] Dự án NhanDienBienSo. Báo cáo thực nghiệm JSON và mã nguồn phiên bản 1.3.0, ngày 6 tháng 10 năm 2026. training.json, hardening.json, ocr_weather.json, real_video.json, operation_validation.json và RELEASE_VALIDATION.md.',
+ '[11] fict-labs. VNLP: Vietnamese License Plate dataset. https://github.com/fict-labs/VNLP, revision d0b38df15c961393a7a1189912476c3d8d1edbfc. Nhãn, quy tắc phân vùng và checksum được ghi trong reports/ocr_finetune_manifest.json. Truy cập ngày 2 tháng 11 năm 2026.',
+ '[12] FastPlateOCR. Training CLI và cấu hình huấn luyện, phiên bản thư viện 1.1.0. https://ankandrew.github.io/fast-plate-ocr/latest/training/cli/train/. Asset pretrained tại https://github.com/ankandrew/fast-plate-ocr/releases/tag/arg-plates. Truy cập ngày 2 tháng 11 năm 2026.',
+ '[13] Jiachen Zhu, Xinlei Chen, Kaiming He, Yann LeCun và Zhuang Liu. Transformers without Normalization. CVPR 2025, trang 14901–14911. https://arxiv.org/abs/2503.10622. Cơ sở Dynamic Tanh trong cấu hình model đang sử dụng.',
+ '[14] Dự án NhanDienBienSo. Thí nghiệm fine-tune OCR ngày 2 tháng 11 năm 2026. reports/ocr_finetune_training.json, ocr_finetune_export.json, ocr_finetune_torch_parity.json, ocr_finetune_validation.json và ocr_finetune_test.json. Mã chuẩn bị, train, export và đánh giá đi kèm trong scripts/.'
 ]
 for reference in references:
-    paragraph=p(reference);paragraph.paragraph_format.line_spacing=1.05;paragraph.paragraph_format.space_after=Pt(9)
+    paragraph=p(reference);paragraph.paragraph_format.line_spacing=1.0;paragraph.paragraph_format.space_after=Pt(6)
     paragraph.alignment=WD_ALIGN_PARAGRAPH.LEFT
-    for run in paragraph.runs:run.font.size=Pt(11.5)
+    for run in paragraph.runs:run.font.size=Pt(11)
 
 page('Phụ lục Tái lập và giao thức API',1)
 heading('Tổ chức file và thực thi')
 code('NhanDienBienSo/\n  app.py  recognition.py  temporal.py\n  models/    reports/    scripts/    tests/    web/\n  data/      runs/       runtime/    .venv/\n  run.cmd    setup.ps1   requirements-lock.txt')
-code('.\\.venv\\Scripts\\python.exe -m unittest discover -s tests -v\nnode tests/check_camera_js.cjs\nnode tests/check_video_js.cjs\n.\\.venv\\Scripts\\python.exe scripts/evaluate_video.py --device auto')
+code('.\\.venv\\Scripts\\python.exe -m unittest discover -s tests -v\nnode tests/check_camera_js.cjs\nnode tests/check_video_js.cjs\n.\\.venv\\Scripts\\python.exe scripts/evaluate_video.py --device auto --output .local/replayed-video.json')
 p('evaluate_video.py tải clip nguồn nếu file thiếu, chặn quá 100 MB và kiểm tra hash ghim trong manifest. Các trọng số và threshold không tự thay sau phép đo. build_report.py tạo DOCX từ các JSON thực nghiệm; cần dependency authoring python-docx và Pillow. Các lệnh vận hành sản phẩm dùng môi trường riêng của dự án. Bộ dựng báo cáo trong lần bàn giao dùng runtime tài liệu đã cài.')
 heading('Ví dụ phiên API và định nghĩa phản hồi')
 code('POST /api/recognize  multipart/form-data\nfile = frame.jpg\nsource = video:sample.mp4:0.40s\nconfidence = 0.35\nsave = false\nstream_id = UUID mới của phiên\nsample_time = 0.40')
 p('detections trả chuỗi raw/display, bbox, layout, điểm detector/OCR, quality, needs_review, saved và temporal. temporal gồm track_id, status pending/review/stable, chuỗi consensus khi đủ điều kiện, số votes/observations và new_event. Chỉ saved=true mới có image_url/crop_url dùng tra cứu. new_event là điều kiện có thể lưu, không chứng minh bản ghi đã được lưu. Khi save=false, voting vẫn chạy nhưng không thêm lịch sử.')
 heading('Nhận diện phiên bản trọng số')
 code('Detector SHA-256\n'+training['weights_sha256'])
+if release:
+    code('Candidate OCR ONNX SHA-256\n'+ocr_test['candidate_weights_sha256'])
+    code('Frozen training manifest SHA-256\n'+ocr_train['manifest_sha256'])
+    p('Model phục vụ '+('dùng candidate OCR ở trên.' if release['adopted'] else 'giữ OCR baseline 1.4; hash candidate chỉ nhận diện thí nghiệm, không phải model đang hoạt động.'))
 p('Hash này cần trùng health API và các báo cáo model đang dùng. Kết quả qua phiên bản khác phải được đo lại theo cùng protocol. Các JSON giữ số liệu chi tiết từng frame, nguồn clip, cấu hình và giới hạn; báo cáo không thay thế dữ liệu gốc để kiểm tra lại kết luận.')
 
 document.save(OUT)

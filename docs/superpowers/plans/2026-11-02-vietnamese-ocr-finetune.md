@@ -49,15 +49,15 @@ Transitive same-plate/source/crop links must not cross splits or reserved groups
 - [x] Test adoption rejects accuracy/CER/two-line/p95/legacy regressions; test full-image target metrics include missing detections, wrong text and unannotated extra boxes without claiming precision. Observe RED then implement.
 - [x] Measure both candidate serving paths on new validation only; choose by the predefined gate and record all compared settings, including a rejected candidate. Run legacy37 and validation synthetic stress without using the final partition.
 - [x] Request a pre-final review of split/training/evaluation correctness. Freeze chosen checkpoint/settings/code in Git before running final test once.
-- [ ] Publish paired crop exact/CER/Wilson/latency and annotated-target detection/end-to-end results, denominators and every prediction. Label old benchmark reruns as regression. Do not tune after final results.
+- [x] Publish paired crop exact/CER/Wilson/latency and annotated-target detection/end-to-end results, denominators and every prediction. Label old benchmark reruns as regression. Do not tune after final results.
 
 ## Task 4 — Verified release, CV and rendered DOCX
 
 **Files:** only necessary active-model integration in recognition.py, scripts/download_ocr.py/models provenance/artifact, app.py/web metrics; extend existing contract tests. Update README.md, docs/CV.md, reports/OCR_BENCHMARK.md and scripts/build_report.py plus reports/Bao_cao_do_an_nhan_dien_bien_so.docx. Update report-only requirements if authoring needs it.
 
 - [x] If gate passes, package selected ONNX/config with hashes and make the minimal active-model change while retaining rollback provenance. Otherwise retain1.4 and make the failed experiment clear. Verify fresh-setup assets and API fields/quality behavior.
-- [ ] Run full Python/Node checks and real API/video smoke; ensure displayed benchmark refers to the measured active model and no raw prediction arrays flood API responses.
-- [ ] Update measured model/data/training card and honest bilingual CV bullets. Build learning curves/results charts with standard plotting tools. Update DOCX theory/method/results/limitations; render every page, inspect layout and fix defects.
+- [x] Run full Python/Node checks and real API/video smoke; ensure displayed benchmark refers to the measured active model and no raw prediction arrays flood API responses.
+- [x] Update measured model/data/training card and honest bilingual CV bullets. Build learning curves/results charts with standard plotting tools. Update DOCX theory/method/results/limitations; render every page, inspect layout and fix defects.
 - [ ] Review whole branch with a fresh reviewer, resolve important findings, commit/push, verify CI then merge/push main and verify its hash/CI. Preserve the approved spec and completion evidence.
 
 Self-review: all spec sections map to these four sequential deliverables; data and inference dictionary interfaces are shared explicitly. No additional user confirmation is needed for the implementation choices delegated in the approved design.

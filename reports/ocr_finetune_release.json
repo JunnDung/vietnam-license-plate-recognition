@@ -2,6 +2,10 @@
   "version": "1.5.0",
   "candidate_mode": "single",
   "adopted": true,
-  "report_date": "2 thang 11 nam 2026",
-  "selection_report": "reports/ocr_finetune_selection.json"
+  "report_date": "2 tháng 11 năm 2026",
+  "selection_report": "reports/ocr_finetune_selection.json",
+  "freeze_commit": "bf26eb664396ed82d6ba23ddbd970324679e5ed6",
+  "final_report_sha256": "61f8d2369c24759b14443f4b224555a4456ab5d4c98b370fc675b2da28e14092",
+  "final_test_status": "complete_once_after_freeze",
+  "limitations": "OCR fine-tune identity/pixel holdout; filename labels not independently verified; upstream OCR/detector-source overlap unknown; no camera-specific acceptance; strong synthetic motion blur remains weak."
 }

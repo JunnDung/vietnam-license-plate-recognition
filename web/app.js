@@ -207,10 +207,12 @@ async function showModel() {
       if(before) card.append(element('span','',`Trước cập nhật: ${(before.pipeline_exact_match*100).toFixed(1)}% · cùng mẫu OCR`));
     }
     if(data.ocr_weather) $('metrics').append(element('p','hint','OCR điều kiện khó: dùng cùng mẫu đọc được ở ảnh gốc, không loại thêm mẫu sau khi làm mờ/thiếu sáng. Chưa nghiệm thu trên camera triển khai.'));
-    if(data.real_video) {
-      for(const clip of data.real_video.clips) {
+    const video=data.ocr_finetune_video_regression || data.real_video;
+    if(video) {
+      for(const clip of video.clips) {
         const label=clip.file==='moving-car.MOV' ? 'Giao thông ban ngày' : clip.file==='video1.mp4' ? 'Xe máy trong nhà' : 'Giao thông ban đêm';
-        const card=element('div','metric');card.append(element('b','',`${clip.targets_read_stably.length}/${clip.selected_targets.length}`),element('span','',`${label}${clip.roi_percent ? ' · có vùng cắt' : ''} · biển đã chọn đọc ổn định`));$('metrics').append(card);
+        const card=element('div','metric');card.append(element('b','',`${clip.targets_read_stably.length}/${clip.selected_targets.length}`),element('span','',`${data.ocr_finetune_video_regression ? 'v1.5' : 'v1.3'} · ${label}${clip.roi_percent ? ' · có vùng cắt' : ''} · biển đã chọn đọc ổn định`));
+        card.append(element('span','',`${clip.unverified_stable_plates.length} chuỗi stable ngoài nhãn chưa xác minh`));$('metrics').append(card);
       }
       $('metrics').append(element('p','hint','Video thật công khai, nhãn chọn bằng mắt; mẫu phát triển nhỏ, chưa nghiệm thu độc lập hoặc đo mọi xe. Chưa có video mưa thật.'));
     }

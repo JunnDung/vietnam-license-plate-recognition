@@ -39,8 +39,12 @@ class OCRContracts(unittest.TestCase):
             (root/'reports/ocr_benchmark.json').write_text(json.dumps(report),encoding='utf-8')
             (root/'reports/ocr_finetune_test.json').write_text(json.dumps(report),encoding='utf-8')
             (root/'reports/ocr_finetune_release.json').write_text('{"adopted":true}',encoding='utf-8')
+            (root/'reports/ocr_finetune_video_regression.json').write_text('{"clips":[{"frames":[{}],"unverified_stable_plates":["51A12345"]}]}',encoding='utf-8')
             with patch.object(app,'ROOT',root):reports=app.model_report()
             self.assertTrue(reports['ocr_finetune_release']['adopted'])
+            clip=reports['ocr_finetune_video_regression']['clips'][0]
+            self.assertNotIn('frames',clip)
+            self.assertEqual(clip['unverified_stable_plates'],['51A12345'])
             for name in ('ocr_benchmark','ocr_finetune_test'):
                 result=reports[name]
                 self.assertEqual(result['results']['candidate']['correct'],10)
