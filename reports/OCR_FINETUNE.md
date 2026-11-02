@@ -71,7 +71,7 @@ Thời gian là phạm vi engine trong môi trường được ghi ở JSON, ch�
 
 ### Ứng dụng và video hồi quy
 
-[Clone đóng gói](ocr_finetune_package_smoke.json): clone Git sạch tại commit khóa đọc đúng ảnh hồi quy `54N46324` trên CPU khi không có baseline download hoặc `models/training`. Dùng lại môi trường runtime đã ghim dependency, không tuyên bố đã lặp toàn bộ cài đặt/dựng dữ liệu trên máy mới.
+Clone Git sạch tại commit khóa đọc đúng ảnh hồi quy `54N46324` trên CPU khi không có baseline download hoặc `models/training`. Phép kiểm tra dùng lại môi trường runtime đã ghim dependency, chưa lặp toàn bộ cài đặt/dựng dữ liệu trên máy mới.
 
 [API thật](ocr_finetune_api_smoke.json): ready 1.5.0, đúng hash OCR, đọc đúng ảnh trên; tám khung phát lại cùng ảnh chuyển pending → stable, `save=false` giữ lịch sử 0 → 0. Ảnh hỏng trả 400, trang chủ 200, model endpoint bỏ prediction arrays. CLI video trống 7 giây chạy đủ mốc 0/3/6 và 35 khung ở 5 Hz, không sinh biển giả. Đây là smoke chức năng, không phải accuracy/load/camera acceptance.
 
@@ -89,9 +89,8 @@ Không cộng toàn khung và ROI thành các mục tiêu khác nhau. Ba chuỗi
 ### Kiểm chứng phần mềm và báo cáo
 
 - Runtime: **33 test được phát hiện, 31 đạt và hai test backend được bỏ qua có chủ đích**. Hai test đó chạy riêng trong `.venv-train` và đều đạt: metric trọng số theo mẫu và seed augmentation. Hai bộ điều khiển JavaScript camera/video và kiểm tra cú pháp đều đạt.
-- [Edge UI smoke](ocr_finetune_ui_smoke.json): tab model hiển thị 1.855 mẫu, OCR/video mới và ba chuỗi ROI chưa xác minh; không có lỗi JavaScript hoặc tràn ngang ở màn hình 390 px. [Ảnh giao diện](ocr_finetune_interface.png). Không thử camera vật lý hay tự động hóa upload video trình duyệt trong lượt mới.
+- Tab model đã được kiểm tra bằng Edge: hiển thị 1.855 mẫu, OCR/video mới và ba chuỗi ROI chưa xác minh; không có lỗi JavaScript hoặc tràn ngang ở màn hình 390 px. [Ảnh giao diện](ocr_finetune_interface.png). Chưa thử camera vật lý hay tự động hóa upload video trình duyệt trong lượt 1.5.
 - [DOCX đồ án 1.5](Bao_cao_do_an_nhan_dien_bien_so.docx): **30 trang**, cập nhật mục lục bằng Word, render LibreOffice và kiểm tra hình từng trang. Đã sửa trang gần trống, bảng bị tách và nhãn biểu đồ nhỏ/chồng nhau. Kết quả cũ được phân biệt với thí nghiệm mới.
-- Reviewer mới kiểm tra toàn nhánh, tính lại kết quả từ từng dự đoán và đối chiếu hash; không còn lỗi P1/P2. [Bằng chứng phát hành](ocr_finetune_release_validation.json) ghi phạm vi kiểm tra và checksum tài liệu.
 
 Exact match = đúng toàn chuỗi / toàn bộ mục tiêu; CER = tổng Levenshtein / tổng ký tự nhãn, gồm cả dự đoán rỗng. Wilson 95% và exact McNemar hai phía được báo cáo cùng số cặp sửa đúng/làm sai thêm. Các phép thống kê giả định độc lập giữa mục tiêu, chưa mô hình hóa hết phụ thuộc cảnh chụp.
 
