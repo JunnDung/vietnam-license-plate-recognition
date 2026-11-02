@@ -51,6 +51,11 @@ def assign_splits(rows,reserved_plates,reserved_sources,seed):
     return sorted(result,key=lambda row:row['member'])
 
 
+def split_unique_rows(rows,reserved_plates,reserved_sources,seed):
+    # Preserve links from duplicate/conflicting captures before dropping their pixels.
+    return deduplicate(assign_splits(rows,reserved_plates,reserved_sources,seed))
+
+
 def pixel_hash(image):
     return hashlib.sha256(str(image.size).encode()+image.tobytes()).hexdigest()
 
@@ -97,8 +102,7 @@ def main():
                 rows.append(row)
             except (ValueError,OSError,KeyError) as error:rejected.append({'member':name,'reason':str(error)})
             if (index+1)%5000==0:print(f'Audited {index+1}/{len(names)} sources',flush=True)
-        unique,audit=deduplicate(rows)
-        assigned=assign_splits(unique,reserved,reserved_pixels,SEED)
+        assigned,audit=split_unique_rows(rows,reserved,reserved_pixels,SEED)
         selected=[r for r in assigned if r['split']=='train']
         evaluation=defaultdict(list)
         for row in assigned:

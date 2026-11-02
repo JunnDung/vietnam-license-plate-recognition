@@ -1,0 +1,16 @@
+{
+  "created_at": "2026-11-02T06:42:01.065043+00:00",
+  "phase": "post-training audit, before model selection/final evaluation",
+  "verified_training_validation_crops": 28898,
+  "manifest_sha256": "4a81ed7de5aff2905eb897b1737369f8f13d48a89d66824ae9e4a877387a7c8c",
+  "training_source_revision": "3cd79d7",
+  "training_source_sha256": "20d8601bcfd5dd7ff63ac3e859c785ab3dfcaebd18e2b63092373a13682719b8",
+  "upstream_asset_hashes_match": true,
+  "split_identity_pixel_group_audit": "disjoint in frozen manifest; no reserved plate selected",
+  "source_dedup_audit": {
+    "duplicate_images": 0,
+    "conflicting_images": 0
+  },
+  "preparation_fix": "Group/reserve before deduplication; frozen run has zero duplicates/conflicts, so data unchanged.",
+  "validation_timing_note": "Partial first validation timing stopped without reading scores because it overlapped hashing; clean full measurement follows."
+}

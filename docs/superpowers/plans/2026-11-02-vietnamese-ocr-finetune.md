@@ -36,9 +36,9 @@ Transitive same-plate/source/crop links must not cross splits or reserved groups
 **Interfaces:** official train CLI consumes prepared train/val CSVs only. Wrapper records initial assets/config hashes, fixed arguments, process/live status, epoch CSV and best/last checkpoint paths. Training report exposes selected checkpoint/hash and actual epochs/elapsed. Selected ONNX path feeds Task3; no test CSV passed to training.
 
 - [x] Pin/download official Keras/config assets with hashes. Inspect loaded model weights/heads and execute a small CUDA forward/backward sanity check before the full run; fail on unintended weight mismatch or nonfinite loss.
-- [ ] Reuse official training CLI/callback behavior with declared seed/LR/batch/early stopping; save logs and recoverable best/last Keras checkpoints. Monitor real current logs and GPU, estimate timing from measured batches. Diagnose failures before making the one permitted validation-driven rerun.
-- [ ] Select best checkpoint by validation whole-plate accuracy, export to ONNX using supported backend, and assert decoded parity on validation examples. Record package versions and checksums; preserve logs rather than overwrite earlier experiments.
-- [ ] Commit training tooling, configuration and measured training evidence; keep source images/checkpoints out of Git until an adopted inference artifact is deliberately packaged.
+- [x] Reuse official training CLI/callback behavior with declared seed/LR/batch/early stopping; save logs and recoverable best/last Keras checkpoints. Monitor real current logs and GPU, estimate timing from measured batches. Diagnose failures before making the one permitted validation-driven rerun.
+- [x] Select best checkpoint by validation whole-plate accuracy, export to ONNX using supported backend, and assert decoded parity on validation examples. Record package versions and checksums; preserve logs rather than overwrite earlier experiments.
+- [x] Commit training tooling, configuration and measured training evidence; keep source images/checkpoints out of Git until an adopted inference artifact is deliberately packaged.
 
 ## Task 3 — Validation selection and final comparison
 
@@ -46,7 +46,7 @@ Transitive same-plate/source/crop links must not cross splits or reserved groups
 
 **Interfaces:** evaluate baseline frozen 1.4 and candidate single-pass/existing-variant paths through the same reading dictionary (plate,raw_text,ocr_confidence,valid_format,ocr_disagreement). Gate accepts validation summaries + legacy37 summaries; final evaluation receives the chosen frozen path/checkpoint only. Per-target matching is best IoU>=.5, missing detection is failure.
 
-- [ ] Test adoption rejects accuracy/CER/two-line/p95/legacy regressions; test full-image target metrics include missing detections, wrong text and unannotated extra boxes without claiming precision. Observe RED then implement.
+- [x] Test adoption rejects accuracy/CER/two-line/p95/legacy regressions; test full-image target metrics include missing detections, wrong text and unannotated extra boxes without claiming precision. Observe RED then implement.
 - [ ] Measure both candidate serving paths on new validation only; choose by the predefined gate and record all compared settings, including a rejected candidate. Run legacy37 and validation synthetic stress without using the final partition.
 - [ ] Request a pre-final review of split/training/evaluation correctness. Freeze chosen checkpoint/settings/code in Git before running final test once.
 - [ ] Publish paired crop exact/CER/Wilson/latency and annotated-target detection/end-to-end results, denominators and every prediction. Label old benchmark reruns as regression. Do not tune after final results.

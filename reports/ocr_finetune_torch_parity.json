@@ -1,0 +1,413 @@
+{
+  "checkpoint_sha256": "5bc2283956c2d5741085ddadc0d77e4e5963bf13b2bfe2c10702e63c5b140de1",
+  "onnx_sha256": "5ad8cf39ce818b34b28f51e95efbed62e255b8b6131c0ceb35449949405796d9",
+  "source_sha256": "f4f0217ebd54f55b26329eaba923503c9c47b98f0447a948db4c1f9db50df6f0",
+  "selection": "Same32 validation IDs as the TF-FP32 export check; no final data.",
+  "runtime": {
+    "keras": "3.15.1",
+    "torch": "2.11.0+cu128",
+    "onnxruntime": "1.30.0"
+  },
+  "results": {
+    "float32": {
+      "same": 32,
+      "samples": 32,
+      "max_absolute_probability_difference": 2.384185791015625e-07,
+      "device": "cuda:0",
+      "results": [
+        {
+          "member": "detection/one_row/8_1221_1_36A08280_36_269_592_338.jpg",
+          "torch": "36A08280",
+          "onnx": "36A08280",
+          "same": true
+        },
+        {
+          "member": "detection/two_rows_label_xe_may/2_159_0_18T14401_404_63_569_206.jpg",
+          "torch": "18T14401",
+          "onnx": "18T14401",
+          "same": true
+        },
+        {
+          "member": "detection/two_rows/7_1811_0_36C22368_137_348_206_413.jpg",
+          "torch": "36C22368",
+          "onnx": "36C22368",
+          "same": true
+        },
+        {
+          "member": "detection/one_row/7_4720_1_36LD00023_226_240_481_301.jpg",
+          "torch": "36LD00023",
+          "onnx": "36LD00023",
+          "same": true
+        },
+        {
+          "member": "detection/two_rows_label_xe_may/7_1486_0_29E120041_408_9_549_128.jpg",
+          "torch": "29E120041",
+          "onnx": "29E120041",
+          "same": true
+        },
+        {
+          "member": "detection/one_row/4_1710_1_36A11325_59_237_528_343.jpg",
+          "torch": "36A11325",
+          "onnx": "36A11325",
+          "same": true
+        },
+        {
+          "member": "detection/one_row/6_3829_1_36M6022_61_237_546_321.jpg",
+          "torch": "36M6022",
+          "onnx": "36M6022",
+          "same": true
+        },
+        {
+          "member": "detection/one_row/4_2722_1_36C04174_99_210_517_279.jpg",
+          "torch": "36C04174",
+          "onnx": "36C04174",
+          "same": true
+        },
+        {
+          "member": "detection/two_rows/1_552_0_36A21202_476_225_544_297.jpg",
+          "torch": "36A21202",
+          "onnx": "36A21202",
+          "same": true
+        },
+        {
+          "member": "detection/one_row/7_2645_1_36A08896_115_244_552_308.jpg",
+          "torch": "36A08896",
+          "onnx": "36A08896",
+          "same": true
+        },
+        {
+          "member": "detection/two_rows/8_65_0_29R00575_128_265_171_314.jpg",
+          "torch": "29R00575",
+          "onnx": "29R00575",
+          "same": true
+        },
+        {
+          "member": "detection/two_rows/2_74_0_36A01789_409_182_486_264.jpg",
+          "torch": "36A01789",
+          "onnx": "36A01789",
+          "same": true
+        },
+        {
+          "member": "detection/two_rows/7_2024_0_36M5925_175_210_228_261.jpg",
+          "torch": "36M5925",
+          "onnx": "36M5925",
+          "same": true
+        },
+        {
+          "member": "detection/one_row/6_2570_1_36A41708_85_225_553_288.jpg",
+          "torch": "36A41708",
+          "onnx": "36A41708",
+          "same": true
+        },
+        {
+          "member": "detection/two_rows_label_xe_may/4_708_0_29T39217_503_25_635_161.jpg",
+          "torch": "29T39217",
+          "onnx": "29T39217",
+          "same": true
+        },
+        {
+          "member": "detection/two_rows/7_318_0_36A08828_148_215_204_278.jpg",
+          "torch": "36A08828",
+          "onnx": "36A08828",
+          "same": true
+        },
+        {
+          "member": "detection/one_row/4_1149_1_36C28338_120_296_199_344.jpg",
+          "torch": "36C28338",
+          "onnx": "36C28338",
+          "same": true
+        },
+        {
+          "member": "detection/two_rows_label_xe_may/4_1114_0_73b119325_424_191_546_299.jpg",
+          "torch": "73B119325",
+          "onnx": "73B119325",
+          "same": true
+        },
+        {
+          "member": "detection/two_rows_label_xe_may/2_266_0_36B664879_414_3_560_122.jpg",
+          "torch": "36B664879",
+          "onnx": "36B664879",
+          "same": true
+        },
+        {
+          "member": "detection/one_row/5_4088_1_36M9615_156_225_496_288.jpg",
+          "torch": "36M9615",
+          "onnx": "36M9615",
+          "same": true
+        },
+        {
+          "member": "detection/two_rows_label_xe_may/5_1629_0_29g150678_456_166_601_295.jpg",
+          "torch": "29G150678",
+          "onnx": "29G150678",
+          "same": true
+        },
+        {
+          "member": "detection/one_row/2_1539_1_36D01080_76_230_555_269.jpg",
+          "torch": "36D01080",
+          "onnx": "36D01080",
+          "same": true
+        },
+        {
+          "member": "detection/two_rows/1_1802_0_36M4201_443_274_498_329.jpg",
+          "torch": "36M4201",
+          "onnx": "36M4201",
+          "same": true
+        },
+        {
+          "member": "detection/two_rows/1_1404_0_36B03334_170_322_221_370.jpg",
+          "torch": "36B03334",
+          "onnx": "36B03334",
+          "same": true
+        },
+        {
+          "member": "detection/one_row/4_1987_1_36A25851_130_205_540_288.jpg",
+          "torch": "36A25851",
+          "onnx": "36A25851",
+          "same": true
+        },
+        {
+          "member": "detection/one_row/5_2702_1_36A41063_117_171_555_251.jpg",
+          "torch": "36A41063",
+          "onnx": "36A41063",
+          "same": true
+        },
+        {
+          "member": "detection/one_row/5_4076_1_36M8746_134_187_528_267.jpg",
+          "torch": "36M8746",
+          "onnx": "36M8746",
+          "same": true
+        },
+        {
+          "member": "detection/one_row/2_1475_1_36C25270_151_210_489_301.jpg",
+          "torch": "36C25270",
+          "onnx": "36C25270",
+          "same": true
+        },
+        {
+          "member": "detection/two_rows/1_1724_0_36D00576_182_246_270_329.jpg",
+          "torch": "36D00576",
+          "onnx": "36D00576",
+          "same": true
+        },
+        {
+          "member": "detection/one_row/1_3546_1_36B1419_26_281_620_380.jpg",
+          "torch": "36B1419",
+          "onnx": "36B1419",
+          "same": true
+        },
+        {
+          "member": "detection/two_rows_label_xe_may/3_528_0_36G117836_353_56_530_203.jpg",
+          "torch": "36G117836",
+          "onnx": "36G117836",
+          "same": true
+        },
+        {
+          "member": "detection/one_row/2_1260_1_36C07673_80_196_581_298.jpg",
+          "torch": "36C07673",
+          "onnx": "36C07673",
+          "same": true
+        }
+      ]
+    },
+    "mixed_float16": {
+      "same": 32,
+      "samples": 32,
+      "max_absolute_probability_difference": 0.0006821155548095703,
+      "device": "cuda:0",
+      "results": [
+        {
+          "member": "detection/one_row/8_1221_1_36A08280_36_269_592_338.jpg",
+          "torch": "36A08280",
+          "onnx": "36A08280",
+          "same": true
+        },
+        {
+          "member": "detection/two_rows_label_xe_may/2_159_0_18T14401_404_63_569_206.jpg",
+          "torch": "18T14401",
+          "onnx": "18T14401",
+          "same": true
+        },
+        {
+          "member": "detection/two_rows/7_1811_0_36C22368_137_348_206_413.jpg",
+          "torch": "36C22368",
+          "onnx": "36C22368",
+          "same": true
+        },
+        {
+          "member": "detection/one_row/7_4720_1_36LD00023_226_240_481_301.jpg",
+          "torch": "36LD00023",
+          "onnx": "36LD00023",
+          "same": true
+        },
+        {
+          "member": "detection/two_rows_label_xe_may/7_1486_0_29E120041_408_9_549_128.jpg",
+          "torch": "29E120041",
+          "onnx": "29E120041",
+          "same": true
+        },
+        {
+          "member": "detection/one_row/4_1710_1_36A11325_59_237_528_343.jpg",
+          "torch": "36A11325",
+          "onnx": "36A11325",
+          "same": true
+        },
+        {
+          "member": "detection/one_row/6_3829_1_36M6022_61_237_546_321.jpg",
+          "torch": "36M6022",
+          "onnx": "36M6022",
+          "same": true
+        },
+        {
+          "member": "detection/one_row/4_2722_1_36C04174_99_210_517_279.jpg",
+          "torch": "36C04174",
+          "onnx": "36C04174",
+          "same": true
+        },
+        {
+          "member": "detection/two_rows/1_552_0_36A21202_476_225_544_297.jpg",
+          "torch": "36A21202",
+          "onnx": "36A21202",
+          "same": true
+        },
+        {
+          "member": "detection/one_row/7_2645_1_36A08896_115_244_552_308.jpg",
+          "torch": "36A08896",
+          "onnx": "36A08896",
+          "same": true
+        },
+        {
+          "member": "detection/two_rows/8_65_0_29R00575_128_265_171_314.jpg",
+          "torch": "29R00575",
+          "onnx": "29R00575",
+          "same": true
+        },
+        {
+          "member": "detection/two_rows/2_74_0_36A01789_409_182_486_264.jpg",
+          "torch": "36A01789",
+          "onnx": "36A01789",
+          "same": true
+        },
+        {
+          "member": "detection/two_rows/7_2024_0_36M5925_175_210_228_261.jpg",
+          "torch": "36M5925",
+          "onnx": "36M5925",
+          "same": true
+        },
+        {
+          "member": "detection/one_row/6_2570_1_36A41708_85_225_553_288.jpg",
+          "torch": "36A41708",
+          "onnx": "36A41708",
+          "same": true
+        },
+        {
+          "member": "detection/two_rows_label_xe_may/4_708_0_29T39217_503_25_635_161.jpg",
+          "torch": "29T39217",
+          "onnx": "29T39217",
+          "same": true
+        },
+        {
+          "member": "detection/two_rows/7_318_0_36A08828_148_215_204_278.jpg",
+          "torch": "36A08828",
+          "onnx": "36A08828",
+          "same": true
+        },
+        {
+          "member": "detection/one_row/4_1149_1_36C28338_120_296_199_344.jpg",
+          "torch": "36C28338",
+          "onnx": "36C28338",
+          "same": true
+        },
+        {
+          "member": "detection/two_rows_label_xe_may/4_1114_0_73b119325_424_191_546_299.jpg",
+          "torch": "73B119325",
+          "onnx": "73B119325",
+          "same": true
+        },
+        {
+          "member": "detection/two_rows_label_xe_may/2_266_0_36B664879_414_3_560_122.jpg",
+          "torch": "36B664879",
+          "onnx": "36B664879",
+          "same": true
+        },
+        {
+          "member": "detection/one_row/5_4088_1_36M9615_156_225_496_288.jpg",
+          "torch": "36M9615",
+          "onnx": "36M9615",
+          "same": true
+        },
+        {
+          "member": "detection/two_rows_label_xe_may/5_1629_0_29g150678_456_166_601_295.jpg",
+          "torch": "29G150678",
+          "onnx": "29G150678",
+          "same": true
+        },
+        {
+          "member": "detection/one_row/2_1539_1_36D01080_76_230_555_269.jpg",
+          "torch": "36D01080",
+          "onnx": "36D01080",
+          "same": true
+        },
+        {
+          "member": "detection/two_rows/1_1802_0_36M4201_443_274_498_329.jpg",
+          "torch": "36M4201",
+          "onnx": "36M4201",
+          "same": true
+        },
+        {
+          "member": "detection/two_rows/1_1404_0_36B03334_170_322_221_370.jpg",
+          "torch": "36B03334",
+          "onnx": "36B03334",
+          "same": true
+        },
+        {
+          "member": "detection/one_row/4_1987_1_36A25851_130_205_540_288.jpg",
+          "torch": "36A25851",
+          "onnx": "36A25851",
+          "same": true
+        },
+        {
+          "member": "detection/one_row/5_2702_1_36A41063_117_171_555_251.jpg",
+          "torch": "36A41063",
+          "onnx": "36A41063",
+          "same": true
+        },
+        {
+          "member": "detection/one_row/5_4076_1_36M8746_134_187_528_267.jpg",
+          "torch": "36M8746",
+          "onnx": "36M8746",
+          "same": true
+        },
+        {
+          "member": "detection/one_row/2_1475_1_36C25270_151_210_489_301.jpg",
+          "torch": "36C25270",
+          "onnx": "36C25270",
+          "same": true
+        },
+        {
+          "member": "detection/two_rows/1_1724_0_36D00576_182_246_270_329.jpg",
+          "torch": "36D00576",
+          "onnx": "36D00576",
+          "same": true
+        },
+        {
+          "member": "detection/one_row/1_3546_1_36B1419_26_281_620_380.jpg",
+          "torch": "36B1419",
+          "onnx": "36B1419",
+          "same": true
+        },
+        {
+          "member": "detection/two_rows_label_xe_may/3_528_0_36G117836_353_56_530_203.jpg",
+          "torch": "36G117836",
+          "onnx": "36G117836",
+          "same": true
+        },
+        {
+          "member": "detection/one_row/2_1260_1_36C07673_80_196_581_298.jpg",
+          "torch": "36C07673",
+          "onnx": "36C07673",
+          "same": true
+        }
+      ]
+    }
+  }
+}

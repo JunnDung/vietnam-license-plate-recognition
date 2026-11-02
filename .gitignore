@@ -1,5 +1,6 @@
 .venv/
 .venv-train/
+.venv-export/
 models/training/
 __pycache__/
 *.pyc

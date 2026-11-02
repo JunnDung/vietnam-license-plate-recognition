@@ -8,12 +8,51 @@ from types import SimpleNamespace
 
 import numpy as np
 
-from scripts.prepare_ocr_training import build_groups, assign_splits, write_csvs
-from scripts.train_ocr import fetch_assets, training_progress
+from scripts.prepare_ocr_training import build_groups, assign_splits, write_csvs, split_unique_rows
+from scripts.train_ocr import fetch_assets, training_progress, verify_training_crops, sha
 from scripts.evaluate_ocr_finetune import adoption_checks, match_target, read_single
+from scripts.export_ocr import decode_texts, export_paths
 
 
 class TrainingDataChecks(unittest.TestCase):
+    def test_training_rejects_changed_pixels_and_paths_outside_data(self):
+        with tempfile.TemporaryDirectory() as folder:
+            root=Path(folder);(root/'data').mkdir();image=root/'data/a.png';image.write_bytes(b'pixels')
+            rows=[{'split':'train','image':'data/a.png','image_sha256':sha(image)}]
+            self.assertEqual(verify_training_crops(rows,root),1)
+            image.write_bytes(b'changed')
+            with self.assertRaisesRegex(ValueError,'checksum'):verify_training_crops(rows,root)
+            rows[0]['image']='../outside.png'
+            with self.assertRaisesRegex(ValueError,'outside'):verify_training_crops(rows,root)
+            outside=root/'outside.png';outside.write_bytes(b'pixels')
+            link=root/'data/link.png'
+            try:link.symlink_to(outside)
+            except OSError:return  # Windows without symlink privilege still runs the other boundary checks.
+            rows[0].update(image='data/link.png',image_sha256=sha(outside))
+            with self.assertRaisesRegex(ValueError,'outside'):verify_training_crops(rows,root)
+
+    def test_deduplication_preserves_reserved_links_from_all_captures(self):
+        rows=[{'member':m,'plate':p,'source_pixel_sha256':s,'pixel_sha256':c}
+              for m,p,s,c in [('a','A','s1','same'),('b','A','s2','same'),('c','B','s2','other')]]
+        selected,audit=split_unique_rows(rows,set(),{'s2'},'seed')
+        self.assertEqual(audit['duplicate_images'],1)
+        self.assertEqual({r['split'] for r in selected},{'excluded'})
+        self.assertEqual(len({r['group'] for r in selected}),1)
+
+    def test_export_never_overwrites_a_resumable_checkpoint(self):
+        with tempfile.TemporaryDirectory() as folder:
+            checkpoint=Path(folder)/'best.keras';checkpoint.write_bytes(b'optimizer and weights')
+            output=Path(folder)/'best.onnx'
+            fp32=export_paths(output)
+            self.assertEqual(fp32.name,'best-fp32.keras')
+            self.assertEqual(checkpoint.read_bytes(),b'optimizer and weights')
+            fp32.write_bytes(b'prior export')
+            with self.assertRaises(FileExistsError):export_paths(output)
+
+    def test_export_decoder_preserves_slots_and_strips_only_trailing_padding(self):
+        probabilities=np.eye(3,dtype=np.float32)[np.array([[0,2],[1,0]])]
+        self.assertEqual(decode_texts(probabilities,'AB_',2),['A','BA'])
+
     def test_adoption_rejects_accuracy_character_layout_latency_and_legacy_regressions(self):
         base={'samples':1000,'correct':960,'cer':.01,'latency_p95_ms':100.,
               'two_lines':{'samples':400,'correct':370},'pipeline_exact_match':.94}

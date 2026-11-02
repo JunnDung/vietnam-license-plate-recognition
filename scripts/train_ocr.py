@@ -23,6 +23,19 @@ def sha(path):
     with Path(path).open('rb') as file:return hashlib.file_digest(file,'sha256').hexdigest()
 
 
+def verify_training_crops(samples,root):
+    count=0;parents={};data=(root/'data').resolve()
+    for row in samples:
+        if row['split'] not in ('train','val'):continue
+        path=root/row['image']
+        if path.parent not in parents:parents[path.parent]=path.parent.resolve()
+        resolved=path.resolve() if path.is_symlink() else parents[path.parent]/path.name
+        if not resolved.is_relative_to(data):raise ValueError('Training image outside data directory')
+        if sha(path)!=row['image_sha256']:raise ValueError('Training image checksum mismatch')
+        count+=1
+    return count
+
+
 def fetch_assets(folder):
     folder.mkdir(parents=True,exist_ok=True)
     for name,expected in ASSETS.items():
@@ -86,6 +99,7 @@ def main():
     if run.exists():parser.error('Run exists; preserve checkpoints and use a new name')
     manifest_path=ROOT/'reports/ocr_finetune_manifest.json'
     manifest=json.loads(manifest_path.read_text(encoding='utf-8'))
+    verified_images=verify_training_crops(manifest['samples'],ROOT)
     data=ROOT/'data/ocr_training'
     for split in ('train','val'):
         if sha(data/(split+'.csv'))!=manifest['csv_sha256'][split]:raise ValueError('Training CSV checksum mismatch')
@@ -132,6 +146,7 @@ def main():
     started=time.monotonic();stopped=threading.Event()
     status={'state':'training','started_at':datetime.now(timezone.utc).isoformat(),'pid':os.getpid(),
         'manifest_sha256':sha(manifest_path),'assets':{name:{'url':BASE+name,'sha256':expected} for name,expected in ASSETS.items()},
+        'verified_training_validation_images':verified_images,
         'dependency_lock_sha256':sha(ROOT/'requirements-ocr-train-lock.txt'),
         'training_source_sha256':sha(Path(__file__)),
         'primary_metric':'Per-sample whole-plate slot exact accuracy; fixes upstream batch-mean weighting. Auxiliary metrics remain upstream batch means; region head has zero loss weight.',

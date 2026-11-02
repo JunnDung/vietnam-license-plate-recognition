@@ -1,0 +1,78 @@
+{
+  "state": "complete",
+  "started_at": "2026-11-01T22:41:52.987391+00:00",
+  "pid": 14428,
+  "manifest_sha256": "4a81ed7de5aff2905eb897b1737369f8f13d48a89d66824ae9e4a877387a7c8c",
+  "assets": {
+    "cct_s_v2_global.keras": {
+      "url": "https://github.com/ankandrew/fast-plate-ocr/releases/download/arg-plates/cct_s_v2_global.keras",
+      "sha256": "dc6db494714d88e1fb0a21b4e4e96089842dd5440418262abfc382454453c2c8"
+    },
+    "cct_s_v2_global_model_config.yaml": {
+      "url": "https://github.com/ankandrew/fast-plate-ocr/releases/download/arg-plates/cct_s_v2_global_model_config.yaml",
+      "sha256": "244c3c712205750e9747bca4707cd553a84005f41959745bff676b0fca8faba3"
+    },
+    "cct_s_v2_global_plate_config.yaml": {
+      "url": "https://github.com/ankandrew/fast-plate-ocr/releases/download/arg-plates/cct_s_v2_global_plate_config.yaml",
+      "sha256": "0335c74a305173bb6f393efed0fde03cadeaa0b649ed8e19f431016d8232d0a6"
+    }
+  },
+  "dependency_lock_sha256": "3a8a118ef58458d73c5f930c7ce0b5ffac0e78609313a89ea3eb3f2c1dc23619",
+  "training_source_sha256": "20d8601bcfd5dd7ff63ac3e859c785ab3dfcaebd18e2b63092373a13682719b8",
+  "primary_metric": "Per-sample whole-plate slot exact accuracy; fixes upstream batch-mean weighting. Auxiliary metrics remain upstream batch means; region head has zero loss weight.",
+  "augmentation_seed_persisted": 20261102,
+  "data_csv_sha256": {
+    "train": "b5d03f230fdf7909ea9f24400c963d0d4237b4ee8102ad2799362466d2ca5764",
+    "val": "5e06e46890b2011f30f9da59bdb8cc422ad1545b3a8bbe21842f1fe995fc861e"
+  },
+  "seed": 20261102,
+  "settings": {
+    "epochs_max": 30,
+    "batch": 32,
+    "learning_rate": 0.0001,
+    "early_stopping_patience": 6,
+    "region_loss_weight": 0.0,
+    "plate_loss_weight": 1.0,
+    "mixed_precision": "mixed_float16"
+  },
+  "runtime": {
+    "keras": "3.15.1",
+    "torch": "2.11.0+cu128",
+    "gpu": "NVIDIA GeForce RTX 3060 Laptop GPU"
+  },
+  "sanity": {
+    "loss": 6.828284740447998,
+    "plate_loss": 6.828284740447998,
+    "region_loss": 7.6905317306518555
+  },
+  "completed_epochs": 16,
+  "elapsed_seconds": 8063.828000000001,
+  "last_metrics": {
+    "epoch": 15.0,
+    "loss": 0.02073625847697258,
+    "plate_acc": 0.973866879940033,
+    "plate_char_acc": 0.995893120765686,
+    "plate_len_acc": 0.9971051216125488,
+    "plate_loss": 0.02073625847697258,
+    "plate_top3_acc": 0.9988614320755005,
+    "region_acc": 0.7440513968467712,
+    "region_loss": 0.6650109887123108,
+    "region_macro_f1": 0.012934975326061249,
+    "region_top3_acc": 0.9881213307380676,
+    "val_loss": 0.03648068755865097,
+    "val_plate_acc": 0.9821337461471558,
+    "val_plate_char_acc": 0.9950822591781616,
+    "val_plate_len_acc": 0.9934476017951965,
+    "val_plate_loss": 0.03648068755865097,
+    "val_plate_top3_acc": 0.9971774816513062,
+    "val_region_acc": 0.7406840324401855,
+    "val_region_loss": 0.6129453182220459,
+    "val_region_macro_f1": 0.012904543429613113,
+    "val_region_top3_acc": 0.9908116459846497
+  },
+  "best_validation_accuracy": 0.9846860766410828,
+  "best_epoch": 10,
+  "checkpoint_dir": "runs\\ocr_finetune_exact\\2026-11-02_05-41-54",
+  "best_checkpoint_sha256": "5bc2283956c2d5741085ddadc0d77e4e5963bf13b2bfe2c10702e63c5b140de1",
+  "last_checkpoint_sha256": "064a60c9003e75ea35cd927e01c116c4014ccca56e0a7518ff80d102790b0f67"
+}
