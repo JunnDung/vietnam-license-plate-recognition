@@ -1,0 +1,21 @@
+{
+  "model": "CCT S v2 Vietnamese fine-tune",
+  "trained_in_this_project": true,
+  "mode": "single",
+  "initialization": "https://github.com/ankandrew/fast-plate-ocr/releases/tag/arg-plates",
+  "initial_checkpoint_sha256": "dc6db494714d88e1fb0a21b4e4e96089842dd5440418262abfc382454453c2c8",
+  "best_keras_sha256": "5bc2283956c2d5741085ddadc0d77e4e5963bf13b2bfe2c10702e63c5b140de1",
+  "files": {
+    "plate_ocr_vn.onnx": {
+      "sha256": "5ad8cf39ce818b34b28f51e95efbed62e255b8b6131c0ceb35449949405796d9",
+      "bytes": 5282462
+    },
+    "plate_ocr_vn_config.yaml": {
+      "sha256": "0335c74a305173bb6f393efed0fde03cadeaa0b649ed8e19f431016d8232d0a6",
+      "bytes": 1725
+    }
+  },
+  "training_report": "reports/ocr_finetune_training.json",
+  "selection_report": "reports/ocr_finetune_selection.json",
+  "limitations": "Filename labels not fully independently verified; upstream pretraining overlap unknown; no physical-camera acceptance. Source VNLP images not redistributed."
+}

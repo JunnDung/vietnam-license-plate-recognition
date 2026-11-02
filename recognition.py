@@ -1,4 +1,4 @@
-"""YOLO detector + pretrained plate OCR. No fabricated text or registry lookup."""
+"""YOLO detector + Vietnamese fine-tuned OCR. No fabricated text or registry lookup."""
 import io
 import hashlib
 import math
@@ -135,12 +135,13 @@ class PlateEngine:
 
         torch.set_num_threads(2)
         self.detector_weights_sha256 = hashlib.sha256((ROOT/'models/plate_detector.pt').read_bytes()).hexdigest() if detector is None else None
+        self.ocr_weights_sha256 = hashlib.sha256((ROOT/'models/plate_ocr_vn.onnx').read_bytes()).hexdigest() if ocr is None else None
         self.detector = detector if detector is not None else YOLO(str(ROOT / 'models/plate_detector.pt'))
         options = ort.SessionOptions()
         options.intra_op_num_threads = 2
         self.ocr = ocr if ocr is not None else LicensePlateRecognizer(
-            onnx_model_path=ROOT / 'models/plate_ocr.onnx',
-            plate_config_path=ROOT / 'models/plate_ocr_config.yaml',
+            onnx_model_path=ROOT / 'models/plate_ocr_vn.onnx',
+            plate_config_path=ROOT / 'models/plate_ocr_vn_config.yaml',
             providers=['CPUExecutionProvider'], sess_options=options)
         self.device = ('0' if torch.cuda.is_available() else 'cpu') if device == 'auto' else device
         self.min_detail = float(os.getenv('PLATE_MIN_DETAIL', '25'))
@@ -153,18 +154,8 @@ class PlateEngine:
     def read_crop(self, crop, square=False):
         if min(crop.shape[:2]) < 8:
             return {'plate': '', 'raw_text': '', 'ocr_confidence': 0., 'valid_format': False}
-        variants = [crop]
-        if square or crop.shape[1] / crop.shape[0] < 2.2:
-            variants.append(flatten_two_lines(crop))
-        lab = cv2.cvtColor(variants[-1], cv2.COLOR_BGR2LAB)
-        lab[:, :, 0] = cv2.createCLAHE(clipLimit=2., tileGridSize=(4, 4)).apply(lab[:, :, 0])
-        variants.append(cv2.cvtColor(lab, cv2.COLOR_LAB2BGR))
-        if square or crop.shape[1] / crop.shape[0] < 2.2:
-            rectified = rectify_plate(crop)
-            if rectified is not None:
-                variants.append(flatten_two_lines(rectified))
         # FastPlateOCR's RGB model assumes in-memory arrays already use RGB.
-        predictions = self.ocr.run([cv2.cvtColor(image, cv2.COLOR_BGR2RGB) for image in variants], return_confidence=True)
+        predictions = self.ocr.run([cv2.cvtColor(crop, cv2.COLOR_BGR2RGB)], return_confidence=True)
         return decode_predictions(predictions)
 
     def predict(self, image, confidence=.35):

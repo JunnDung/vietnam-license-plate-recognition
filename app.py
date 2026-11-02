@@ -76,7 +76,7 @@ def authorized(request: Request):
         raise HTTPException(401, 'API key không hợp lệ.')
 
 
-app = FastAPI(title='Biển Số Việt · Recognition API', version='1.4.0', lifespan=lifespan)
+app = FastAPI(title='Biển Số Việt · Recognition API', version='1.5.0', lifespan=lifespan)
 
 
 @app.middleware('http')
@@ -98,24 +98,26 @@ async def reject_large_requests(request, call_next):
 @app.get('/api/health')
 def health():
     return {'status': 'ready' if getattr(app.state, 'engine', None) else 'model_unavailable',
-            'detector': 'YOLO11n · fine-tuned Vietnamese plates', 'ocr': 'CCT S v2 · pretrained',
+            'detector': 'YOLO11n · fine-tuned Vietnamese plates', 'ocr': 'CCT S v2 · fine-tuned Vietnamese plates · single crop',
             'device': getattr(getattr(app.state, 'engine', None), 'device', None), 'auth_required': bool(API_KEY),
             'version': app.version, 'storage_free_mb': round(shutil.disk_usage(DATA).free / 1024**2),
             'detector_weights_sha256': getattr(getattr(app.state, 'engine', None), 'detector_weights_sha256', None),
+            'ocr_weights_sha256': getattr(getattr(app.state, 'engine', None), 'ocr_weights_sha256', None),
             'model_error': getattr(app.state, 'model_error', None)}
 
 
 @app.get('/api/model', dependencies=[Depends(authorized)])
 def model_report():
     reports = {}
-    for name in ('training', 'robustness', 'ocr_evaluation', 'hardening', 'ocr_weather', 'real_video', 'ocr_benchmark'):
+    for name in ('training', 'robustness', 'ocr_evaluation', 'hardening', 'ocr_weather', 'real_video', 'ocr_benchmark',
+                 'ocr_finetune_release', 'ocr_finetune_training', 'ocr_finetune_test'):
         path = ROOT / 'reports' / (name + '.json')
         if path.exists():
             reports[name] = json.loads(path.read_text(encoding='utf-8'))
             if name == 'real_video':
                 for clip in reports[name]['clips']:
                     clip.pop('frames',None)
-            if name == 'ocr_benchmark':
+            if name in ('ocr_benchmark', 'ocr_finetune_test'):
                 for result in reports[name]['results'].values():
                     result.pop('predictions',None)
     return reports

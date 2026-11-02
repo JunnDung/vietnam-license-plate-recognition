@@ -15,3 +15,5 @@ yolo*.pt
 models/*.onnx
 models/*config.yaml
 !models/README.md
+!models/plate_ocr_vn.onnx
+!models/plate_ocr_vn_config.yaml

@@ -1,0 +1,7 @@
+{
+  "version": "1.5.0",
+  "candidate_mode": "single",
+  "adopted": true,
+  "report_date": "2 thang 11 nam 2026",
+  "selection_report": "reports/ocr_finetune_selection.json"
+}

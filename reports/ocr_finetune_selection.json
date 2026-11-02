@@ -1,0 +1,14 @@
+{
+  "version": "1.5.0",
+  "candidate_mode": "single",
+  "adopted": true,
+  "validation_report_sha256": "0eca9264e152b01138679b6a59792f1a2491af58772af43203e78939c9ea52b2",
+  "candidate_weights_sha256": "5ad8cf39ce818b34b28f51e95efbed62e255b8b6131c0ceb35449949405796d9",
+  "candidate_config_sha256": "0335c74a305173bb6f393efed0fde03cadeaa0b649ed8e19f431016d8232d0a6",
+  "inference_source_sha256": "78d6f591ffcc8935f1d0f04173e7620d52d927e1e584242c9f8927459f38ef7b",
+  "evaluation_source_sha256": "3cc62abbd88e8acc4cc0bc4d217ce55da250b4ca8e369f821441d05e6e86b20c",
+  "manifest_sha256": "4a81ed7de5aff2905eb897b1737369f8f13d48a89d66824ae9e4a877387a7c8c",
+  "reason": "Both modes pass all six gates; single has higher exact match, lower CER and lower p95. Selection uses validation only. Motion-blur stress regresses104/200 versus106/200; disclosed, not an adoption gate.",
+  "new_final_test_status_at_freeze": "UNRUN",
+  "pre_final_review": "finetune_pretest_review: grouping-before-dedup and original Torch parity corrections independently verified; no remaining blocker."
+}

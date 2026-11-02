@@ -182,11 +182,17 @@ async function showModel() {
   try {
     const data=await (await api('/api/model')).json(); $('metrics').replaceChildren(); const test=data.training?.test || {};
     const metrics=[['mAP@50 · detection / test',test['metrics/mAP50(B)']],['mAP@50–95 · detection / test',test['metrics/mAP50-95(B)']],['Recall · detection / test',test['metrics/recall(B)']]];
-    const ocr=data.ocr_benchmark?.results?.candidate;
+    const release=data.ocr_finetune_release;
+    const ocr=release ? data.ocr_finetune_test?.results?.[release.adopted ? release.candidate_mode : 'baseline'] : data.ocr_benchmark?.results?.candidate;
     if (ocr) metrics.push([`Đọc đúng cả biển · VNLP test (${ocr.samples} crop)`,ocr.exact_match]);
+    if (release && ocr) metrics.push([`Phát hiện + đọc đúng mục tiêu · ${ocr.samples} ảnh nguồn`,ocr.pipeline_exact_match]);
     if (data.ocr_evaluation) metrics.push(['Hồi quy v1.3 · đọc crop',data.ocr_evaluation.exact_match], ['Hồi quy v1.3 · phát hiện + đọc',data.ocr_evaluation.pipeline_exact_match]);
     for(const [label,value] of metrics) { const card=element('div','metric'); card.append(element('b','',value===undefined ? 'Chưa đo' : `${(value*100).toFixed(1)}%`),element('span','',label)); $('metrics').append(card); }
-    if(ocr) $('metrics').append(element('p','hint',`VNLP: ${ocr.correct}/${ocr.samples} crop đúng cả biển; CER ${(ocr.cer*100).toFixed(2)}%; khoảng Wilson 95% ${(ocr.wilson95[0]*100).toFixed(2)}–${(ocr.wilson95[1]*100).toFixed(2)}%. Tách theo biển số với tập phát triển; chưa rõ mức trùng dữ liệu pretrain của OCR. Đây là phép đo crop, chưa phải kết quả toàn camera.`));
+    if(ocr) $('metrics').append(element('p','hint',`VNLP: ${ocr.correct}/${ocr.samples} crop đúng cả biển; CER ${(ocr.cer*100).toFixed(3)}%; khoảng Wilson 95% ${(ocr.wilson95[0]*100).toFixed(2)}–${(ocr.wilson95[1]*100).toFixed(2)}%. Tách theo ID biển; chưa rõ mức trùng dữ liệu pretrain của OCR. Nhãn nguồn chưa được kiểm tra độc lập. Chưa nghiệm thu camera mới.`));
+    if(release && ocr) {
+      $('ocr-description').textContent=release.adopted ? `CCT S v2 fine-tune trên 26.939 crop Việt Nam, chạy ONNX CPU theo cách ${release.candidate_mode}.` : 'CCT S v2 pretrained vẫn là model hoạt động. Candidate fine-tune chưa vượt đủ tiêu chí thay model.';
+      $('metrics').append(element('p','hint',`Model hoạt động ${release.version}: OCR p50/p95 ${ocr.latency_p50_ms.toFixed(1)}/${ocr.latency_p95_ms.toFixed(1)} ms; pipeline p50/p95 ${ocr.pipeline_p50_ms.toFixed(1)}/${ocr.pipeline_p95_ms.toFixed(1)} ms. Không gồm IO/HTTP/lưu ảnh. Pipeline chỉ đo mục tiêu có nhãn IoU ≥0,5, chưa phải precision mọi biển trong cảnh. Các phép đo v1.3/v1.4 bên dưới là lịch sử với trọng số/cấu hình lúc đo.`));
+    }
     if(data.ocr_evaluation) $('metrics').append(element('p','hint',`Mẫu OCR: ${data.ocr_evaluation.samples} biển số được phiên âm bằng mắt từ ảnh test. Mẫu nhỏ, không đại diện toàn bộ camera.`));
     const conditions={original:'Ảnh gốc',synthetic_dark:'Thiếu sáng mô phỏng',synthetic_rain_fog:'Mưa/sương mô phỏng',synthetic_motion_blur:'Mờ chuyển động mô phỏng'};
     if(data.robustness) for(const [name,item] of Object.entries(data.robustness.conditions)) {

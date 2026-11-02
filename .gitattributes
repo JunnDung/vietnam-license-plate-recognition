@@ -12,3 +12,7 @@ scripts/verify_ocr_checkpoint.py text eol=lf
 reports/ocr_finetune*.json text eol=lf
 requirements-ocr-train*.txt text eol=lf
 requirements-ocr-export*.txt text eol=lf
+reports/ocr_finetune*.csv text eol=lf
+reports/ocr_finetune*.yaml text eol=lf
+models/plate_ocr_vn.onnx -text
+models/plate_ocr_vn_config.yaml text eol=lf

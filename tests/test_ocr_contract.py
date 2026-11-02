@@ -2,6 +2,7 @@
 import unittest
 from types import SimpleNamespace
 import json
+import hashlib
 from pathlib import Path
 import tempfile
 from unittest.mock import patch
@@ -13,6 +14,16 @@ from recognition import PlateEngine, rectify_plate, decode_predictions
 
 
 class OCRContracts(unittest.TestCase):
+    def test_packaged_active_model_matches_export_and_provenance(self):
+        root=Path(__file__).resolve().parents[1]
+        provenance=json.loads((root/'models/ocr_vn_provenance.json').read_text())
+        exported=json.loads((root/'reports/ocr_finetune_export.json').read_text())
+        for name,item in provenance['files'].items():
+            raw=(root/'models'/name).read_bytes()
+            self.assertEqual(hashlib.sha256(raw).hexdigest(),item['sha256'])
+            self.assertEqual(len(raw),item['bytes'])
+        self.assertEqual(provenance['files']['plate_ocr_vn.onnx']['sha256'],exported['onnx_sha256'])
+
     def test_shared_prediction_decoding_preserves_normalized_slots(self):
         result=decode_predictions([SimpleNamespace(plate='51A_12345',char_probs=[.9,.9,.9,.01,.8,.8,.8,.8,.8,.01])])
         self.assertEqual(result['plate'],'51A12345')
@@ -26,9 +37,14 @@ class OCRContracts(unittest.TestCase):
             report={'results':{'baseline':{'correct':9,'predictions':[{'expected':'51A12345'}]},
                                'candidate':{'correct':10,'predictions':[{'expected':'51A12345'}]}}}
             (root/'reports/ocr_benchmark.json').write_text(json.dumps(report),encoding='utf-8')
-            with patch.object(app,'ROOT',root):result=app.model_report()['ocr_benchmark']
-            self.assertEqual(result['results']['candidate']['correct'],10)
-            for item in result['results'].values():self.assertNotIn('predictions',item)
+            (root/'reports/ocr_finetune_test.json').write_text(json.dumps(report),encoding='utf-8')
+            (root/'reports/ocr_finetune_release.json').write_text('{"adopted":true}',encoding='utf-8')
+            with patch.object(app,'ROOT',root):reports=app.model_report()
+            self.assertTrue(reports['ocr_finetune_release']['adopted'])
+            for name in ('ocr_benchmark','ocr_finetune_test'):
+                result=reports[name]
+                self.assertEqual(result['results']['candidate']['correct'],10)
+                for item in result['results'].values():self.assertNotIn('predictions',item)
 
     def test_rectification_uses_large_bright_plate_border_only(self):
         crop=np.zeros((140,220,3),np.uint8)
@@ -45,7 +61,7 @@ class OCRContracts(unittest.TestCase):
         cv2.fillConvexPoly(small,corners//3,(230,230,230))
         self.assertIsNone(rectify_plate(small))
 
-    def test_rgb_for_every_variant_without_mutating_bgr(self):
+    def test_active_single_crop_rgb_without_mutating_bgr(self):
         crop=np.full((40,100,3),(10,20,200),dtype=np.uint8)
         original=crop.copy()
         received=[]
@@ -55,7 +71,7 @@ class OCRContracts(unittest.TestCase):
         engine=object.__new__(PlateEngine)
         engine.ocr=SimpleNamespace(run=run)
         engine.read_crop(crop,square=True)
-        self.assertEqual(len(received),3)
+        self.assertEqual(len(received),1)
         np.testing.assert_array_equal(received[0][0,0],[200,20,10])
         for image in received:
             self.assertGreater(image[:,:,0].mean(),image[:,:,2].mean())
